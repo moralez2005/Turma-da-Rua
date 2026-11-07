@@ -8,7 +8,7 @@ Projeto desenvolvido para o workshop **IBM SkillsBuild · #IBMBOB**.
 
 ## ▶️ Jogue agora
 
-**👉 [https://moralez2005.github.io/turma-da-rua/](https://moralez2005.github.io/turma-da-rua/)**
+**👉 [https://moralez2005.github.io/Turma-da-Rua/](https://moralez2005.github.io/Turma-da-Rua/)**
 
 Funciona direto no navegador do computador, sem instalar nada.
 

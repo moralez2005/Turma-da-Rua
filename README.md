@@ -8,7 +8,7 @@ Projeto desenvolvido para o workshop **IBM SkillsBuild · #IBMBOB**.
 
 ## ▶️ Jogue agora
 
-**👉 [https://SEU-USUARIO.github.io/turma-da-rua/](https://SEU-USUARIO.github.io/turma-da-rua/)**
+**👉 [https://moralez2005.github.io/turma-da-rua/](https://moralez2005.github.io/turma-da-rua/)**
 
 Funciona direto no navegador do computador, sem instalar nada.
 
@@ -25,11 +25,16 @@ Funciona direto no navegador do computador, sem instalar nada.
 
 ![Seleção de personagens](assets/prints/02_selecao.png)
 
-| Futebol | Queimada |
-| --- | --- |
-| ![Futebol](assets/prints/03_futebol.png) | ![Queimada](assets/prints/04_queimada.png) |
-| **Alerta** | **Esconde-esconde** |
-| ![Alerta](assets/prints/05_alerta.png) | ![Esconde-esconde](assets/prints/06_esconde.png) |
+<table>
+  <tr>
+    <td align="center"><img src="assets/prints/03_futebol.png" alt="Futebol" width="400"><br><b>Futebol</b></td>
+    <td align="center"><img src="assets/prints/04_queimada.png" alt="Queimada" width="400"><br><b>Queimada</b></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="assets/prints/05_alerta.png" alt="Alerta" width="400"><br><b>Alerta</b></td>
+    <td align="center"><img src="assets/prints/06_esconde.png" alt="Esconde-esconde" width="400"><br><b>Esconde-esconde</b></td>
+  </tr>
+</table>
 
 ![Fim de tarde](assets/prints/08_fim_de_tarde.png)
 

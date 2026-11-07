@@ -1,0 +1,636 @@
+{
+ "tamanho": [
+  1920,
+  1080
+ ],
+ "pique": {
+  "x": 960,
+  "y": 338
+ },
+ "solidos": [
+  [
+   0,
+   60,
+   240,
+   240
+  ],
+  [
+   240,
+   60,
+   50,
+   240
+  ],
+  [
+   352,
+   60,
+   168,
+   240
+  ],
+  [
+   290,
+   60,
+   62,
+   150
+  ],
+  [
+   520,
+   40,
+   80,
+   26
+  ],
+  [
+   600,
+   60,
+   260,
+   240
+  ],
+  [
+   860,
+   60,
+   260,
+   240
+  ],
+  [
+   1120,
+   40,
+   240,
+   260
+  ],
+  [
+   1360,
+   60,
+   300,
+   240
+  ],
+  [
+   1660,
+   60,
+   40,
+   240
+  ],
+  [
+   1880,
+   0,
+   40,
+   300
+  ],
+  [
+   430,
+   693,
+   16,
+   180
+  ],
+  [
+   430,
+   950,
+   16,
+   130
+  ],
+  [
+   446,
+   693,
+   194,
+   15
+  ],
+  [
+   700,
+   693,
+   220,
+   15
+  ],
+  [
+   920,
+   693,
+   16,
+   70
+  ],
+  [
+   920,
+   830,
+   16,
+   250
+  ],
+  [
+   936,
+   693,
+   140,
+   15
+  ],
+  [
+   1136,
+   693,
+   563,
+   15
+  ],
+  [
+   1060,
+   760,
+   440,
+   250
+  ],
+  [
+   240,
+   400,
+   180,
+   30
+  ],
+  [
+   1095,
+   604,
+   170,
+   26
+  ],
+  [
+   147,
+   324,
+   26,
+   10
+  ],
+  [
+   631,
+   320,
+   90,
+   12
+  ],
+  [
+   1024,
+   324,
+   32,
+   10
+  ],
+  [
+   1210,
+   324,
+   20,
+   10
+  ],
+  [
+   1422,
+   322,
+   96,
+   12
+  ],
+  [
+   1540,
+   326,
+   100,
+   10
+  ],
+  [
+   240,
+   802,
+   120,
+   18
+  ],
+  [
+   60,
+   1020,
+   160,
+   20
+  ],
+  [
+   362,
+   708,
+   56,
+   12
+  ],
+  [
+   548,
+   888,
+   24,
+   12
+  ],
+  [
+   665,
+   814,
+   190,
+   6
+  ],
+  [
+   825,
+   946,
+   70,
+   14
+  ],
+  [
+   492,
+   1040,
+   16,
+   10
+  ],
+  [
+   958,
+   890,
+   64,
+   10
+  ],
+  [
+   1530,
+   1028,
+   60,
+   12
+  ],
+  [
+   1515,
+   854,
+   170,
+   26
+  ],
+  [
+   1855,
+   888,
+   90,
+   12
+  ],
+  [
+   532,
+   104,
+   56,
+   12
+  ]
+ ],
+ "objetos": [
+  {
+   "id": "o0",
+   "tipo": "kombi",
+   "x": 330,
+   "y": 430,
+   "w": 200,
+   "h": 120,
+   "nome": "Atrás da Kombi",
+   "cobre": true,
+   "pe": [
+    180,
+    30
+   ],
+   "mato": false,
+   "copa": false
+  },
+  {
+   "id": "o1",
+   "tipo": "carro",
+   "x": 1180,
+   "y": 630,
+   "w": 190,
+   "h": 96,
+   "nome": "Atrás do carro parado",
+   "cobre": true,
+   "pe": [
+    170,
+    26
+   ],
+   "mato": false,
+   "copa": false
+  },
+  {
+   "id": "o2",
+   "tipo": "lixeira",
+   "x": 160,
+   "y": 334,
+   "w": 40,
+   "h": 60,
+   "nome": "Atrás da lixeira",
+   "cobre": true,
+   "pe": [
+    26,
+    10
+   ],
+   "mato": false,
+   "copa": false
+  },
+  {
+   "id": "o3",
+   "tipo": "arbusto",
+   "x": 676,
+   "y": 332,
+   "w": 110,
+   "h": 70,
+   "nome": "No arbusto da casa amarela",
+   "cobre": true,
+   "pe": [
+    90,
+    12
+   ],
+   "mato": false,
+   "copa": false
+  },
+  {
+   "id": "o4",
+   "tipo": "tambor",
+   "x": 1040,
+   "y": 334,
+   "w": 44,
+   "h": 64,
+   "nome": "Atrás do tambor azul",
+   "cobre": true,
+   "pe": [
+    32,
+    10
+   ],
+   "mato": false,
+   "copa": false
+  },
+  {
+   "id": "o5",
+   "tipo": "orelhao",
+   "x": 1220,
+   "y": 334,
+   "w": 60,
+   "h": 120,
+   "nome": "Atrás do orelhão",
+   "cobre": true,
+   "pe": [
+    20,
+    10
+   ],
+   "mato": false,
+   "copa": false
+  },
+  {
+   "id": "o6",
+   "tipo": "engradados",
+   "x": 1470,
+   "y": 334,
+   "w": 110,
+   "h": 84,
+   "nome": "Atrás dos engradados do bar",
+   "cobre": true,
+   "pe": [
+    96,
+    12
+   ],
+   "mato": false,
+   "copa": false
+  },
+  {
+   "id": "o7",
+   "tipo": "mesa",
+   "x": 1590,
+   "y": 336,
+   "w": 120,
+   "h": 70,
+   "nome": "Debaixo da mesa do bar",
+   "cobre": true,
+   "pe": [
+    100,
+    10
+   ],
+   "mato": false,
+   "copa": false
+  },
+  {
+   "id": "o8",
+   "tipo": "mato",
+   "x": 110,
+   "y": 900,
+   "w": 150,
+   "h": 100,
+   "nome": "No mato alto (1)",
+   "cobre": true,
+   "pe": [
+    0,
+    0
+   ],
+   "mato": true,
+   "copa": false
+  },
+  {
+   "id": "o9",
+   "tipo": "mato",
+   "x": 330,
+   "y": 1060,
+   "w": 150,
+   "h": 100,
+   "nome": "No mato alto (2)",
+   "cobre": true,
+   "pe": [
+    0,
+    0
+   ],
+   "mato": true,
+   "copa": false
+  },
+  {
+   "id": "o10",
+   "tipo": "mato",
+   "x": 820,
+   "y": 1060,
+   "w": 150,
+   "h": 100,
+   "nome": "No mato do quintal",
+   "cobre": true,
+   "pe": [
+    0,
+    0
+   ],
+   "mato": true,
+   "copa": false
+  },
+  {
+   "id": "o11",
+   "tipo": "entulho",
+   "x": 300,
+   "y": 820,
+   "w": 140,
+   "h": 80,
+   "nome": "Atrás do entulho",
+   "cobre": true,
+   "pe": [
+    120,
+    18
+   ],
+   "mato": false,
+   "copa": false
+  },
+  {
+   "id": "o12",
+   "tipo": "cacamba",
+   "x": 140,
+   "y": 1040,
+   "w": 170,
+   "h": 90,
+   "nome": "Atrás da caçamba",
+   "cobre": true,
+   "pe": [
+    160,
+    20
+   ],
+   "mato": false,
+   "copa": false
+  },
+  {
+   "id": "o13",
+   "tipo": "pneus",
+   "x": 390,
+   "y": 720,
+   "w": 70,
+   "h": 76,
+   "nome": "Atrás dos pneus",
+   "cobre": true,
+   "pe": [
+    56,
+    12
+   ],
+   "mato": false,
+   "copa": false
+  },
+  {
+   "id": "o14",
+   "tipo": "manga",
+   "x": 560,
+   "y": 900,
+   "w": 260,
+   "h": 280,
+   "nome": "Debaixo do pé de manga",
+   "cobre": true,
+   "pe": [
+    24,
+    12
+   ],
+   "mato": false,
+   "copa": true
+  },
+  {
+   "id": "o15",
+   "tipo": "varal",
+   "x": 760,
+   "y": 820,
+   "w": 190,
+   "h": 120,
+   "nome": "Atrás dos lençóis do varal",
+   "cobre": true,
+   "pe": [
+    190,
+    6
+   ],
+   "mato": false,
+   "copa": false
+  },
+  {
+   "id": "o16",
+   "tipo": "casinha",
+   "x": 860,
+   "y": 960,
+   "w": 84,
+   "h": 76,
+   "nome": "Atrás da casinha do cachorro",
+   "cobre": true,
+   "pe": [
+    70,
+    14
+   ],
+   "mato": false,
+   "copa": false
+  },
+  {
+   "id": "o17",
+   "tipo": "bananeira",
+   "x": 500,
+   "y": 1050,
+   "w": 120,
+   "h": 160,
+   "nome": "Na bananeira",
+   "cobre": true,
+   "pe": [
+    16,
+    10
+   ],
+   "mato": false,
+   "copa": false
+  },
+  {
+   "id": "o18",
+   "tipo": "caixa",
+   "x": 990,
+   "y": 900,
+   "w": 80,
+   "h": 150,
+   "nome": "Atrás da caixa d'água",
+   "cobre": true,
+   "pe": [
+    64,
+    10
+   ],
+   "mato": false,
+   "copa": false
+  },
+  {
+   "id": "o19",
+   "tipo": "tanque",
+   "x": 1560,
+   "y": 1040,
+   "w": 70,
+   "h": 64,
+   "nome": "Atrás do tanque de lavar roupa",
+   "cobre": true,
+   "pe": [
+    60,
+    12
+   ],
+   "mato": false,
+   "copa": false
+  },
+  {
+   "id": "o20",
+   "tipo": "carro_vermelho",
+   "x": 1600,
+   "y": 880,
+   "w": 190,
+   "h": 96,
+   "nome": "Atrás do carro da garagem",
+   "cobre": true,
+   "pe": [
+    170,
+    26
+   ],
+   "mato": false,
+   "copa": false
+  },
+  {
+   "id": "o21",
+   "tipo": "arbusto",
+   "x": 1900,
+   "y": 900,
+   "w": 110,
+   "h": 70,
+   "nome": "No arbusto da esquina",
+   "cobre": true,
+   "pe": [
+    90,
+    12
+   ],
+   "mato": false,
+   "copa": false
+  },
+  {
+   "id": "o22",
+   "tipo": "tanque",
+   "x": 560,
+   "y": 116,
+   "w": 70,
+   "h": 64,
+   "nome": "No fundo do beco",
+   "cobre": true,
+   "pe": [
+    56,
+    12
+   ],
+   "mato": false,
+   "copa": false
+  }
+ ],
+ "esconderijos_extra": [
+  {
+   "id": "barracao",
+   "nome": "Dentro do barracão",
+   "x": 321,
+   "y": 222,
+   "raio": 28,
+   "escuro": true
+  }
+ ],
+ "inicio": {
+  "x": 900,
+  "y": 420
+ }
+}

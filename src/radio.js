@@ -74,7 +74,7 @@
             onStateChange: (ev) => {
               const S = YT.PlayerState;
               if (ev.data === S.PLAYING) { this.playing = true;
-              this.player.setVolume(this.mode === 'final' ? 35 : 100);}
+              this.player.setVolume(this.mode === 'final' ? 25 : 40);}
               if (ev.data === S.PAUSED || ev.data === S.CUED) this.playing = false;
               if (ev.data === S.ENDED) { this.playing = false; if (this.mode === 'radio') this.next(); }
               this.emit();

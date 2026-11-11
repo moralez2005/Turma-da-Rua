@@ -30,6 +30,9 @@ Um jogo indie em pixel art sobre uma tarde de brincadeiras na rua com sete amigo
 
 ## A turma
 
+Antes de cada brincadeira você escolhe com quem joga. No futebol e na queimada, dá pra montar os dois times com qualquer um da turma (ou sortear); no futebol o 1º de cada time ataca, o 2º defende e o 3º vai pro gol. Quem fica de fora assiste da calçada.
+
+
 | Personagem | Habilidade no futebol (tecla E) |
 | --- | --- |
 | **Pernalonga** | Passada longa: corre muito mais rápido (no Alerta, dá 4 passos em vez de 3) |
@@ -54,10 +57,14 @@ Na queimada as habilidades são outras, próprias do jogo: Braço longo (Pernalo
 | 1 a 7 | Escolher tema e palavra (alerta) |
 | E | Habilidade do personagem |
 | Q | Trocar jogador ou alvo |
+| F | Gritar "FUSCA AZUL!" quando um Fusca azul passar (quem gritar primeiro dá o peteleco) |
+| T | Atender o orelhão (esconde-esconde) |
 | M | Tocar ou pausar a Rádio da Rua |
 | Esc | Voltar para a rua |
 
 **Rádio da Rua:** uma barra fica suspensa no topo da tela o tempo todo. Escolha a JBL do Lucas (eletrônica, gringas e o rap do Minecraft) ou a do Pedro (funk) ali em cima, ou clique numa JBL no cenário. O player oficial do YouTube fica pendurado ao lado do jogo, com a lista de músicas, e a música continua tocando nas brincadeiras. O botão ▴ pausa e recolhe o player.
+
+**Orelhão:** no esconde-esconde, aperte T perto do orelhão pra ele tocar a música de `orelhao` no `radio.json` pela Rádio da Rua.
 
 **Vizinhas:** os nomes são inventados e tudo delas (nome, cor, falas, demora e chance de furar a bola) fica em `src/vizinhas.js`.
 

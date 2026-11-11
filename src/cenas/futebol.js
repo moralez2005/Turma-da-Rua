@@ -7,10 +7,23 @@ class Futebol extends Phaser.Scene {
 
   create() {
     this._saindo = false;
+    this.players = null;   // ao jogar de novo, a cena reaproveita o objeto: limpa o que sobrou da partida anterior
     this.cameras.main.fadeIn(300, 18, 13, 24);
     this.F = { x0: 24, x1: 936, y0: 292, y1: 498, mid: 480, gy0: 344, gy1: 444 };
     this.add.image(0, 0, 'rua').setOrigin(0);
     this.drawField();
+    TR.backButton(this);
+    this.state = 'escolha';
+    TR.escolherTimes(this, 'futebol', {
+      titulo: 'Futebol: monte os times',
+      papeis: ['Atacante', 'Defesa', 'Goleiro'],
+      padrao: { azul: ['pernalonga', 'cezar', 'kaua'], vermelho: ['lucas', 'pedro', 'gabriel'] },
+    }, (t) => this.montar(t));
+  }
+
+  // Monta a partida com os times escolhidos (o 1º de cada time ataca, o 2º defende, o 3º vai pro gol)
+  montar(times) {
+    const F = this.F;
 
     this.score = [0, 0];
     this.timeLeft = 180;
@@ -19,19 +32,21 @@ class Futebol extends Phaser.Scene {
     this.car = null;
     this.charge = 0;
 
-    const roles = [
-      { id: 'pernalonga', team: 0, role: 'att', home: [380, 430] },
-      { id: 'cezar', team: 0, role: 'def', home: [240, 340] },
-      { id: 'kaua', team: 0, role: 'gk', home: [58, 394] },
-      { id: 'lucas', team: 1, role: 'att', home: [580, 360] },
-      { id: 'pedro', team: 1, role: 'def', home: [720, 450] },
-      { id: 'gabriel', team: 1, role: 'gk', home: [902, 394] },
-    ];
+    const papel = ['att', 'def', 'gk'];
+    const casa = [[[380, 430], [240, 340], [58, 394]], [[580, 360], [720, 450], [902, 394]]];
+    const roles = [];
+    [times.azul, times.vermelho].forEach((lista, team) => lista.forEach((id, i) => roles.push({ id, team, role: papel[i], home: casa[team][i] })));
     this.players = roles.map((r) => this.makePlayer(r));
     this.human = this.players[0];
+    this.nomeTime = [TR.KIDS[times.azul[0]].nome, TR.KIDS[times.vermelho[0]].nome];
 
-    this.daniel = TR.kid(this, 'daniel', 660, 258).setDepth(258);
-    this.daniel.play('daniel_idle');
+    // quem ficou de fora assiste da calçada (o primeiro deles comenta o jogo)
+    this.torcida = times.fora.map((id, i) => {
+      const s = TR.kid(this, id, 660 - i * 70, 258).setDepth(258);
+      s.play(id + '_idle');
+      return s;
+    });
+    this.daniel = this.torcida[0] || this.players[0].spr;
 
     this.ball = { x: 480, y: 394, z: 0, vx: 0, vy: 0, vz: 0, owner: null, last: null, noPick: 0 };
     this.ballShadow = this.add.ellipse(0, 0, 18, 6, 0x000000, 0.35);
@@ -47,7 +62,6 @@ class Futebol extends Phaser.Scene {
     this.passArrow = this.add.triangle(0, 0, 0, 0, 14, 0, 7, 9, 0x7cf27c).setDepth(6000).setVisible(false);
     this.chargeBar = this.add.graphics().setDepth(6000);
     this.big = TR.txt(this, 480, 200, '', 4, 0xffd36a).setOrigin(0.5).setDepth(6500).setVisible(false);
-    TR.backButton(this);
     TR.jblHud(this, { lucas: [548, 280], pedro: [800, 280] });
 
     this.keys = this.input.keyboard.addKeys('UP,DOWN,LEFT,RIGHT,W,A,S,D,SPACE,SHIFT,E,Q,Z,C');
@@ -69,8 +83,8 @@ class Futebol extends Phaser.Scene {
       'E .................. habilidade do jogador',
       'Q .................. trocar de jogador',
       'Encoste em quem está com a bola pra roubar. 2 gols ganha!',
-    ], () => { this.state = 'play'; TR.sfx(this, 'apito', 0.5); TR.bubble(this, this.daniel, 'Vai, Pernalonga!', 2); });
-    const byId = {}; this.players.forEach((p) => { byId[p.id] = p.spr; }); byId.daniel = this.daniel;
+    ], () => { this.state = 'play'; TR.sfx(this, 'apito', 0.5); TR.bubble(this, this.daniel, 'Vai, ' + TR.KIDS[this.human.id].nome + '!', 2); });
+    const byId = {}; this.players.forEach((p) => { byId[p.id] = p.spr; }); times.fora.forEach((id, i) => { byId[id] = this.torcida[i]; });
     TR.chatter(this, (id) => byId[id], { can: () => this.state === 'play', first: 6000 });
   }
 
@@ -106,6 +120,7 @@ class Futebol extends Phaser.Scene {
 
   // ------------------------------------------------------------------ loop
   update(time, delta) {
+    if (!this.players) return;   // ainda escolhendo os times
     const dt = Math.min(delta, 50) / 1000;
     if (this.state === 'play') {
       this.timeLeft -= dt;
@@ -429,7 +444,7 @@ class Futebol extends Phaser.Scene {
     const v = TR.VIZINHAS[id];
     this.time.delayedCall(500, () => TR.bubble(this, quem.spr, id === 'vera' ? 'Xi... na da ' + v.nome + '...' : 'Ô ' + v.nome + ', a bola!', 1.6));
     const ped = this.players.find((p) => p.id === 'pedro');
-    if (id === 'vera') this.time.delayedCall(2200, () => TR.bubble(this, ped.spr, 'Se ela furar eu vou embora!', 1.6));
+    if (id === 'vera' && ped) this.time.delayedCall(2200, () => TR.bubble(this, ped.spr, 'Se ela furar eu vou embora!', 1.6));
     TR.bolaNaCasa(this, id, {
       volta: (x, y) => {
         Object.assign(b, { x, y: this.F.y0 + 6, z: 40, vx: Phaser.Math.Between(-60, 60), vy: 260, vz: 220, last: null, noPick: 0.4 });
@@ -458,15 +473,13 @@ class Futebol extends Phaser.Scene {
     this.cameras.main.shake(250, 0.008);
     const sc = this.ball.last;
     if (sc) TR.bubble(this, sc.spr, sc.team === team ? TR.fala(sc.id, 'gol') : 'Foi contra...', 1.5);
-    TR.bubble(this, this.daniel, team === 0 ? 'Golaço!!' : 'Acorda, Kauã!', 1.5);
-    // Pedro não sabe perder: ameaça ir embora com a bola
-    if (team === 0) {
-      const ped = this.players.find((p) => p.id === 'pedro');
-      this.time.delayedCall(600, () => TR.bubble(this, ped.spr, TR.fala('pedro', 'sofreu'), 1.6));
-    } else {
-      const k = this.players.find((p) => p.id === 'kaua');
-      this.time.delayedCall(600, () => TR.bubble(this, k.spr, TR.fala('kaua', 'sofreu'), 1.4));
-    }
+    const sofreu = this.players.filter((p) => p.team !== team);
+    const gol = sofreu.find((p) => p.role === 'gk');
+    TR.bubble(this, this.daniel, team === 0 ? 'Golaço!!' : 'Acorda, ' + TR.KIDS[gol.id].nome + '!', 1.5);
+    // Pedro não sabe perder: se o time dele tomou gol, ameaça ir embora com a bola
+    const ped = sofreu.find((p) => p.id === 'pedro');
+    const quem = ped || gol;
+    this.time.delayedCall(600, () => TR.bubble(this, quem.spr, TR.fala(quem.id, 'sofreu'), 1.6));
     this.time.delayedCall(1700, () => {
       if (this.score[team] >= 2) return this.endGame();
       this.kickoff(team === 0 ? 1 : 0);
@@ -489,7 +502,11 @@ class Futebol extends Phaser.Scene {
   startCar() {
     this.state = 'car';
     this.carTimer = Phaser.Math.Between(40, 60);
-    this.car = this.add.image(-120, 420, 'obj_carro').setOrigin(0.5, 1).setDepth(900);
+    // às vezes é um Fusca azul: quem apertar F primeiro dá o peteleco
+    const fusca = Math.random() < 0.4;
+    if (fusca) TR._texturaFusca(this);
+    this.car = this.add.image(-120, 420, fusca ? 'fusca' : 'obj_carro').setOrigin(0.5, 1).setDepth(900);
+    if (fusca) TR.fusca(this, { semCarro: true, voce: () => this.human.spr, kids: () => this.players.map((p) => p.spr).concat(this.torcida) });
     TR.sfx(this, 'carro', 0.5);
     const near = this.players.slice().sort((a, b) => this.dist(a, this.ball) - this.dist(b, this.ball))[0];
     TR.bubble(this, near.spr, 'Ó o carro!', 1.8);
@@ -512,7 +529,7 @@ class Futebol extends Phaser.Scene {
     this.state = 'end';
     const won = this.score[0] > this.score[1], draw = this.score[0] === this.score[1];
     TR.sfx(this, won ? 'vitoria' : 'derrota', 0.6);
-    TR.endPanel(this, draw ? 'EMPATE!' : won ? 'VITÓRIA!' : 'PERDEU!', 'Pernalonga ' + this.score[0] + ' x ' + this.score[1] + ' Lucas',
+    TR.endPanel(this, draw ? 'EMPATE!' : won ? 'VITÓRIA!' : 'PERDEU!', 'Time do ' + this.nomeTime[0] + ' ' + this.score[0] + ' x ' + this.score[1] + ' Time do ' + this.nomeTime[1],
       () => this.scene.restart());
   }
 
@@ -549,7 +566,7 @@ class Futebol extends Phaser.Scene {
       this.chargeBar.fillStyle(this.charge > 0.8 ? 0xff5a3c : 0xffb13c, 1).fillRect(h.x - 24, h.y + 10, 48 * this.charge, 5);
     }
     const m = Math.max(0, Math.floor(this.timeLeft / 60)), s = Math.max(0, Math.floor(this.timeLeft % 60)).toString().padStart(2, '0');
-    this.hud.setText('Pernalonga  ' + this.score[0] + ' x ' + this.score[1] + '  Lucas     ' + m + ':' + s);
+    this.hud.setText(this.nomeTime[0] + '  ' + this.score[0] + ' x ' + this.score[1] + '  ' + this.nomeTime[1] + '     ' + m + ':' + s);
     if (h) {
       const cd = Math.max(0, h.habCd);
       this.habTxt.setText('E: ' + TR.KIDS[h.id].hab + (cd > 0 ? ' (' + Math.ceil(cd) + 's)' : ' PRONTA') + '   Z: drible' + (h.dribCd > 0 ? ' ..' : ' ok'));

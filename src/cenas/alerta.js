@@ -23,10 +23,20 @@ class Alerta extends Phaser.Scene {
 
   create() {
     this._saindo = false;
+    this.players = null;   // ao jogar de novo, a cena reaproveita o objeto: limpa o que sobrou da partida anterior
     this.cameras.main.fadeIn(300, 18, 13, 24);
     this.add.image(0, 0, 'rua').setOrigin(0);
     this.F = { x0: 40, x1: 920, y0: 296, y1: 496, cx: 480, cy: 396 };
-    const ids = ['pernalonga', 'cezar', 'lucas', 'pedro', 'daniel', 'gabriel'];
+    TR.backButton(this);
+    TR.escolherVoce(this, 'alerta', {
+      titulo: 'Alerta: com quem você vai jogar?', padrao: 'pernalonga',
+      habilidade: (id) => (id === 'pernalonga' ? 'dá 4 passos em vez de 3' : 'E: arrancada na hora de fugir'),
+    }, (voce) => this.montar(voce));
+  }
+
+  montar(voce) {
+    // você primeiro, depois o resto da turma
+    const ids = [voce].concat(TR.ORDEM.filter((id) => id !== voce));
     this.players = ids.map((id, i) => {
       const a = (i / ids.length) * Math.PI * 2;
       const x = 480 + Math.cos(a) * 120, y = 396 + Math.sin(a) * 60;
@@ -46,7 +56,6 @@ class Alerta extends Phaser.Scene {
     g.fillStyle(0x0c0810, 0.8).fillRect(200, 40, 560, 26);
     this.aimG = this.add.graphics().setDepth(6000);
     this.marker = this.add.triangle(0, 0, 0, 0, 14, 0, 7, 9, 0xffe066).setDepth(6000);
-    TR.backButton(this);
     TR.jblHud(this, { lucas: [120, 282], pedro: [840, 282] });
     this.wordHud = TR.txt(this, 940, 512, '', 1, 0x9cff9c).setOrigin(1, 0).setDepth(6001);
     const g2 = this.add.graphics().setDepth(6000);
@@ -97,8 +106,9 @@ class Alerta extends Phaser.Scene {
   chooseTheme() {
     this.state = 'menu';
     const temas = Object.keys(ALERTA_TEMAS);
-    TR.bubble(this, this.players.find((p) => p.id === 'daniel').spr, 'Bora de Games!', 2);
-    TR.bubble(this, this.players.find((p) => p.id === 'pedro').spr, 'Times! Eu sou Flamengo', 2);
+    const fala = (id, t) => { const p = this.players.find((q) => q.id === id && q !== this.human); if (p) TR.bubble(this, p.spr, t, 2); };
+    fala('daniel', 'Bora de Games!');
+    fala('pedro', 'Times! Eu sou Flamengo');
     this.menu('Escolha o tema', temas, (t) => {
       this.tema = t;
       const pal = ALERTA_TEMAS[t].slice();
@@ -186,7 +196,7 @@ class Alerta extends Phaser.Scene {
       this.dodgeWin = 0.28;
     } else if (this.state === 'scatter' && k === 'KeyE' && !this.human.usedBoost) {
       this.human.usedBoost = true; this.human.boost = 1.2; TR.sfx(this, 'habilidade', 0.5);
-      TR.bubble(this, this.human.spr, 'Passada longa!', 1);
+      TR.bubble(this, this.human.spr, this.human.id === 'pernalonga' ? 'Passada longa!' : 'Sai da frente!', 1);
     }
   }
 
@@ -299,6 +309,7 @@ class Alerta extends Phaser.Scene {
 
   // ------------------------------------------------------------ loop
   update(time, delta) {
+    if (!this.players) return;   // ainda escolhendo
     const dt = Math.min(delta, 50) / 1000;
     const b = this.ball, F = this.F;
     if (this.state === 'ready') {

@@ -18,6 +18,8 @@
     player: null,
     listeners: [],
     wasPlayingBeforeHide: false,
+    volume: 40,          // volume das JBLs (0 a 100)
+    avulsa: null,        // música tocada fora da playlist (ex.: o orelhão)
 
     init() {
       this.dock = $('radio');
@@ -79,6 +81,7 @@
     },
     current() {
       if (this.mode === 'final') return this.data && this.data.cenaFinal;
+      if (this.avulsa) return this.avulsa;
       return this.songs()[this.index];
     },
 
@@ -97,7 +100,7 @@
               const S = YT.PlayerState;
               if (ev.data === S.PLAYING) {
                 this.playing = true;
-                this.player.setVolume(this.mode === 'final' ? 35 : 100);
+                this.player.setVolume(this.mode === 'final' ? 35 : this.volume);
               }
               if (ev.data === S.PAUSED || ev.data === S.CUED) this.playing = false;
               if (ev.data === S.ENDED) { this.playing = false; if (this.mode === 'radio') this.next(); }
@@ -118,6 +121,7 @@
     // ----- comandos usados pelas cenas e pelos botões -----
     setStation(id) {
       if (this.mode === 'final') return;
+      this.avulsa = null;
       this.station = id;
       this.mode = 'radio';
       const list = this.songs();
@@ -131,6 +135,7 @@
     playIndex(i) {
       const list = this.songs();
       if (!list[i]) return;
+      this.avulsa = null;
       this.index = i;
       this.open();
       this.ensurePlayer(list[i].videoId, true);
@@ -151,6 +156,17 @@
       const list = this.songs();
       if (!list.length) return;
       this.playIndex((this.index + d + list.length) % list.length);
+    },
+    // toca uma música fora da playlist (o orelhão usa isso); depois dela, a JBL segue normal
+    tocarAvulsa(m) {
+      if (this.mode === 'final' || !m || !m.videoId) return;
+      if (this.offline) { this.msg('Sem conexão com o YouTube agora.'); return; }
+      this.avulsa = m;
+      this.mode = 'radio';
+      if (!this.station) this.station = 'pedro';
+      this.open();
+      this.ensurePlayer(m.videoId, true);
+      this.emit();
     },
     playFinal() {
       const v = this.data && this.data.cenaFinal && this.data.cenaFinal.videoId;
@@ -208,7 +224,7 @@
       $('radio-play').textContent = this.playing ? '❚❚' : '▶';
       if (this.playing) this.msg('');
       // lista de músicas da estação (clique pra tocar)
-      const key = this.mode + '|' + this.station + '|' + this.index;
+      const key = this.mode + '|' + this.station + '|' + this.index + '|' + (this.avulsa ? 1 : 0);
       if (this.listEl && this._listKey !== key) {
         this._listKey = key;
         this.listEl.innerHTML = '';
@@ -216,7 +232,7 @@
           this.songs().forEach((s, i) => {
             const li = document.createElement('li');
             li.textContent = s.titulo + (s.artista ? ' — ' + s.artista : '');
-            if (i === this.index) li.className = 'tocando';
+            if (i === this.index && !this.avulsa) li.className = 'tocando';
             li.onclick = () => this.playIndex(i);
             this.listEl.appendChild(li);
           });

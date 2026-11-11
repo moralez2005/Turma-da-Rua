@@ -17,10 +17,19 @@ class Rua extends Phaser.Scene {
     this.items.forEach((it, i) => this.makeStation(it, i));
 
     // turma na calçada
+    this.turma = {};
     [['kaua', 90, 262], ['gabriel', 150, 266], ['cezar', 440, 260], ['daniel', 560, 262], ['pernalonga', 620, 258]].forEach(([id, x, y]) => {
       const s = TR.kid(this, id, x, y).setDepth(y);
       s.play(id + '_idle'); s.anims.setProgress(Math.random());
+      this.turma[id] = s;
     });
+    // de vez em quando passa um Fusca azul pela rua (aperta F!)
+    const proximoFusca = () => this.time.delayedCall(Phaser.Math.Between(18000, 35000), () => {
+      if (!this.sys.isActive()) return;
+      TR.fusca(this, { y: 330, depth: 3500, voce: () => this.turma.pernalonga, kids: () => Object.values(this.turma) });
+      proximoFusca();
+    });
+    proximoFusca();
     // JBLs na calçada, com o dono do lado
     this.jbls = {};
     this.makeJbl('lucas', 250, 262, 'JBL do Lucas', 338);
@@ -92,6 +101,7 @@ class Rua extends Phaser.Scene {
 
   makeJbl(id, x, y, label, ownerX) {
     const owner = TR.kid(this, id, ownerX, y + 2).setDepth(y + 2);
+    this.turma[id] = owner;
     owner.play(id + '_idle');
     const s = this.add.sprite(x, y, 'jbl_' + id, 0).setScale(1.4).setOrigin(0.5, 1).setDepth(y + 1)
       .setInteractive({ useHandCursor: true });

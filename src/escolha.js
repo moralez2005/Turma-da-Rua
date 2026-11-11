@@ -1,0 +1,133 @@
+/*
+ * Telas de escolha antes das brincadeiras.
+ *
+ * TR.escolherTimes(scene, chave, cfg, cb)
+ *   Monta dois times com qualquer um da turma. Clique num moleque (ou aperte 1 a 7) pra mudar:
+ *   fora → time azul → time vermelho → fora. O primeiro do time azul é você.
+ *   cfg = { titulo, porTime: 3, papeis: ['Atacante', 'Defesa', 'Goleiro'] (opcional), padrao: { azul: [...], vermelho: [...] } }
+ *   cb({ azul: [ids], vermelho: [ids], fora: [ids] })
+ *
+ * TR.escolherVoce(scene, chave, cfg, cb)
+ *   Escolhe só com quem você vai jogar. cfg = { titulo, padrao: 'pernalonga', dica }
+ *
+ * A última escolha fica guardada (TR.escolhas[chave]) e já vem marcada da próxima vez.
+ */
+TR.ORDEM = ['pernalonga', 'cezar', 'kaua', 'pedro', 'lucas', 'daniel', 'gabriel'];
+TR.escolhas = {};
+
+TR._telaEscolha = (scene, titulo, alturaExtra) => {
+  const itens = [];
+  const add = (o) => { itens.push(o); return o; };
+  add(TR.panel(scene, 480, 270, 880, 420 + (alturaExtra || 0), 7000));
+  add(TR.txt(scene, 480, 78, titulo, 2, 0xffd36a).setOrigin(0.5).setScrollFactor(0).setDepth(7001));
+  return { itens, add, fechar: () => itens.forEach((o) => o.destroy()) };
+};
+
+TR._cartas = (scene, tela, onClick) => {
+  const cartas = {};
+  TR.ORDEM.forEach((id, i) => {
+    const x = 120 + i * 120, y = 250;
+    const fundo = tela.add(scene.add.rectangle(x, y - 40, 104, 170, 0x1a1222, 1).setScrollFactor(0).setDepth(7001)
+      .setStrokeStyle(3, 0x5b4466).setInteractive({ useHandCursor: true }));
+    const spr = tela.add(scene.add.sprite(x, y + 30, id, 0).setOrigin(0.5, 1).setScale(0.9).setScrollFactor(0).setDepth(7002));
+    spr.play(id + '_idle');
+    const nome = tela.add(TR.txt(scene, x, y + 36, (i + 1) + '. ' + TR.KIDS[id].nome, 1, 0xfff1d6).setOrigin(0.5, 0).setScrollFactor(0).setDepth(7002));
+    const tag = tela.add(TR.txt(scene, x, y - 118, '', 1, 0xffffff).setOrigin(0.5).setScrollFactor(0).setDepth(7002));
+    fundo.on('pointerdown', () => onClick(id));
+    fundo.on('pointerover', () => TR.sfx(scene, 'hover', 0.2));
+    cartas[id] = { fundo, spr, nome, tag };
+  });
+  return cartas;
+};
+
+TR.escolherTimes = (scene, chave, cfg, cb) => {
+  const n = cfg.porTime || 3;
+  const salvo = TR.escolhas[chave] || cfg.padrao;
+  let azul = salvo.azul.slice(), vermelho = salvo.vermelho.slice();
+  const tela = TR._telaEscolha(scene, cfg.titulo || 'Monte os times');
+  tela.add(TR.txt(scene, 480, 108, 'Clique (ou 1 a 7) pra trocar: fora → AZUL → VERMELHO. O 1º do azul é você.', 1, 0xc9b8d8)
+    .setOrigin(0.5).setScrollFactor(0).setDepth(7001));
+  const resumo = tela.add(TR.txt(scene, 480, 340, '', 1, 0xfff1d6).setOrigin(0.5, 0).setScrollFactor(0).setDepth(7001));
+  const aviso = tela.add(TR.txt(scene, 480, 396, '', 1, 0xff9a7a).setOrigin(0.5, 0).setScrollFactor(0).setDepth(7001));
+
+  const ciclo = (id) => {
+    TR.sfx(scene, 'clique', 0.3);
+    if (azul.includes(id)) { azul = azul.filter((x) => x !== id); if (vermelho.length < n) vermelho.push(id); }
+    else if (vermelho.includes(id)) vermelho = vermelho.filter((x) => x !== id);
+    else if (azul.length < n) azul.push(id);
+    else if (vermelho.length < n) vermelho.push(id);
+    desenha();
+  };
+  const cartas = TR._cartas(scene, tela, ciclo);
+  const nomeDe = (lista, i) => (lista[i] ? TR.KIDS[lista[i]].nome : '___');
+  const linha = (rot, lista) => rot + ': ' + Array.from({ length: n }, (_, i) => (cfg.papeis ? cfg.papeis[i] + ' ' : '') + nomeDe(lista, i)).join('  ·  ');
+  const desenha = () => {
+    TR.ORDEM.forEach((id) => {
+      const c = cartas[id];
+      const ia = azul.indexOf(id), iv = vermelho.indexOf(id);
+      if (ia >= 0) { c.fundo.setStrokeStyle(4, 0x5ab0ff); c.tag.setText(ia === 0 ? 'VOCÊ' : 'AZUL').setTint(0x9ccfff); c.spr.clearTint(); }
+      else if (iv >= 0) { c.fundo.setStrokeStyle(4, 0xff6a5a); c.tag.setText('VERMELHO').setTint(0xffaa9c); c.spr.clearTint(); }
+      else { c.fundo.setStrokeStyle(3, 0x5b4466); c.tag.setText('fora').setTint(0x8a7a96); c.spr.setTint(0x777777); }
+    });
+    resumo.setText(linha('AZUL', azul) + '\n' + linha('VERMELHO', vermelho));
+    aviso.setText(azul.length === n && vermelho.length === n ? '' : 'Cada time precisa de ' + n + ' jogadores.');
+  };
+  const sortear = () => {
+    const todos = Phaser.Utils.Array.Shuffle(TR.ORDEM.slice());
+    azul = todos.slice(0, n); vermelho = todos.slice(n, n * 2);
+    TR.sfx(scene, 'selecionar', 0.4); desenha();
+  };
+  const jogar = () => {
+    if (azul.length !== n || vermelho.length !== n) { TR.sfx(scene, 'derrota', 0.3); return; }
+    TR.escolhas[chave] = { azul: azul.slice(), vermelho: vermelho.slice() };
+    scene.input.keyboard.off('keydown', teclas);
+    tela.fechar();
+    // espera um instante: o mesmo Enter não pode pular a tela de instruções que vem depois
+    scene.time.delayedCall(60, () => cb({ azul, vermelho, fora: TR.ORDEM.filter((id) => !azul.includes(id) && !vermelho.includes(id)) }));
+  };
+  const teclas = (ev) => {
+    const d = parseInt(ev.key, 10);
+    if (d >= 1 && d <= 7) ciclo(TR.ORDEM[d - 1]);
+    if (ev.code === 'KeyR') sortear();
+    if (ev.code === 'Enter') jogar();
+  };
+  tela.add(TR.button(scene, 300, 450, 'Sortear (R)', sortear, { fixed: true, depth: 7003, w: 170 }));
+  tela.add(TR.button(scene, 480, 450, 'Padrão', () => { azul = cfg.padrao.azul.slice(); vermelho = cfg.padrao.vermelho.slice(); desenha(); }, { fixed: true, depth: 7003, w: 170 }));
+  tela.add(TR.button(scene, 660, 450, 'Jogar (Enter)', jogar, { fixed: true, depth: 7003, w: 170 }));
+  scene.time.delayedCall(200, () => scene.input.keyboard.on('keydown', teclas));
+  desenha();
+};
+
+TR.escolherVoce = (scene, chave, cfg, cb) => {
+  let voce = TR.escolhas[chave] || cfg.padrao;
+  const tela = TR._telaEscolha(scene, cfg.titulo || 'Com quem você vai jogar?');
+  tela.add(TR.txt(scene, 480, 108, cfg.dica || 'Clique num moleque (ou 1 a 7) e aperte Enter.', 1, 0xc9b8d8)
+    .setOrigin(0.5).setScrollFactor(0).setDepth(7001));
+  const info = tela.add(TR.txt(scene, 480, 350, '', 1, 0xfff1d6).setOrigin(0.5, 0).setScrollFactor(0).setDepth(7001));
+  const marca = (id) => { voce = id; TR.sfx(scene, 'clique', 0.3); desenha(); };
+  const cartas = TR._cartas(scene, tela, marca);
+  const desenha = () => {
+    TR.ORDEM.forEach((id) => {
+      const c = cartas[id], on = id === voce;
+      c.fundo.setStrokeStyle(on ? 4 : 3, on ? 0xffd36a : 0x5b4466);
+      c.tag.setText(on ? 'VOCÊ' : '').setTint(0xffd36a);
+      if (on) c.spr.clearTint(); else c.spr.setTint(0x999999);
+    });
+    const k = TR.KIDS[voce];
+    info.setText(k.nome + ' · ' + (cfg.habilidade ? cfg.habilidade(voce) : k.hab + ': ' + k.habDesc));
+  };
+  const jogar = () => {
+    TR.escolhas[chave] = voce;
+    scene.input.keyboard.off('keydown', teclas);
+    tela.fechar();
+    scene.time.delayedCall(60, () => cb(voce));
+  };
+  const teclas = (ev) => {
+    const d = parseInt(ev.key, 10);
+    if (d >= 1 && d <= 7) marca(TR.ORDEM[d - 1]);
+    if (ev.code === 'Enter') jogar();
+  };
+  tela.add(TR.button(scene, 480, 450, 'Jogar (Enter)', jogar, { fixed: true, depth: 7003, w: 200 }));
+  scene.time.delayedCall(200, () => scene.input.keyboard.on('keydown', teclas));
+  desenha();
+};

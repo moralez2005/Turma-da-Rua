@@ -1,15 +1,16 @@
 /*
  * Esconde-esconde no quarteirão inteiro (1920x1080), câmera seguindo o jogador.
- * Modo ESCONDER: você é o Pernalonga, o Daniel procura. Modo PROCURAR: você é o Daniel.
+ * Modo ESCONDER: você escolhe quem se esconde e o Daniel procura. Modo PROCURAR: você escolhe quem procura.
  * Setas andam · Shift corre (faz barulho) · Espaço agacha/levanta (ou "Achei!" quando procura) · E habilidade
  */
 class EscondeEsconde extends Phaser.Scene {
   constructor() { super('EscondeEsconde'); }
 
-  init(data) { this.modo = (data && data.modo) || null; }
+  init(data) { this.modo = (data && data.modo) || null; this.quem = (data && data.quem) || null; }
 
   create() {
     this._saindo = false;
+    this.kids = null; this.human = null; this.seeker = null;   // ao jogar de novo, a cena reaproveita o objeto: limpa o que sobrou da partida anterior
     this.cameras.main.fadeIn(300, 18, 13, 24);
     const M = this.cache.json.get('esc_mapa');
     this.M = M;
@@ -48,8 +49,9 @@ class EscondeEsconde extends Phaser.Scene {
     this.input.keyboard.on('keydown-SPACE', () => this.onSpace());
     this.input.keyboard.on('keydown-C', () => this.onSpace());
     this.input.keyboard.on('keydown-E', () => this.ability());
+    this.input.keyboard.on('keydown-T', () => this.atenderOrelhao());
     this.state = 'menu';
-    if (this.modo) this.setup(this.modo); else this.chooseMode();
+    if (this.modo) this.escolher(this.modo); else this.chooseMode();
   }
 
   // ------------------------------------------------------------ mapa / navegação
@@ -136,8 +138,19 @@ class EscondeEsconde extends Phaser.Scene {
     this.cameras.main.centerOn(this.pique.x, this.pique.y + 100);
     TR.button(this, 360, 290, 'Esconder', () => this.scene.restart({ modo: 'esconder' }), { fixed: true, depth: 7002, w: 200 });
     TR.button(this, 600, 290, 'Procurar', () => this.scene.restart({ modo: 'procurar' }), { fixed: true, depth: 7002, w: 200 });
-    TR.txt(this, 360, 318, 'o Daniel procura', 1, 0xc9b8d8).setOrigin(0.5, 0).setScrollFactor(0).setDepth(7001);
-    TR.txt(this, 600, 318, 'você é o Daniel', 1, 0xc9b8d8).setOrigin(0.5, 0).setScrollFactor(0).setDepth(7001);
+    TR.txt(this, 360, 318, 'alguém da turma procura', 1, 0xc9b8d8).setOrigin(0.5, 0).setScrollFactor(0).setDepth(7001);
+    TR.txt(this, 600, 318, 'você procura a turma', 1, 0xc9b8d8).setOrigin(0.5, 0).setScrollFactor(0).setDepth(7001);
+  }
+
+  // escolhe com quem você joga (no modo procurar, você é quem procura)
+  escolher(modo) {
+    if (this.quem) return this.setup(modo);
+    this.cameras.main.centerOn(this.pique.x, this.pique.y + 100);
+    TR.escolherVoce(this, 'esconde_' + modo, {
+      titulo: modo === 'esconder' ? 'Quem vai se esconder?' : 'Quem vai procurar?',
+      padrao: modo === 'esconder' ? 'pernalonga' : 'daniel',
+      habilidade: () => (modo === 'esconder' ? 'E: corrida rápida pra chegar no pique' : 'E: uma seta mostra o escondido mais perto'),
+    }, (id) => { this.quem = id; this.setup(modo); });
   }
 
   setup(modo) {
@@ -152,33 +165,36 @@ class EscondeEsconde extends Phaser.Scene {
       this.kids.push(k);
       return k;
     };
+    const quem = this.quem;
     if (modo === 'esconder') {
-      this.human = mk('pernalonga', P.x - 60, P.y + 70, 'hider');
-      this.seeker = mk('daniel', P.x, P.y + 12, 'seeker');
-      ['cezar', 'lucas', 'pedro', 'gabriel', 'kaua'].forEach((id, i) => mk(id, P.x - 120 + i * 50, P.y + 110, 'hider'));
+      const quemProcura = quem === 'daniel' ? 'gabriel' : 'daniel';
+      this.human = mk(quem, P.x - 60, P.y + 70, 'hider');
+      this.seeker = mk(quemProcura, P.x, P.y + 12, 'seeker');
+      TR.ORDEM.filter((id) => id !== quem && id !== quemProcura).forEach((id, i) => mk(id, P.x - 120 + i * 50, P.y + 110, 'hider'));
     } else {
-      this.human = this.seeker = mk('daniel', P.x, P.y + 12, 'seeker');
-      ['pernalonga', 'cezar', 'lucas', 'pedro', 'gabriel', 'kaua'].forEach((id, i) => mk(id, P.x - 150 + i * 60, P.y + 110, 'hider'));
+      this.human = this.seeker = mk(quem, P.x, P.y + 12, 'seeker');
+      TR.ORDEM.filter((id) => id !== quem).forEach((id, i) => mk(id, P.x - 150 + i * 60, P.y + 110, 'hider'));
     }
+    const N = this.nomeSeeker = TR.KIDS[this.seeker.id].nome;
     this.hiders = this.kids.filter((k) => k.role === 'hider');
     this.aiHiders = this.hiders.filter((k) => k !== this.human);
     this.cameras.main.startFollow(this.human.spr, true, 0.12, 0.12, 0, 60);
     this.habCd = 0;
     const linhas = modo === 'esconder' ? [
-      'O Daniel conta até 20 no poste (PIQUE). Corre se esconder!',
+      'O ' + N + ' conta até 20 no poste (PIQUE). Corre se esconder!',
       'Setas ...... andar          Shift ...... correr (faz barulho)',
       'Espaço ..... agachar (atrás de algo, ninguém te vê)',
       'No mato o capim balança se você se mexer. Cuidado!',
-      'Se o Daniel te ver, corre pro PIQUE: 1, 2, 3 salve eu!',
+      'Se o ' + N + ' te ver, corre pro PIQUE: 1, 2, 3 salve eu!',
       'Chegou no pique sem ser pego = SALVO (você ganha).',
-      'E .......... Passada longa (corrida rápida)',
+      'E .......... corrida rápida      T ...... atender o orelhão',
     ] : [
-      'Você é o Daniel. Conta até 12 enquanto a turma se esconde.',
+      'Você procura. Conta até 12 enquanto a turma se esconde.',
       'Setas ...... andar          Shift ...... correr',
       'Chegue perto e aperte Espaço pra gritar "ACHEI!"',
       'Depois corre pro PIQUE antes do escondido!',
       'Os escondidos tentam se salvar quando você se afasta.',
-      'E .......... Estrategista: seta pro escondido mais perto',
+      'E .......... seta pro escondido mais perto     T ... orelhão',
       'Ganha se achar mais gente do que se salvar.',
     ];
     TR.instructions(this, modo === 'esconder' ? 'Esconder' : 'Procurar', linhas, () => this.startCount());
@@ -234,14 +250,22 @@ class EscondeEsconde extends Phaser.Scene {
     }
   }
 
+  // T perto do orelhão: ele toca a música do orelhão na Rádio da Rua
+  atenderOrelhao() {
+    const h = this.human;
+    if (!h || !this.objs) return;
+    const o = this.objs.find((q) => q.tipo === 'orelhao' && Math.hypot(q.x - h.x, q.y - h.y) < 110);
+    if (o) TR.orelhao(this, h.spr);
+  }
+
   ability() {
     if (this.state !== 'search' || this.habCd > 0) return;
     this.habCd = this.modo === 'esconder' ? 8 : 15;
     TR.sfx(this, 'habilidade', 0.5);
-    if (this.modo === 'esconder') { this.human.boost = 1.6; TR.bubble(this, this.human.spr, 'Passada longa!', 1); }
+    if (this.modo === 'esconder') { this.human.boost = 1.6; TR.bubble(this, this.human.spr, 'Corre!', 1); }
     else {
       const t = this.aiHiders.filter((k) => k.state === 'hidden').sort((a, b) => this.d2(a, this.human) - this.d2(b, this.human))[0];
-      if (t) { this.arrowTarget = t; this.arrowT = 2.5; TR.bubble(this, this.human.spr, 'Estrategista!', 1); }
+      if (t) { this.arrowTarget = t; this.arrowT = 2.5; TR.bubble(this, this.human.spr, this.human.id === 'daniel' ? 'Estrategista!' : 'Achei a pista!', 1); }
     }
   }
 
@@ -299,7 +323,7 @@ class EscondeEsconde extends Phaser.Scene {
     if (k.spot) k.spot.used = false;
     if (k !== this.human) k.path = this.path(k.x, k.y, this.pique.x, this.pique.y + 20);
     if (this.seeker !== this.human) { this.seeker.state = 'race'; this.seeker.path = this.path(this.seeker.x, this.seeker.y, this.pique.x, this.pique.y + 10); }
-    if (k === this.human) this.tipSet('O Daniel te viu! CORRE PRO PIQUE!');
+    if (k === this.human) this.tipSet('O ' + this.nomeSeeker + ' te viu! CORRE PRO PIQUE!');
   }
 
   // ------------------------------------------------------------ loop
@@ -532,7 +556,7 @@ class EscondeEsconde extends Phaser.Scene {
     } else this.arrow.setVisible(false);
     // HUD
     const m = Math.max(0, Math.floor((this.timeLeft || 0) / 60)), sec = Math.max(0, Math.floor((this.timeLeft || 0) % 60)).toString().padStart(2, '0');
-    if (this.state === 'count') this.hud.setText((this.modo === 'esconder' ? 'Daniel contando: ' : 'Contando: ') + this.count + '...');
+    if (this.state === 'count') this.hud.setText((this.modo === 'esconder' ? this.nomeSeeker + ' contando: ' : 'Contando: ') + this.count + '...');
     else if (this.state === 'search') this.hud.setText('Achados ' + this.found + '  ·  Salvos ' + this.saved + '  ·  ' + m + ':' + sec);
     if (this.state === 'search' && this.modo === 'esconder' && this.human.state !== 'race') {
       const hid = this.hiddenAmount(this.human);
@@ -589,7 +613,7 @@ class EscondeEsconde extends Phaser.Scene {
       sub = 'Pegos ' + caught + ' · Salvos ' + this.saved;
     }
     TR.sfx(this, won ? 'vitoria' : 'derrota', 0.6);
-    TR.endPanel(this, title, sub, () => this.scene.restart({ modo: this.modo }));
+    TR.endPanel(this, title, sub, () => this.scene.restart({ modo: this.modo, quem: this.quem }));
   }
 
   d2(a, b) { return (a.x - b.x) ** 2 + (a.y - b.y) ** 2; }

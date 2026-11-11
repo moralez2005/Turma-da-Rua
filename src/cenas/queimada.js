@@ -12,6 +12,7 @@ const QHAB = {
   lucas: { nome: 'Zoeira', desc: 'zoa o time rival e deixa todo mundo lento' },
   pedro: { nome: 'Bomba do MC', desc: 'próximo arremesso é uma pedrada' },
   gabriel: { nome: 'Mão de goleiro', desc: 'agarra a próxima bola que vier' },
+  kaua: { nome: 'Paredão', desc: 'agarra as próximas bolas que vierem' },
 };
 
 class Queimada extends Phaser.Scene {
@@ -19,20 +20,30 @@ class Queimada extends Phaser.Scene {
 
   create() {
     this._saindo = false;
+    this.players = null;   // ao jogar de novo, a cena reaproveita o objeto: limpa o que sobrou da partida anterior
     this.cameras.main.fadeIn(300, 18, 13, 24);
     this.add.image(0, 0, 'rua').setOrigin(0);
     this.F = { x0: 24, x1: 936, y0: 296, y1: 496, mid: 480, cem: 64 };
     this.drawField();
+    TR.backButton(this);
+    TR.escolherTimes(this, 'queimada', {
+      titulo: 'Queimada: monte os times',
+      padrao: { azul: ['pernalonga', 'cezar', 'daniel'], vermelho: ['lucas', 'pedro', 'gabriel'] },
+    }, (t) => this.montar(t));
+  }
+
+  montar(times) {
     this.state = 'intro';
     this.timeLeft = 180;
     this.charge = 0;
     this.catchWin = 0;
     this.targetIdx = 0;
 
-    const setup = [
-      ['pernalonga', 0, 300, 360], ['cezar', 0, 220, 440], ['daniel', 0, 140, 380],
-      ['lucas', 1, 660, 360], ['pedro', 1, 740, 440], ['gabriel', 1, 820, 380],
-    ];
+    const pos = [[[300, 360], [220, 440], [140, 380]], [[660, 360], [740, 440], [820, 380]]];
+    const setup = [];
+    [times.azul, times.vermelho].forEach((lista, team) => lista.forEach((id, i) => setup.push([id, team, pos[team][i][0], pos[team][i][1]])));
+    this.nomeRival = TR.KIDS[times.vermelho[0]].nome;
+    times.fora.forEach((id, i) => TR.kid(this, id, 560 + i * 70, 258).setDepth(258).play(id + '_idle'));
     this.players = setup.map(([id, team, x, y]) => {
       const spr = TR.kid(this, id, x, y);
       return {
@@ -56,7 +67,6 @@ class Queimada extends Phaser.Scene {
     this.targetRing = this.add.ellipse(0, 0, 60, 18).setStrokeStyle(3, 0xff5a3c).setDepth(4).setVisible(false);
     this.chargeBar = this.add.graphics().setDepth(6000);
     this.big = TR.txt(this, 480, 200, '', 4, 0xffd36a).setOrigin(0.5).setDepth(6500).setVisible(false);
-    TR.backButton(this);
     TR.jblHud(this, { lucas: [120, 284], pedro: [840, 284] });
 
     this.keys = this.input.keyboard.addKeys('UP,DOWN,LEFT,RIGHT,W,A,S,D,SPACE,E,Q');
@@ -77,7 +87,7 @@ class Queimada extends Phaser.Scene {
       'Mouse .............. clique onde quer arremessar',
       'Q .................. trocar o alvo (círculo vermelho)',
       'Espaço sem bola .... agarrar a bola na hora que ela chega',
-      'E .................. habilidade de queimada (Pernalonga: Braço longo)',
+      'E .................. habilidade (' + TR.KIDS[this.human.id].nome + ': ' + QHAB[this.human.id].nome + ')',
       'Queimado vai pro cemitério e volta se queimar alguém!',
     ], () => { this.state = 'play'; TR.sfx(this, 'apito', 0.5); });
     TR.chatter(this, (id) => { const p = this.players.find((q) => q.id === id); return p ? p.spr : null; }, { can: () => this.state === 'play', first: 7000 });
@@ -103,6 +113,7 @@ class Queimada extends Phaser.Scene {
 
   // ------------------------------------------------------------ loop
   update(time, delta) {
+    if (!this.players) return;   // ainda escolhendo os times
     const dt = Math.min(delta, 50) / 1000;
     if (this.state === 'play') {
       this.timeLeft -= dt;
@@ -171,7 +182,7 @@ class Queimada extends Phaser.Scene {
     else if (p.id === 'daniel') { p.sure = true; }
     else if (p.id === 'lucas') { this.enemiesOf(p).forEach((q) => { q.slow = 2.2; }); TR.bubble(this, p.spr, 'kkkkk Dona Juliete!', 1.4); return; }
     else if (p.id === 'pedro') { p.bomb = true; }
-    else if (p.id === 'gabriel') { p.luva = 4; }
+    else if (p.id === 'gabriel' || p.id === 'kaua') { p.luva = 4; }
     TR.bubble(this, p.spr, QHAB[p.id].nome + '!', 1.1);
   }
 
@@ -390,7 +401,7 @@ class Queimada extends Phaser.Scene {
     }
     const a = this.players.filter((q) => q.team === 0 && q.alive).length, c = this.players.filter((q) => q.team === 1 && q.alive).length;
     const m = Math.max(0, Math.floor(this.timeLeft / 60)), s = Math.max(0, Math.floor(this.timeLeft % 60)).toString().padStart(2, '0');
-    this.hud.setText('Seu time  ' + a + ' x ' + c + '  Time do Lucas    ' + m + ':' + s);
+    this.hud.setText('Seu time  ' + a + ' x ' + c + '  Time do ' + this.nomeRival + '    ' + m + ':' + s);
     if (h) this.habTxt.setText('E: ' + QHAB[h.id].nome + (h.habCd > 0 ? '  (' + Math.ceil(h.habCd) + 's)' : '  PRONTA') + (h.alive ? '' : '  [cemitério]'));
   }
 

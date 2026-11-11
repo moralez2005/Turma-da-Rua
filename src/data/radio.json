@@ -1,5 +1,5 @@
 {
-  "_como_usar": "Cada música precisa do videoId do YouTube: o código depois de watch?v= ou de youtu.be/ (sem o ?si=...). Para adicionar, copie uma linha, troque titulo, artista e videoId e confira as vírgulas. Músicas da lista 'sem_link' ainda não tocam: é só achar o vídeo e mover a linha para 'musicas'. Para a música começar depois do início, coloque \"inicio\": 10 (em segundos). O orelhão do esconde-esconde toca a música de 'orelhao': cole o videoId do clipe lá.",
+  "_como_usar": "Cada música precisa do videoId do YouTube: o código depois de watch?v= ou de youtu.be/ (sem o ?si=...). Para adicionar, copie uma linha, troque titulo, artista e videoId e confira as vírgulas. Músicas da lista 'sem_link' ainda não tocam: é só achar o vídeo e mover a linha para 'musicas'. Para a música começar depois do início, coloque \"inicio\": 10 (em segundos).",
   "estacoes": [
     {
       "id": "lucas",
@@ -67,6 +67,5 @@
       ]
     }
   ],
-  "orelhao": { "titulo": "Piririn (Atoladinha)", "artista": "Bola de Fogo e as Foguentas", "videoId": "2ha3rJKIgUU" },
   "cenaFinal": { "titulo": "Música do fim de tarde", "artista": "", "videoId": "9qo5v22F6MU" }
 }

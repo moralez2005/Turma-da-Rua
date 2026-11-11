@@ -64,7 +64,7 @@ Na queimada as habilidades são outras, próprias do jogo: Braço longo (Pernalo
 
 **Rádio da Rua:** uma barra fica suspensa no topo da tela o tempo todo. Escolha a JBL do Lucas (eletrônica, gringas e o rap do Minecraft) ou a do Pedro (funk) ali em cima, ou clique numa JBL no cenário. O player oficial do YouTube fica pendurado ao lado do jogo, com a lista de músicas, e a música continua tocando nas brincadeiras. O botão ▴ pausa e recolhe o player.
 
-**Orelhão:** no esconde-esconde, aperte T perto do orelhão pra ele tocar a música de `orelhao` no `radio.json` pela Rádio da Rua.
+**Orelhão:** no esconde-esconde, aperte T perto do orelhão pra ele tocar: um trim-trim e uma musiquinha 8-bit original, feita por código (`ferramentas/gerador/orelhao.py`), sem precisar do YouTube.
 
 **Vizinhas:** os nomes são inventados e tudo delas (nome, cor, falas, demora e chance de furar a bola) fica em `src/vizinhas.js`.
 
@@ -84,7 +84,7 @@ Para abrir direto numa brincadeira: `http://localhost:8000/?cena=Futebol`. Tamb�
 
 - **Motor:** [Phaser 3.87](https://phaser.io), que já vem em `lib/`, sem build e sem CDN.
 - **Arte:** pixel art gerada por scripts em Python (Pillow/numpy) em `ferramentas/gerador/`. Isso inclui sprites em 4 direções, cenários em 960×540, o mapa de 1920×1440 do esconde-esconde (`esconde_mapa_real.py`) e os objetos. A única foto é a da homenagem no final: a turma de verdade.
-- **Sons:** efeitos retrô sintetizados por código (`ferramentas/gerador/sons.py`).
+- **Sons:** efeitos retrô e o toque do orelhão, todos sintetizados por código (`ferramentas/gerador/sons.py` e `orelhao.py`).
 - **Fonte:** Unifont, renderizada como fonte bitmap.
 
 ### Feito com IA

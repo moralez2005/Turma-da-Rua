@@ -6,8 +6,9 @@
  *   Se você demorar, alguém da turma grita antes e o peteleco é em você.
  *   kids() devolve os sprites da turma na cena; voce() devolve o seu sprite.
  *
- * TR.orelhao(scene, x, y)
- *   O orelhão toca a música configurada em src/data/radio.json ("orelhao"), pela Rádio da Rua.
+ * TR.orelhao(scene, falante)
+ *   O orelhão toca um toque 8-bit original (assets/sons/orelhao.wav, feito por ferramentas/gerador/orelhao.py).
+ *   Se a JBL estiver tocando, ela pausa enquanto o orelhão toca.
  */
 TR.placar = TR.placar || { petelecosDados: 0, petelecosLevados: 0 };
 
@@ -81,17 +82,17 @@ TR.peteleco = (scene, alvo) => {
   scene.tweens.add({ targets: estrela, y: estrela.y - 30, alpha: 0, duration: 600, onComplete: () => estrela.destroy() });
 };
 
-// Orelhão: toca a música do orelhão na Rádio da Rua (vídeo oficial do YouTube)
+// Orelhão: toca o toque 8-bit do jogo, sem precisar do YouTube
 TR.orelhao = (scene, falante) => {
-  const m = Radio.data && Radio.data.orelhao;
-  // toque de telefone (bipes curtos sintetizados pelo jogo)
-  [0, 180, 600, 780].forEach((t) => scene.time.delayedCall(t, () => TR.sfx(scene, 'bip', 0.4, 1.8)));
-  if (!m || !m.videoId) {
-    scene.time.delayedCall(900, () => TR.bubble(scene, falante, 'Alô? ...ninguém atendeu.', 1.6));
-    return;
-  }
-  scene.time.delayedCall(900, () => {
-    TR.bubble(scene, falante, 'Alô? Quem tá falando?', 1.6);
-    Radio.tocarAvulsa(m);
+  if (scene._orelhaoTocando) return;
+  scene._orelhaoTocando = true;
+  const jblTocando = Radio.playing;
+  if (jblTocando) Radio.pause();
+  TR.sfx(scene, 'orelhao', 0.7);
+  TR.bubble(scene, falante, 'Trim-trim... o orelhão tá tocando!', 1.8);
+  scene.time.delayedCall(2600, () => TR.bubble(scene, falante, 'Alô? Quem tá falando?', 1.8));
+  scene.time.delayedCall(7400, () => {
+    scene._orelhaoTocando = false;
+    if (jblTocando && Radio.mode === 'radio') Radio.toggle();   // a JBL volta a tocar
   });
 };

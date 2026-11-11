@@ -20,6 +20,11 @@ class EscondeEsconde extends Phaser.Scene {
       const img = this.add.image(o.x, o.y, 'obj_' + o.tipo).setOrigin(0.5, 1).setDepth(o.y);
       return Object.assign({}, o, { img });
     });
+    // placas com o nome de quem mora em cada casa
+    (M.casas || []).forEach((c) => {
+      const t = TR.txt(this, c.x, c.y, c.nome, 1, 0xffe9b0).setOrigin(0.5).setDepth(7);
+      this.add.rectangle(c.x, c.y, t.width + 14, t.height + 6, 0x241a2c, 0.75).setDepth(6);
+    });
     this.pique = M.pique;
     this.piqueMark = this.add.ellipse(this.pique.x, this.pique.y + 4, 70, 20).setStrokeStyle(3, 0xffd36a).setDepth(5);
     this.tweens.add({ targets: this.piqueMark, alpha: 0.3, yoyo: true, repeat: -1, duration: 700 });
@@ -38,7 +43,7 @@ class EscondeEsconde extends Phaser.Scene {
     this.arrow = this.add.triangle(0, 0, 0, 0, 22, 10, 0, 20, 0x7cf27c).setDepth(6000).setVisible(false);
     this.makeMinimap();
     TR.backButton(this);
-    TR.jblHud(this, { lucas: [878, 322], pedro: [1112, 326] });
+    TR.jblHud(this, { lucas: [620, 652], pedro: [1000, 652] });
     this.keys = this.input.keyboard.addKeys('UP,DOWN,LEFT,RIGHT,W,A,S,D,SHIFT,SPACE,E,C');
     this.input.keyboard.on('keydown-SPACE', () => this.onSpace());
     this.input.keyboard.on('keydown-C', () => this.onSpace());
@@ -545,7 +550,7 @@ class EscondeEsconde extends Phaser.Scene {
   }
 
   makeMinimap() {
-    const x = 16, y = 412, s = 0.1;
+    const s = 0.09, x = 16, y = TR.H - 12 - Math.round(this.WH * s);   // canto de baixo, cabe qualquer tamanho de mapa
     this.mm = { x, y, s };
     this.add.graphics().setScrollFactor(0).setDepth(5900).fillStyle(0x0c0810, 0.85).fillRect(x - 4, y - 4, this.WW * s + 8, this.WH * s + 8);
     this.add.image(x, y, 'esc_chao').setOrigin(0).setScale(s).setScrollFactor(0).setDepth(5901);

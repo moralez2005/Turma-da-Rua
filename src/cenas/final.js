@@ -29,7 +29,7 @@ class Final extends Phaser.Scene {
     });
 
     Radio.playFinal();
-    this.hint = TR.txt(this, 16, 14, '♪ Clique no vídeo ao lado pra ouvir a música do fim de tarde', 1, 0xffe0b0).setDepth(9000).setScrollFactor(0);
+    this.hint = TR.txt(this, 16, 14, '♪ Aperte o play no vídeo ao lado pra ouvir a música do fim de tarde', 1, 0xffe0b0).setDepth(9000).setScrollFactor(0);
     this.tweens.add({ targets: this.hint, alpha: 0.4, yoyo: true, repeat: 6, duration: 700, onComplete: () => this.hint.setAlpha(0.8) });
     const back = TR.button(this, 880, 22, 'Voltar (Esc)', () => this.leave(), { fixed: true, depth: 9500 });
     this.input.keyboard.on('keydown-ESC', () => this.leave());
@@ -90,7 +90,7 @@ class Final extends Phaser.Scene {
       'A TURMA DA RUA', '', 'Itaberá, 2019', '',
       'Pernalonga · Cezar · Kauã Henrique · Pedro', 'Lucas · Daniel · Gabriel', '',
       'Músicas: tocadas pelo player oficial do YouTube.', 'Todos os direitos reservados aos autores.', '',
-      'Feito com Phaser 3 e IBM Bob', 'Inspirado em Zueirama', '', 'Obrigado por jogar!',
+      'Feito com Phaser 3, IBM Bob e Claude', 'Inspirado em Zueirama', '', 'Obrigado por jogar!',
     ];
     this.tweens.add({ targets: this.quoteObjs.concat([this.sheik]), alpha: 0, duration: 900 });
     const c = this.add.container(480, 600).setDepth(8100).setScrollFactor(0);

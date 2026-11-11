@@ -6,30 +6,39 @@
   <title>A Turma da Rua — Itaberá, 2019</title>
   <meta name="description" content="Jogo em pixel art sobre uma tarde de brincadeiras na rua em Itaberá (SP), 2019.">
   <link rel="stylesheet" href="./src/estilo.css">
+  <link rel="icon" href="./assets/itens/token_futebol.png">
 </head>
 <body>
   <div id="jogo"></div>
 
-  <!-- Rádio JBL: player oficial do YouTube num cantinho (aparece quando uma JBL é ligada) -->
-  <aside id="radio" aria-label="Rádio JBL">
-    <div class="radio-topo">
-      <span class="radio-icone"></span>
-      <strong id="radio-nome">JBL</strong>
-      <button id="radio-fechar" title="Desligar a JBL">✕</button>
+  <!-- Rádio da Rua: barra no topo; o player oficial do YouTube fica pendurado nela enquanto toca -->
+  <header id="radio" aria-label="Rádio da Rua">
+    <div class="radio-barra">
+      <span class="radio-icone" aria-hidden="true"></span>
+      <strong id="radio-nome">Rádio da Rua</strong>
+      <div class="radio-estacoes">
+        <button data-estacao="lucas" title="Tocar a JBL do Lucas">JBL do Lucas</button>
+        <button data-estacao="pedro" title="Tocar a JBL do Pedro">JBL do Pedro</button>
+      </div>
+      <div class="radio-botoes">
+        <button id="radio-prev" title="Anterior">⏮</button>
+        <button id="radio-play" title="Tocar/pausar (M)">▶</button>
+        <button id="radio-next" title="Próxima">⏭</button>
+      </div>
+      <span id="radio-titulo">clique numa JBL pra tocar</span>
+      <button id="radio-fechar" title="Pausar e recolher o player">▴</button>
     </div>
-    <div id="radio-player"></div>
-    <div id="radio-titulo"></div>
-    <div id="radio-msg"></div>
-    <div class="radio-botoes">
-      <button id="radio-prev" title="Anterior">⏮</button>
-      <button id="radio-play" title="Tocar/pausar">▶</button>
-      <button id="radio-next" title="Próxima">⏭</button>
+    <div id="radio-painel">
+      <div id="radio-player"></div>
+      <div id="radio-msg"></div>
+      <ol id="radio-musicas"></ol>
     </div>
-  </aside>
+  </header>
 
   <script src="./lib/phaser.min.js"></script>
   <script src="./src/radio.js"></script>
   <script src="./src/comum.js"></script>
+  <script src="./src/vizinhas.js"></script>
   <script src="./src/cenas/boot.js"></script>
   <script src="./src/cenas/abertura.js"></script>
   <script src="./src/cenas/rua.js"></script>

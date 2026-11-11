@@ -63,7 +63,7 @@ class Alerta extends Phaser.Scene {
       'Quem pega grita ALERTA! e todo mundo congela.',
       'Com a bola: até 3 passos (setas), Q troca o alvo, Espaço mira.',
       'Se jogarem em você: Espaço na hora certa pra desviar.',
-      'Se você jogar a bola pra cima, escolhe a palavra (1 a 5).',
+      'Se você jogar a bola pra cima, escolhe a palavra (números).',
     ], () => this.chooseTheme());
     const byId = {}; this.players.forEach((p) => { byId[p.id] = p; });
     TR.chatter(this, (id) => (byId[id] && !byId[id].out ? byId[id].spr : null), { can: () => this.state === 'steps' || this.state === 'scatter', first: 9000, min: 8000, max: 13000 });
@@ -172,6 +172,7 @@ class Alerta extends Phaser.Scene {
   }
 
   onKey(ev) {
+    if (ev.repeat) return;   // segurar a seta não gasta os 3 passos de uma vez
     const k = ev.code;
     if (this.state === 'steps' && this.ball.owner === this.human) {
       const dirs = { ArrowUp: [0, -1], KeyW: [0, -1], ArrowDown: [0, 1], KeyS: [0, 1], ArrowLeft: [-1, 0], KeyA: [-1, 0], ArrowRight: [1, 0], KeyD: [1, 0] };
@@ -212,8 +213,9 @@ class Alerta extends Phaser.Scene {
     if (caller === this.human) this.info.setText('Até ' + this.maxSteps + ' passos com as setas · Q troca o alvo · Espaço mira');
     else {
       this.info.setText(TR.KIDS[caller.id].nome + ' está andando... fica esperto!');
-      // IA: anda até 3 passos na direção do alvo mais perto
-      const tgt = this.nearestTarget(caller);
+      // IA: mira num dos dois mais perto (assim não é sempre em você)
+      const perto = this.targets(caller).slice(0, 2);
+      const tgt = Phaser.Utils.Array.GetRandom(perto);
       let n = 0;
       const ev = this.time.addEvent({
         delay: 420, repeat: 2, callback: () => {
@@ -274,6 +276,7 @@ class Alerta extends Phaser.Scene {
 
   resolve(hit) {
     this.state = 'result';
+    this.info.setText('');
     const thrower = this.ball.thrower, tgt = this.throwTarget;
     const loser = hit ? tgt : thrower;
     loser.lives--;
@@ -335,7 +338,9 @@ class Alerta extends Phaser.Scene {
           if (p.x < F.x0 + 30 || p.x > F.x1 - 30) my += (p.y < F.cy ? -1 : 1) * 80;
         }
         const len = Math.hypot(mx, my);
-        if (len > 4) { p.x += mx / len * spd * dt; p.y += my / len * spd * dt * 0.8; p.dir = TR.dirFrom(mx, my, p.dir); p.moving = true; } else p.moving = false;
+        // setas valem 1 (ou 1,4 na diagonal); os outros miram em pixels, por isso a folga de 4 só vale pra eles
+        const minimo = p === this.human ? 0 : 4;
+        if (len > minimo) { p.x += mx / len * spd * dt; p.y += my / len * spd * dt * 0.8; p.dir = TR.dirFrom(mx, my, p.dir); p.moving = true; } else p.moving = false;
         p.x = Phaser.Math.Clamp(p.x, F.x0, F.x1); p.y = Phaser.Math.Clamp(p.y, F.y0, F.y1);
       });
       // ninguém fica empilhado em cima do outro

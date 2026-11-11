@@ -33,7 +33,7 @@ class Rua extends Phaser.Scene {
     // painel de informação
     const g = this.add.graphics().setDepth(4000);
     g.fillStyle(0x0c0810, 0.85).fillRect(0, 0, 960, 34);
-    TR.txt(this, 16, 9, 'Escolha uma brincadeira:  ← →  e  Enter   |   clique numa JBL para tocar música', 1, 0xffe0b0).setDepth(4001);
+    TR.txt(this, 16, 9, 'Escolha uma brincadeira:  ← →  e  Enter   |   clique numa JBL (ou na rádio lá em cima) pra tocar música', 1, 0xffe0b0).setDepth(4001);
     this.info = TR.panel(this, 480, 506, 600, 54, 4000);
     this.infoTitle = TR.txt(this, 196, 486, '', 1, 0xffd36a).setDepth(4001);
     this.infoDesc = TR.txt(this, 196, 506, '', 1, 0xf4e9d8).setDepth(4001);
@@ -93,18 +93,18 @@ class Rua extends Phaser.Scene {
   makeJbl(id, x, y, label, ownerX) {
     const owner = TR.kid(this, id, ownerX, y + 2).setDepth(y + 2);
     owner.play(id + '_idle');
-    const s = this.add.sprite(x, y, 'jbl_' + id, 0).setScale(2).setOrigin(0.5, 1).setDepth(y + 1)
+    const s = this.add.sprite(x, y, 'jbl_' + id, 0).setScale(1.4).setOrigin(0.5, 1).setDepth(y + 1)
       .setInteractive({ useHandCursor: true });
-    const lbl = TR.txt(this, x, y - 172, label, 1, 0xffd36a).setOrigin(0.5).setDepth(3001);
-    const tip = TR.txt(this, x, y - 154, 'clique pra tocar', 1, 0xfff1d6).setOrigin(0.5).setDepth(3001);
+    const lbl = TR.txt(this, x, y - 94, label, 1, 0xffd36a).setOrigin(0.5).setDepth(3001);
+    const tip = TR.txt(this, x, y - 76, 'clique pra tocar', 1, 0xfff1d6).setOrigin(0.5).setDepth(3001);
     const bg = this.add.graphics().setDepth(3000);
-    bg.fillStyle(0x0c0810, 0.75).fillRect(x - 100, y - 184, 200, 40);
-    bg.fillStyle(0x0c0810, 0.75).fillTriangle(x - 8, y - 144, x + 8, y - 144, x, y - 134);
+    bg.fillStyle(0x0c0810, 0.75).fillRect(x - 100, y - 106, 200, 40);
+    bg.fillStyle(0x0c0810, 0.75).fillTriangle(x - 8, y - 66, x + 8, y - 66, x, y - 56);
     s.on('pointerover', () => s.setTint(0xffe9a8));
     s.on('pointerout', () => s.clearTint());
     s.on('pointerdown', () => {
       TR.sfx(this, 'clique', 0.4);
-      if (Radio.mode === 'radio' && Radio.station === id) Radio.toggle();
+      if (Radio.mode === 'radio' && Radio.station === id && Radio.ready) Radio.toggle();
       else Radio.setStation(id);
       TR.bubble(this, owner, id === 'pedro' ? 'Solta o funk!' : 'Aumenta o som!', 1.6);
     });

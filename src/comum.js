@@ -129,6 +129,12 @@ const TR = {
 
   // ---------- balão de fala ----------
   bubble(scene, target, msg, secs = 2, opts = {}) {
+    // Cada personagem fala um balão por vez: o novo substitui o antigo.
+    if (!scene._balloes) {
+      scene._balloes = [];
+      scene.events.once('shutdown', () => { scene._balloes = null; });
+    }
+    scene._balloes.filter((b) => b.alvo === target && b.c.active).forEach((b) => b.fechar());
     const t = TR.txt(scene, 0, 0, msg, 1, 0x241a2c).setOrigin(0.5, 1);
     const g = scene.add.graphics();
     const c = scene.add.container(0, 0, [g, t]).setDepth(5000);
@@ -141,19 +147,34 @@ const TR = {
     c.setScale(0.2);
     scene.tweens.add({ targets: c, scale: 1, duration: 180, ease: 'Back.Out' });
     const offY = opts.offY || 142;
+    const reg = { alvo: target, c, w, h, x: 0, y: 0 };
     const follow = () => {
-      if (!c.active) return;
+      if (!c.active || !scene._balloes) return;
       const x = target.x !== undefined ? target.x : target[0];
       const y = target.y !== undefined ? target.y : target[1];
       const cam = scene.cameras.main;
-      c.setPosition(Phaser.Math.Clamp(x, cam.scrollX + w / 2 + 6, cam.scrollX + TR.W - w / 2 - 6), Math.max(cam.scrollY + h + 8, y - offY));
+      reg.x = Phaser.Math.Clamp(x, cam.scrollX + w / 2 + 6, cam.scrollX + TR.W - w / 2 - 6);
+      reg.y = Math.max(cam.scrollY + h + 8, y - offY);
+      // Se encostar num balão mais antigo, sobe até ficar livre (assim um não cobre o outro)
+      scene._balloes.forEach((o) => {
+        if (o === reg || !o.c.active || scene._balloes.indexOf(o) > scene._balloes.indexOf(reg)) return;
+        const juntosX = Math.abs(o.x - reg.x) < (o.w + w) / 2 + 4;
+        const juntosY = Math.abs(o.y - reg.y) < (o.h + h) / 2 + 6;
+        if (juntosX && juntosY) reg.y = o.y - o.h - 8;
+      });
+      c.setPosition(reg.x, reg.y);
     };
-    follow();
-    const ev = scene.events.on('postupdate', follow);
-    scene.time.delayedCall(secs * 1000, () => {
+    reg.fechar = () => {
+      if (reg.fechado) return;
+      reg.fechado = true;
       scene.events.off('postupdate', follow);
-      scene.tweens.add({ targets: c, alpha: 0, duration: 200, onComplete: () => c.destroy() });
-    });
+      if (scene._balloes) scene._balloes = scene._balloes.filter((b) => b !== reg);
+      if (c.active) scene.tweens.add({ targets: c, alpha: 0, duration: 150, onComplete: () => c.destroy() });
+    };
+    scene._balloes.push(reg);
+    follow();
+    scene.events.on('postupdate', follow);
+    scene.time.delayedCall(secs * 1000, reg.fechar);
     return c;
   },
 
@@ -243,10 +264,10 @@ const TR = {
     const all = {};
     ['lucas', 'pedro'].forEach((id) => {
       const [x, y] = pos[id];
-      const s = scene.add.sprite(x, y, 'jbl_' + id, 0).setScale(1.5).setOrigin(0.5, 1).setDepth(y)
+      const s = scene.add.sprite(x, y, 'jbl_' + id, 0).setScale(1.1).setOrigin(0.5, 1).setDepth(y)
         .setInteractive({ useHandCursor: true });
-      const lblBg = scene.add.rectangle(x, y - 46, 96, 18, 0x0c0810, 0.78).setDepth(5899);
-      const lbl = TR.txt(scene, x, y - 46, '', 1, id === 'pedro' ? 0x9ccfff : 0xffaa9c).setOrigin(0.5).setDepth(5900);
+      const lblBg = scene.add.rectangle(x, y - 40, 96, 18, 0x0c0810, 0.78).setDepth(5899);
+      const lbl = TR.txt(scene, x, y - 40, '', 1, id === 'pedro' ? 0x9ccfff : 0xffaa9c).setOrigin(0.5).setDepth(5900);
       s.on('pointerover', () => s.setTint(0xffe9a8));
       s.on('pointerout', () => s.clearTint());
       s.on('pointerdown', (ptr, lx, ly, ev) => {

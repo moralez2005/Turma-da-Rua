@@ -1,11 +1,12 @@
-"""Mapa do esconde-esconde em 1920x1080: chão/fachadas + objetos separados (para esconder atrás) + JSON."""
+"""Primeiro mapa do esconde-esconde (1920x1080) e os desenhos dos objetos.
+O mapa atual é gerado por esconde_mapa_real.py, que usa os objetos daqui. Rodar este arquivo sozinho volta pro mapa antigo."""
 import os, json, math, random
 import numpy as np
 from PIL import Image
 from bg960 import (Pic, sky, cloud, tree_back, roof, wall, window, door, gate, baiano, poste, wires,
                    sidewalk, curb, pavers, plant_pot, mix, dark, BAYER)
 
-OUT = "/home/claude/jogo/assets/esconde"
+OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "assets", "esconde")
 os.makedirs(OUT, exist_ok=True)
 rnd = random.Random(9)
 W, H = 1920, 1080
@@ -58,9 +59,15 @@ def ground():
         cloud(p, cx, cy, w)
     tree_back(p, 0, 1920, 64, (104, 150, 98))
     # ---- fileira de cima ----
-    wall(p, 0, 92, 240, 300, (236, 234, 226)); roof(p, 0, 240, 72)
-    gate(p, 30, 186, 140, 114); window(p, 186, 160, 40, 34)
-    solid(0, 60, 240, 240)
+    # casa do Kauã: sem portão, uma entrada de meio tijolo com escadinha descendo pro quintal (e a torneira!)
+    wall(p, 0, 92, 240, 300, (226, 214, 190)); roof(p, 0, 240, 72)
+    window(p, 24, 160, 40, 34); window(p, 186, 160, 40, 34)
+    baiano(p, 80, 220, 96, 300); baiano(p, 154, 220, 170, 300)
+    p.rect(96, 200, 154, 300, (70, 56, 50))
+    for k, y in enumerate(range(236, 300, 12)):
+        p.rect(96, y, 154, y + 3, (150, 140, 128)); p.rect(96, y + 4, 154, y + 11, (104, 92, 84))
+    p.rect(140, 212, 146, 216, (170, 170, 176)); p.rect(142, 216, 144, 222, (170, 170, 176))   # torneira
+    solid(0, 60, 96, 240); solid(154, 60, 86, 240); solid(96, 60, 58, 160)   # entrada aberta até y 220
     baiano(p, 240, 84, 520, 300)
     for x in range(240, 521):
         top = 84 - (10 if (x // 30) % 3 == 1 else 0)
@@ -80,30 +87,29 @@ def ground():
     solid(520, 40, 80, 26)
     # casa amarela
     wall(p, 600, 96, 860, 300, (240, 214, 138)); roof(p, 600, 860, 76)
-    window(p, 622, 170); window(p, 790, 170); door(p, 712, 230, 38, 70)
-    plant_pot(p, 692, 300); plant_pot(p, 758, 300)
+    window(p, 622, 170); window(p, 790, 170)
+    gate(p, 664, 222, 64, 78, (124, 78, 46), 6); gate(p, 732, 222, 64, 78, (124, 78, 46), 6)   # portões marrons do Cezar
     solid(600, 60, 260, 240)
     # casa verde-água com muro e portão
     wall(p, 860, 100, 1120, 300, (150, 208, 192)); roof(p, 860, 1120, 80, c=(160, 74, 48))
     window(p, 886, 170); window(p, 1050, 170)
     p.rect(860, 240, 1120, 300, (206, 204, 198)); p.noise(860, 240, 1120, 300, 0.03)
-    gate(p, 958, 236, 70, 64, (110, 118, 130), 6)
+    # portão de madeira do Pedro
+    p.rect(950, 226, 1036, 300, (120, 78, 44))
+    for gx in range(950, 1036, 12):
+        p.rect(gx, 226, gx + 1, 300, (88, 56, 32)); p.rect(gx + 3, 226, gx + 3, 300, (156, 108, 66))
+    p.rect(950, 248, 1036, 251, (88, 56, 32)); p.rect(950, 280, 1036, 283, (88, 56, 32))
     solid(860, 60, 260, 240)
-    # casa rosa de 2 andares
+    # casa rosa de 2 andares (Dona Tita)
     wall(p, 1120, 70, 1360, 300, (232, 160, 168)); roof(p, 1120, 1360, 50, c=(150, 70, 50))
     window(p, 1146, 100); window(p, 1290, 100); window(p, 1146, 200); door(p, 1272, 230, 36, 70)
     p.rect(1130, 150, 1350, 156, (210, 210, 206))
     solid(1120, 40, 240, 260)
-    # bar do Tio
-    wall(p, 1360, 96, 1660, 300, (228, 228, 234)); roof(p, 1360, 1660, 76)
-    for x in range(1366, 1656, 16):
-        p.rect(x, 130, x + 7, 150, (204, 52, 48)); p.rect(x + 8, 130, x + 15, 150, (246, 246, 246))
-    p.rect(1366, 151, 1656, 153, (140, 36, 34))
-    p.rect(1390, 170, 1540, 300, (58, 48, 44))
-    for sx in range(1396, 1536, 14):
-        for sy in (180, 206):
-            p.rect(sx, sy, sx + 8, sy + 16, rnd.choice([(220, 60, 40), (60, 140, 70), (240, 200, 60), (70, 110, 200)]))
-    window(p, 1580, 186, 50, 40)
+    # casa lilás da Dona Vera (com varandinha)
+    wall(p, 1360, 96, 1660, 300, (176, 146, 214)); roof(p, 1360, 1660, 76)
+    window(p, 1392, 160); window(p, 1590, 160); door(p, 1480, 230, 38, 70, (110, 80, 120))
+    p.rect(1360, 240, 1660, 300, (206, 200, 210)); p.noise(1360, 240, 1660, 300, 0.03)
+    gate(p, 1470, 236, 60, 64, (120, 110, 140), 6)
     solid(1360, 60, 300, 240)
     wall(p, 1660, 96, 1700, 300, (214, 208, 198)); roof(p, 1660, 1700, 76, c=(150, 70, 50)); solid(1660, 60, 40, 240)
     # rua transversal (direita) e lote da esquina
@@ -130,11 +136,13 @@ def ground():
     low_wall(p, 446, 693, 920, 708)
     p.rect(640, 693, 700, 708, (116, 156, 80))                  # abertura do portão
     solid(446, 693, 194, 15); solid(700, 693, 220, 15)
-    low_wall(p, 920, 693, 936, 1079); solid(920, 693, 16, 70); solid(920, 830, 16, 250)  # vão y 763..830
+    low_wall(p, 920, 693, 936, 1079, (124, 86, 60)); solid(920, 693, 16, 70); solid(920, 830, 16, 250)  # vão y 763..830
     cement(p, 936, 693, 1699, 1079)
-    low_wall(p, 936, 693, 1699, 708); solid(936, 693, 140, 15); solid(1136, 693, 563, 15)  # portão x 1076..1136
+    low_wall(p, 936, 693, 1699, 708, (124, 86, 60)); solid(936, 693, 140, 15); solid(1136, 693, 563, 15)  # portão x 1076..1136
+    p.rect(936, 699, 1699, 700, (226, 150, 176))   # faixa rosa no muro marrom (casa do Lucas)
     p.rect(1076, 693, 1136, 708, (184, 180, 172))
     # casa de baixo (vista de cima: telhado)
+    p.rect(1052, 782, 1508, 1018, (226, 150, 176))   # paredes rosa aparecendo embaixo do telhado
     p.rect(1060, 790, 1500, 1010, (176, 84, 54))
     for y in range(790, 1010, 8):
         p.rect(1060, y + 6, 1500, y + 7, (150, 66, 42))
@@ -383,13 +391,13 @@ OBJ_MAKERS = {
 # (tipo, x da base (centro), y da base, nome do esconderijo, pé sólido (largura, altura), cobre quem fica atrás?)
 OBJECTS = [
     ("kombi", 330, 430, "Atrás da Kombi", (180, 30), True),
-    ("carro", 1180, 630, "Atrás do carro parado", (170, 26), True),
+    ("carro", 670, 640, "Atrás do Celta branco dos gêmeos", (170, 26), True),
     ("lixeira", 160, 334, "Atrás da lixeira", (26, 10), True),
-    ("arbusto", 676, 332, "No arbusto da casa amarela", (90, 12), True),
+    ("arbusto", 830, 332, "No arbusto do Cezar", (90, 12), True),
     ("tambor", 1040, 334, "Atrás do tambor azul", (32, 10), True),
     ("orelhao", 1220, 334, "Atrás do orelhão", (20, 10), True),
-    ("engradados", 1470, 334, "Atrás dos engradados do bar", (96, 12), True),
-    ("mesa", 1590, 336, "Debaixo da mesa do bar", (100, 10), True),
+    ("engradados", 1410, 334, "Atrás dos engradados da Dona Vera", (96, 12), True),
+    ("mesa", 1590, 336, "Debaixo da mesa da varanda", (100, 10), True),
     ("mato", 110, 900, "No mato alto (1)", None, True),
     ("mato", 330, 1060, "No mato alto (2)", None, True),
     ("mato", 820, 1060, "No mato do quintal", None, True),
@@ -402,12 +410,16 @@ OBJECTS = [
     ("bananeira", 500, 1050, "Na bananeira", (16, 10), True),
     ("caixa", 990, 900, "Atrás da caixa d'água", (64, 10), True),
     ("tanque", 1560, 1040, "Atrás do tanque de lavar roupa", (60, 12), True),
-    ("carro_vermelho", 1600, 880, "Atrás do carro da garagem", (170, 26), True),
+    ("carro_vermelho", 1600, 880, "Atrás do carro do Lucas", (170, 26), True),
     ("arbusto", 1900, 900, "No arbusto da esquina", (90, 12), True),
     ("tanque", 560, 116, "No fundo do beco", (56, 12), True),
 ]
+# placas com o nome de cada casa (aparecem no jogo)
+CASAS = [("Kauã", 120, 112), ("Barracão", 380, 108), ("Cezar", 730, 118), ("Pedro", 990, 122),
+         ("Dona Tita", 1240, 82), ("Dona Vera", 1510, 118), ("Gêmeos", 683, 724), ("Lucas", 1280, 724)]
 EXTRA_SPOTS = [  # esconderijos sem objeto (escuro)
-    {"id": "barracao", "nome": "Dentro do barracão", "x": 321, "y": 222, "raio": 28, "escuro": True},
+    {"id": "barracao", "nome": "Dentro do barracão inacabado", "x": 321, "y": 222, "raio": 28, "escuro": True},
+    {"id": "escada_kaua", "nome": "Na escadinha do Kauã", "x": 125, "y": 232, "raio": 24, "escuro": True},
 ]
 
 
@@ -434,7 +446,8 @@ def build():
         objs.append(o)
     data = {"tamanho": [W, H], "pique": {"x": 960, "y": 338}, "solidos": SOLIDS, "objetos": objs,
             "esconderijos_extra": EXTRA_SPOTS,
-            "inicio": {"x": 900, "y": 420}}
+            "inicio": {"x": 900, "y": 420},
+            "casas": [{"nome": n, "x": x, "y": y} for n, x, y in CASAS]}
     with open(f"{OUT}/mapa.json", "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=1)
     # prévia

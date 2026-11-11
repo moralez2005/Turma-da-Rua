@@ -1,182 +1,54 @@
 {
-  "_como_usar": "Cada musica precisa do videoId do YouTube (o codigo depois de watch?v= ou youtu.be/). Musicas com videoId vazio sao puladas pelo player ate voce preencher. Prefira o clipe do canal oficial do artista, que costuma liberar a incorporacao.",
+  "_como_usar": "Cada música precisa do videoId do YouTube: o código depois de watch?v= ou de youtu.be/ (sem o ?si=...). Para adicionar, copie uma linha, troque titulo, artista e videoId e confira as vírgulas. Músicas da lista 'sem_link' ainda não tocam: é só achar o vídeo e mover a linha para 'musicas'.",
   "estacoes": [
     {
       "id": "lucas",
       "nome": "JBL do Lucas",
       "musicas": [
-        {
-          "titulo": "Stressed Out",
-          "artista": "twenty one pilots",
-          "videoId": "pXRviuL6vMY"
-        },
-        {
-          "titulo": "Heathens",
-          "artista": "twenty one pilots",
-          "videoId": ""
-        },
-        {
-          "titulo": "Pompeii",
-          "artista": "Bastille",
-          "videoId": ""
-        },
-        {
-          "titulo": "Happier",
-          "artista": "Marshmello e Bastille",
-          "videoId": ""
-        },
-        {
-          "titulo": "Believer",
-          "artista": "Imagine Dragons",
-          "videoId": "7wtfhZwyrcc"
-        },
-        {
-          "titulo": "Bad Liar",
-          "artista": "Imagine Dragons",
-          "videoId": "I-QfPUz1es8"
-        },
-        {
-          "titulo": "High Hopes",
-          "artista": "Panic! at the Disco",
-          "videoId": ""
-        },
-        {
-          "titulo": "Sweater Weather",
-          "artista": "The Neighbourhood",
-          "videoId": ""
-        },
-        {
-          "titulo": "Do I Wanna Know?",
-          "artista": "Arctic Monkeys",
-          "videoId": ""
-        },
-        {
-          "titulo": "Someone You Loved",
-          "artista": "Lewis Capaldi",
-          "videoId": "zABLecsR5UE"
-        },
-        {
-          "titulo": "Old Town Road",
-          "artista": "Lil Nas X",
-          "videoId": ""
-        },
-        {
-          "titulo": "Jenifer",
-          "artista": "Gabriel Diniz",
-          "videoId": ""
-        },
-        {
-          "titulo": "Caneta Azul",
-          "artista": "Manoel Gomes",
-          "videoId": ""
-        },
-        {
-          "titulo": "Atrasadinha",
-          "artista": "Felipe Araújo e Ferrugem",
-          "videoId": ""
-        },
-        {
-          "titulo": "Lençol Dobrado",
-          "artista": "João Gustavo e Murilo",
-          "videoId": ""
-        }
+        { "titulo": "Dancin (KRONO Remix)", "artista": "Aaron Smith", "videoId": "Cjp6RVrOOW0" },
+        { "titulo": "In My Mind", "artista": "Dynoro & Gigi D'Agostino", "videoId": "W9P_qUnMaFg" },
+        { "titulo": "Buttercup", "artista": "Jack Stauber", "videoId": "eYDI8b5Nn5s" },
+        { "titulo": "Rap do Minecraft", "artista": "BngOficial", "videoId": "rQzSiiRe6YM" },
+        { "titulo": "Stressed Out", "artista": "twenty one pilots", "videoId": "pXRviuL6vMY" },
+        { "titulo": "Believer", "artista": "Imagine Dragons", "videoId": "7wtfhZwyrcc" },
+        { "titulo": "Bad Liar", "artista": "Imagine Dragons", "videoId": "I-QfPUz1es8" },
+        { "titulo": "Someone You Loved", "artista": "Lewis Capaldi", "videoId": "zABLecsR5UE" }
+      ],
+      "sem_link": [
+        { "titulo": "Heathens", "artista": "twenty one pilots", "videoId": "" },
+        { "titulo": "Pompeii", "artista": "Bastille", "videoId": "" },
+        { "titulo": "Happier", "artista": "Marshmello e Bastille", "videoId": "" },
+        { "titulo": "High Hopes", "artista": "Panic! at the Disco", "videoId": "" },
+        { "titulo": "Sweater Weather", "artista": "The Neighbourhood", "videoId": "" },
+        { "titulo": "Do I Wanna Know?", "artista": "Arctic Monkeys", "videoId": "" },
+        { "titulo": "Old Town Road", "artista": "Lil Nas X", "videoId": "" },
+        { "titulo": "Jenifer", "artista": "Gabriel Diniz", "videoId": "" },
+        { "titulo": "Caneta Azul", "artista": "Manoel Gomes", "videoId": "" },
+        { "titulo": "Atrasadinha", "artista": "Felipe Araújo e Ferrugem", "videoId": "" },
+        { "titulo": "Lençol Dobrado", "artista": "João Gustavo e Murilo", "videoId": "" }
       ]
     },
     {
       "id": "pedro",
       "nome": "JBL do Pedro",
       "musicas": [
-        {
-          "titulo": "",
-          "artista": "",
-          "videoId": "KqRGpEWvbZk"
-        },
-        {
-          "titulo": "",
-          "artista": "",
-          "videoId": "13hspXgLXto"
-        },
-        {
-          "titulo": "",
-          "artista": "",
-          "videoId": "Cjp6RVrOOW0"
-        },
-        {
-          "titulo": "",
-          "artista": "",
-          "videoId": "W9P_qUnMaFg"
-        },
-        {
-          "titulo": "",
-          "artista": "",
-          "videoId": "eYDI8b5Nn5s"
-        },
-        {
-          "titulo": "",
-          "artista": "",
-          "videoId": "upCptHeThio"
-        },
-        {
-          "titulo": "",
-          "artista": "",
-          "videoId": "rQzSiiRe6YM"
-        },
-        {
-          "titulo": "Poesia Acústica #2: Sobre Nós",
-          "artista": "Pineapple StormTV",
-          "videoId": ""
-        },
-        {
-          "titulo": "Poesia Acústica #3: Capricorniana",
-          "artista": "Pineapple StormTV",
-          "videoId": ""
-        },
-        {
-          "titulo": "Poesia Acústica #4: Todo Mundo Odeia Acústico",
-          "artista": "Pineapple StormTV",
-          "videoId": ""
-        },
-        {
-          "titulo": "Poesia Acústica #5: Teu Popô Remix",
-          "artista": "Pineapple StormTV",
-          "videoId": ""
-        },
-        {
-          "titulo": "Poesia Acústica #6: Era Uma Vez",
-          "artista": "Pineapple StormTV",
-          "videoId": ""
-        },
-        {
-          "titulo": "Poesia Acústica #7: Céu Azul",
-          "artista": "Pineapple StormTV",
-          "videoId": ""
-        },
-        {
-          "titulo": "Nós (Poesia Acústica #2 Spin Off)",
-          "artista": "Pineapple StormTV",
-          "videoId": ""
-        },
-        {
-          "titulo": "Poetas no Topo 3.1",
-          "artista": "Pineapple StormTV",
-          "videoId": ""
-        },
-        {
-          "titulo": "Vamos pra Gaiola",
-          "artista": "MC Kevin o Chris",
-          "videoId": ""
-        },
-        {
-          "titulo": "Hoje",
-          "artista": "Ludmilla",
-          "videoId": ""
-        }
+        { "titulo": "Zé Guaritinha", "artista": "MC Jottapê e Mano Brown", "videoId": "KqRGpEWvbZk" },
+        { "titulo": "Gaiola É o Troco", "artista": "MC Du Black", "videoId": "13hspXgLXto" },
+        { "titulo": "Parado no Bailão", "artista": "MC L da Vinte e MC Gury", "videoId": "upCptHeThio" }
+      ],
+      "sem_link": [
+        { "titulo": "Vamos pra Gaiola", "artista": "MC Kevin o Chris", "videoId": "" },
+        { "titulo": "Hoje", "artista": "Ludmilla", "videoId": "" },
+        { "titulo": "Poesia Acústica #2: Sobre Nós", "artista": "Pineapple StormTV", "videoId": "" },
+        { "titulo": "Poesia Acústica #3: Capricorniana", "artista": "Pineapple StormTV", "videoId": "" },
+        { "titulo": "Poesia Acústica #4: Todo Mundo Odeia Acústico", "artista": "Pineapple StormTV", "videoId": "" },
+        { "titulo": "Poesia Acústica #5: Teu Popô Remix", "artista": "Pineapple StormTV", "videoId": "" },
+        { "titulo": "Poesia Acústica #6: Era Uma Vez", "artista": "Pineapple StormTV", "videoId": "" },
+        { "titulo": "Poesia Acústica #7: Céu Azul", "artista": "Pineapple StormTV", "videoId": "" },
+        { "titulo": "Nós (Poesia Acústica #2 Spin Off)", "artista": "Pineapple StormTV", "videoId": "" },
+        { "titulo": "Poetas no Topo 3.1", "artista": "Pineapple StormTV", "videoId": "" }
       ]
     }
   ],
-  "cenaFinal": {
-    "titulo": "",
-    "artista": "",
-    "videoId": "9qo5v22F6MU"
-  }
+  "cenaFinal": { "titulo": "Música do fim de tarde", "artista": "", "videoId": "9qo5v22F6MU" }
 }

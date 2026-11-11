@@ -1,92 +1,95 @@
-# 🎮 A Turma da Rua
+# A Turma da Rua
 
 > *Em algum lugar de Itaberá, em 2019...*
 
-Um jogo em pixel art sobre uma tarde de brincadeiras na rua com sete amigos de infância: futebol com traves de chinelo, esconde-esconde no quarteirão inteiro, queimada e alerta. A JBL do Lucas ou a do Pedro toca as músicas da época e, no fim, a turma senta no meio-fio para ver o pôr do sol.
+Um jogo indie em pixel art sobre uma tarde de brincadeiras na rua com sete amigos de infância. Tem futebol com traves de chinelo, esconde-esconde no quarteirão inteiro, queimada e alerta. A JBL do Lucas ou a do Pedro toca as músicas da época, e no fim a turma senta no meio-fio para ver o pôr do sol.
 
-Projeto desenvolvido para o workshop **IBM SkillsBuild · #IBMBOB**.
-
-## ▶️ Jogue agora
-
-**👉 [https://moralez2005.github.io/Turma-da-Rua/](https://moralez2005.github.io/Turma-da-Rua/)**
-
-Funciona direto no navegador do computador, sem instalar nada.
+## 🎮 [Jogar agora](https://moralez2005.github.io/Turma-da-Rua/)
 
 ![Abertura](assets/prints/01_abertura.png)
 
-## O que tem no jogo
+## Brincadeiras
 
-- **⚽ Futebol de rua:** 3 contra 3 com traves de chinelo. Passe, chute carregado, drible e habilidade de cada personagem. De vez em quando passa um carro e todo mundo corre pra calçada.
-- **👁 Esconde-esconde:** o quarteirão inteiro com 24 esconderijos (Kombi, caçamba, mato alto, varal, bananeira...). Dá pra se esconder ou procurar a turma.
-- **🔴 Queimada:** seu time contra o time do Lucas. Mire, carregue, arremesse e agarre a bola na hora certa. Quem é queimado vai pro cemitério e pode voltar.
-- **❗ Alerta:** escolha um tema e a sua palavra. Gritaram a sua? Corre pegar a bola, grita ALERTA, todo mundo congela e você arremessa.
-- **🌅 Fim de tarde:** a cena final, com a turma no meio-fio, refri, salgadinho e uma frase pra fechar.
-- **📻 Rádio JBL:** as duas JBLs ficam na calçada em todas as telas. É só clicar numa delas pra tocar.
+| | Brincadeira | Como funciona |
+| --- | --- | --- |
+| ⚽ | **Futebol de rua** | 3 contra 3 com traves de chinelo. A bola sobe, quica e rola. Passe, chute carregado, troca de jogador e habilidades. De vez em quando passa um carro e todo mundo vai pra calçada. Se a bola cair na casa rosa, a Dona Tita devolve rapidinho. Se cair na lilás, a Dona Vera reclama e demora... e se a filha dela pegar a bola, ela fura e acabou o jogo. |
+| 👁 | **Esconde-esconde** | O quarteirão inteiro, desenhado a partir do mapa da rua de verdade: a rua principal, as duas ruas que sobem (a do Cezar e do Lucas) e a descida até a casa do Pernalonga. Tem a escadinha do Kauã, o barracão inacabado sem telhado, o portão de madeira do Pedro, as casas da Dona Tita e da Dona Vera e mais de 30 esconderijos. Você pode se esconder enquanto o Daniel procura, ou procurar a turma. |
+| 🔴 | **Queimada** | Seu time contra o time do Lucas. Mire, carregue e arremesse. Agarre a bola na hora certa. Quem é queimado vai pro cemitério e volta se queimar alguém de lá. |
+| ❗ | **Alerta** | Escolha um tema (frutas, times, países, games...) e a sua palavra. Gritaram a sua? Corre pegar a bola e grita ALERTA! Todo mundo congela, você dá 3 passos e arremessa. 3 vidas cada. |
+| 🌅 | **Fim de tarde** | A cena final: a turma no meio-fio, refri e salgadinho, pôr do sol e uma frase pra fechar. |
 
-![Seleção de personagens](assets/prints/02_selecao.png)
+![Seleção](assets/prints/02_selecao.png)
 
-<table>
-  <tr>
-    <td align="center"><img src="assets/prints/03_futebol.png" alt="Futebol" width="400"><br><b>Futebol</b></td>
-    <td align="center"><img src="assets/prints/04_queimada.png" alt="Queimada" width="400"><br><b>Queimada</b></td>
-  </tr>
-  <tr>
-    <td align="center"><img src="assets/prints/05_alerta.png" alt="Alerta" width="400"><br><b>Alerta</b></td>
-    <td align="center"><img src="assets/prints/06_esconde.png" alt="Esconde-esconde" width="400"><br><b>Esconde-esconde</b></td>
-  </tr>
-</table>
+| Futebol | Queimada |
+| --- | --- |
+| ![Futebol](assets/prints/03_futebol.png) | ![Queimada](assets/prints/04_queimada.png) |
+| **Alerta** | **Esconde-esconde** |
+| ![Alerta](assets/prints/05_alerta.png) | ![Esconde-esconde](assets/prints/06_esconde.png) |
 
 ![Fim de tarde](assets/prints/08_fim_de_tarde.png)
 
 ## A turma
 
-Pernalonga, Cezar, Kauã Henrique, Pedro ("Dona Juliete"), Lucas, Daniel e Gabriel. Cada um tem uma habilidade própria no futebol (tecla **E**): passada longa, caneta, paredão, bomba, zoeira, estrategista e gato. Na queimada e no alerta as habilidades mudam para combinar com cada brincadeira.
+| Personagem | Habilidade no futebol (tecla E) |
+| --- | --- |
+| **Pernalonga** | Passada longa: corre muito mais rápido (no Alerta, dá 4 passos em vez de 3) |
+| **Cezar** | Caneta: arrancada rápida, e ninguém rouba a bola dele |
+| **Kauã Henrique** | Paredão: goleiro que alcança mais longe |
+| **Pedro** ("Dona Juliete") | Bomba: o próximo chute ou arremesso sai fortíssimo |
+| **Lucas** | Zoeira: deixa quem está perto mais lento |
+| **Daniel** | Estrategista: mostra onde está o alvo ou o escondido mais perto |
+| **Gabriel** | Gato: pulo de goleiro mais rápido |
+
+Na queimada as habilidades são outras, próprias do jogo: Braço longo (Pernalonga), Ginga (Cezar), Mira calculada (Daniel), Zoeira (Lucas), Bomba do MC (Pedro) e Mão de goleiro (Gabriel).
 
 ## Controles
 
 | Tecla | Ação |
 | --- | --- |
 | Setas / WASD | Andar |
-| Espaço | Passe, arremessar/agarrar, agachar ou "Achei!" |
+| Espaço | Passe (futebol) · arremessar ou agarrar (queimada) · agachar ou "Achei!" (esconde) |
 | Shift | Chute carregado (futebol) · correr (esconde) |
-| C / Z | Passe por cima / drible (futebol) |
+| C | Passe por cima (futebol) |
+| Z | Drible / finta (futebol) |
 | 1 a 7 | Escolher tema e palavra (alerta) |
 | E | Habilidade do personagem |
 | Q | Trocar jogador ou alvo |
-| M | Ligar ou pausar a JBL |
+| M | Tocar ou pausar a Rádio da Rua |
 | Esc | Voltar para a rua |
 
-## Rodar no seu computador
+**Rádio da Rua:** uma barra fica suspensa no topo da tela o tempo todo. Escolha a JBL do Lucas (eletrônica, gringas e o rap do Minecraft) ou a do Pedro (funk) ali em cima, ou clique numa JBL no cenário. O player oficial do YouTube fica pendurado ao lado do jogo, com a lista de músicas, e a música continua tocando nas brincadeiras. O botão ▴ pausa e recolhe o player.
 
-É um site estático, sem build. Dentro da pasta do projeto:
+**Vizinhas:** os nomes são inventados e tudo delas (nome, cor, falas, demora e chance de furar a bola) fica em `src/vizinhas.js`.
 
-```bash
+**Adicionar músicas:** edite `src/data/radio.json`. Cada música tem `titulo`, `artista` e `videoId`, que é o código depois de `v=` no link do YouTube ou depois de `youtu.be/`, sem o `?si=...`. Músicas em `sem_link` ainda não tocam: quando achar o vídeo, mova a linha pra `musicas`.
+
+## Rodar no computador
+
+```
 python -m http.server 8000
 ```
 
-Depois abra `http://localhost:8000`. (Abrir o `index.html` com dois cliques não funciona, porque o navegador bloqueia a leitura dos arquivos locais.)
+Depois, abra `http://localhost:8000`. Abrir o `index.html` com dois cliques não funciona, porque o navegador bloqueia a leitura dos arquivos.
 
-Para ir direto a uma brincadeira: `http://localhost:8000/?cena=Futebol`. Também vale `Queimada`, `Alerta`, `EscondeEsconde` e `Final`.
-
-**Adicionar músicas:** edite `src/data/radio.json` e preencha `titulo`, `artista` e `videoId` (o código que vem depois de `watch?v=` no link do YouTube).
+Para abrir direto numa brincadeira: `http://localhost:8000/?cena=Futebol`. Também funciona com `Queimada`, `Alerta`, `EscondeEsconde` e `Final`.
 
 ## Como foi feito
 
-- **Motor:** [Phaser 3.87](https://phaser.io), incluído em `lib/` (sem build e sem CDN).
-- **Linguagem:** JavaScript puro, HTML e CSS.
-- **Arte:** pixel art gerada por scripts em Python (Pillow/numpy) em `ferramentas/gerador/`: sprites em 4 direções, cenários e o mapa do esconde-esconde. Nenhuma foto real foi usada.
-- **Sons:** efeitos retrô sintetizados por código.
+- **Motor:** [Phaser 3.87](https://phaser.io), que já vem em `lib/`, sem build e sem CDN.
+- **Arte:** pixel art gerada por scripts em Python (Pillow/numpy) em `ferramentas/gerador/`. Isso inclui sprites em 4 direções, cenários em 960×540, o mapa de 1920×1440 do esconde-esconde (`esconde_mapa_real.py`) e os objetos. A única foto é a da homenagem no final: a turma de verdade.
+- **Sons:** efeitos retrô sintetizados por código (`ferramentas/gerador/sons.py`).
 - **Fonte:** Unifont, renderizada como fonte bitmap.
-- **Deploy:** GitHub Pages.
 
-### IA no desenvolvimento
+### Feito com IA
 
-- **IBM Bob:** primeira versão do jogo (estrutura em Phaser, cenas e rádio) a partir do documento de design em [`docs/design.md`](docs/design.md).
-- **Claude (Anthropic):** artes, sons, revisão e reescrita das brincadeiras para corrigir bugs e deixar tudo jogável.
+O jogo foi desenvolvido com ajuda de inteligência artificial, e eu dirigi cada etapa: as memórias, a turma, as brincadeiras e o tom vieram de mim, e a IA ajudou a transformar tudo em código e arte.
+
+- **IBM Bob:** criou a primeira versão do jogo (estrutura em Phaser, cenas e rádio) a partir do meu documento de design, em `docs/design.md`. Os prompts que usei estão no fim desse documento.
+- **Claude (Anthropic):** gerou as artes e os sons por script, revisou o código, reescreveu as brincadeiras pra deixar tudo jogável e fez as melhorias finais: a Rádio da Rua no topo, o Alerta corrigido e os balões de fala que não se sobrepõem mais.
 
 ## Créditos
 
-- **Autor:** Kauã, com a turma de amigos que inspirou o jogo.
+- **A turma:** Pernalonga, Cezar, Kauã Henrique, Pedro, Lucas, Daniel e Gabriel.
 - **Músicas:** tocadas pelo player oficial do YouTube, sem cópia do áudio. Todos os direitos reservados aos autores. A lista está em `src/data/radio.json`.
 - **Frase final:** "Algo que não muda com o tempo é a memória dos dias de juventude." Sheik, *The Legend of Zelda: Ocarina of Time* (Nintendo).
 - **Inspiração:** *Zueirama*.
@@ -94,4 +97,4 @@ Para ir direto a uma brincadeira: `http://localhost:8000/?cena=Futebol`. Também
 
 ## Licença
 
-Código sob a licença MIT ([LICENSE](LICENSE)). Músicas, frase e obras citadas pertencem aos seus autores.
+O código está sob a licença MIT (veja [LICENSE](LICENSE)). Músicas, frase e obras citadas pertencem aos seus autores.

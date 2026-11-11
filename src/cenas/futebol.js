@@ -380,8 +380,12 @@ class Futebol extends Phaser.Scene {
     const fr = Math.pow(b.z > 0 ? 0.85 : 0.32, dt);
     b.vx *= fr; b.vy *= fr;
     if (Math.hypot(b.vx, b.vy) < 10 && b.z === 0) { b.vx = 0; b.vy = 0; }
-    // meios-fios em cima e embaixo
-    if (b.y < F.y0) { b.y = F.y0; b.vy = Math.abs(b.vy) * 0.6; TR.sfx(this, 'quique', 0.3); }
+    // meios-fios em cima e embaixo. Bola alta ou forte em frente à casa de uma vizinha: cai no quintal dela!
+    if (b.y < F.y0) {
+      const viz = TR.vizinhaDaFaixa(b.x);
+      if (viz && (b.z > 30 || Math.hypot(b.vx, b.vy) > 380)) return this.bolaNaVizinha(viz);
+      b.y = F.y0; b.vy = Math.abs(b.vy) * 0.6; TR.sfx(this, 'quique', 0.3);
+    }
     if (b.y > F.y1) { b.y = F.y1; b.vy = -Math.abs(b.vy) * 0.6; TR.sfx(this, 'quique', 0.3); }
     const mouth = b.y > F.gy0 && b.y < F.gy1;
     if (b.x < F.x0) {
@@ -391,6 +395,7 @@ class Futebol extends Phaser.Scene {
     }
     if (b.x > F.x1) {
       if (mouth && b.z < 70) return this.goal(0);
+      if (mouth && Math.random() < 0.5) return this.bolaNaVizinha('vera');   // isolou por cima: casa lilás
       if (mouth) { TR.bubble(this, [b.x - 40, b.y], 'Por cima!', 1); }
       b.x = F.x1; b.vx = -Math.abs(b.vx) * 0.5;
     }
@@ -411,6 +416,38 @@ class Futebol extends Phaser.Scene {
       if (best.role === 'gk' && sp > 300) { TR.sfx(this, 'pulo', 0.4); TR.bubble(this, best.spr, Phaser.Utils.Array.GetRandom(['Defendeu!', 'Pegou nada!']), 1); }
       this.give(best);
     }
+  }
+
+  // A bola caiu no quintal de uma vizinha: o jogo para até ela devolver (ou furar)
+  bolaNaVizinha(id) {
+    const b = this.ball;
+    this.state = 'vizinha';
+    Object.assign(b, { owner: null, vx: 0, vy: 0, vz: 0, z: 0 });
+    this.ballSpr.setVisible(false); this.ballShadow.setVisible(false);
+    this.players.forEach((p) => { p.moving = false; });
+    const quem = b.last || this.human;
+    const v = TR.VIZINHAS[id];
+    this.time.delayedCall(500, () => TR.bubble(this, quem.spr, id === 'vera' ? 'Xi... na da ' + v.nome + '...' : 'Ô ' + v.nome + ', a bola!', 1.6));
+    const ped = this.players.find((p) => p.id === 'pedro');
+    if (id === 'vera') this.time.delayedCall(2200, () => TR.bubble(this, ped.spr, 'Se ela furar eu vou embora!', 1.6));
+    TR.bolaNaCasa(this, id, {
+      volta: (x, y) => {
+        Object.assign(b, { x, y: this.F.y0 + 6, z: 40, vx: Phaser.Math.Between(-60, 60), vy: 260, vz: 220, last: null, noPick: 0.4 });
+        this.ballSpr.setVisible(true); this.ballShadow.setVisible(true);
+        TR.sfx(this, 'chute', 0.5);
+        this.state = 'play';
+      },
+      furou: () => {
+        this.flash('FUROU A BOLA!');
+        TR.bubble(this, this.daniel, 'Acabou o jogo, turma...', 2);
+        this.time.delayedCall(1600, () => {
+          if (this.state === 'end') return;
+          this.state = 'end';
+          TR.sfx(this, 'derrota', 0.6);
+          TR.endPanel(this, 'FUROU!', 'A filha da ' + v.nome + ' furou a bola. Fim de jogo!', () => this.scene.restart());
+        });
+      },
+    });
   }
 
   goal(team) {

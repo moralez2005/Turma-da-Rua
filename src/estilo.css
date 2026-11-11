@@ -2,46 +2,73 @@ html, body {
   margin: 0; height: 100%; background: #120d18; overflow: hidden;
   font-family: "Courier New", monospace; color: #f4e9d8;
 }
-#jogo { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; }
-/* Com a JBL ligada, o jogo encolhe e o player fica numa coluna ao lado: nunca por cima do jogo */
-body.radio-on #jogo { right: 236px; }
-@media (max-aspect-ratio: 5/4) {
-  body.radio-on #jogo { right: 0; bottom: 250px; }
-  #radio { left: 50%; right: auto !important; transform: translateX(-50%); }
-}
-#jogo canvas { image-rendering: pixelated; image-rendering: crisp-edges; }
+:root { --barra: 38px; --painel: 228px; }
 
-/* Rádio no cantinho */
-#radio {
-  position: fixed; right: 10px; bottom: 10px; z-index: 10; width: 216px;
-  background: #1c1424ee; border: 3px solid #f2b13c; border-radius: 8px;
-  padding: 6px 8px 8px; box-shadow: 0 6px 18px #000a;
-  display: none; font-size: 12px;
+/* O jogo ocupa a tela abaixo da barra da rádio */
+#jogo { position: fixed; top: var(--barra); left: 0; right: 0; bottom: 0; display: flex; align-items: center; justify-content: center; }
+#jogo canvas { image-rendering: pixelated; image-rendering: crisp-edges; }
+/* Com o player aberto, o jogo encolhe e o vídeo fica pendurado ao lado: nunca por cima do jogo */
+body.radio-on #jogo { right: var(--painel); }
+
+/* ---------- Rádio da Rua: barra suspensa no topo ---------- */
+#radio { position: fixed; inset: 0 0 auto 0; z-index: 10; font-size: 13px; }
+.radio-barra {
+  height: var(--barra); box-sizing: border-box; display: flex; align-items: center; gap: 8px;
+  padding: 0 10px; background: #1c1424; border-bottom: 3px solid #f2b13c; white-space: nowrap;
 }
-#radio.aberto { display: block; }
-#radio[data-estacao="lucas"] { border-color: #e2453c; }
-#radio[data-estacao="pedro"] { border-color: #3c8cff; }
-#radio[data-estacao="final"] { border-color: #ff9a3c; }
-.radio-topo { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
-.radio-topo strong { flex: 1; color: #ffd36a; letter-spacing: 1px; }
-.radio-icone { width: 18px; height: 12px; background: #e2453c; border-radius: 3px; box-shadow: inset 0 0 0 3px #222; }
+#radio[data-estacao="lucas"] .radio-barra { border-bottom-color: #e2453c; }
+#radio[data-estacao="pedro"] .radio-barra { border-bottom-color: #3c8cff; }
+#radio[data-estacao="final"] .radio-barra { border-bottom-color: #ff9a3c; }
+.radio-icone { flex: none; width: 22px; height: 14px; background: #f2b13c; border-radius: 3px; box-shadow: inset 0 0 0 3px #222; }
+#radio[data-estacao="lucas"] .radio-icone { background: #e2453c; }
 #radio[data-estacao="pedro"] .radio-icone { background: #3c8cff; }
-#radio-player, #radio-player iframe { width: 200px; height: 200px; display: block; border: 0; background: #000; }
-#radio-titulo { margin-top: 4px; min-height: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #e8dccb; }
-#radio-msg { display: none; margin-top: 4px; color: #ffcf8a; font-size: 11px; }
-#radio-msg a { color: #8fd0ff; }
-.radio-botoes { display: flex; gap: 6px; margin-top: 6px; }
+#radio-nome { color: #ffd36a; letter-spacing: 1px; }
+.radio-estacoes, .radio-botoes { display: flex; gap: 4px; flex: none; }
+#radio-titulo { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; color: #e8dccb; }
 #radio button {
   background: #2b2033; color: #ffd36a; border: 2px solid #5b4466; border-radius: 4px;
   font: inherit; cursor: pointer; padding: 2px 8px;
 }
 #radio button:hover { border-color: #ffd36a; }
-#radio-fechar { padding: 0 6px !important; }
+#radio .radio-estacoes button[data-estacao="lucas"].ativa { background: #e2453c; color: #fff; border-color: #ffb3a8; }
+#radio .radio-estacoes button[data-estacao="pedro"].ativa { background: #3c8cff; color: #fff; border-color: #b3d3ff; }
+#radio-fechar { display: none; }
+#radio.aberto #radio-fechar { display: inline-block; }
+#radio[data-estacao="final"] .radio-estacoes, #radio[data-estacao="final"] #radio-prev,
+#radio[data-estacao="final"] #radio-next, #radio[data-estacao="final"] #radio-fechar { display: none; }
 
-/* Cena final: só o vídeo (200x200 é o mínimo que o YouTube permite), sem botões nem título */
-#radio[data-estacao="final"] { width: 204px; padding: 2px; }
-#radio[data-estacao="final"] .radio-topo,
-#radio[data-estacao="final"] #radio-titulo,
-#radio[data-estacao="final"] .radio-botoes { display: none; }
-#radio[data-estacao="final"] #radio-msg { font-size: 10px; }
-body.radio-on.final #jogo { right: 220px; }
+/* painel pendurado na barra, à direita: vídeo (200x200 é o mínimo do YouTube) + lista de músicas */
+#radio-painel {
+  display: none; position: fixed; top: var(--barra); right: 0; bottom: 0; width: var(--painel);
+  box-sizing: border-box; padding: 10px 12px; background: #1c1424; border-left: 3px solid #f2b13c; overflow-y: auto;
+}
+#radio[data-estacao="lucas"] #radio-painel { border-left-color: #e2453c; }
+#radio[data-estacao="pedro"] #radio-painel { border-left-color: #3c8cff; }
+#radio[data-estacao="final"] #radio-painel { border-left-color: #ff9a3c; }
+#radio.aberto #radio-painel { display: block; }
+#radio-player, #radio-player iframe { width: 200px; height: 200px; display: block; border: 0; background: #000; }
+#radio-msg { display: none; margin-top: 6px; color: #ffcf8a; font-size: 12px; }
+#radio-msg a { color: #8fd0ff; }
+#radio-musicas { margin: 10px 0 0; padding: 0 0 0 20px; font-size: 12px; line-height: 1.5; }
+#radio-musicas li { cursor: pointer; color: #cbbfae; }
+#radio-musicas li:hover { color: #ffd36a; }
+#radio-musicas li.tocando { color: #ffd36a; font-weight: bold; }
+
+/* Tela em pé (celular): o painel vai pra baixo do jogo */
+@media (max-aspect-ratio: 5/4) {
+  body.radio-on #jogo { right: 0; bottom: 230px; }
+  #radio-painel { top: auto; left: 0; height: 230px; width: auto; border-left: 0; border-top: 3px solid #f2b13c;
+    display: none; gap: 10px; }
+  #radio.aberto #radio-painel { display: flex; }
+  #radio-musicas { margin: 0; flex: 1; min-width: 0; }
+  #radio-msg { position: absolute; left: 12px; bottom: 2px; margin: 0; }
+  .radio-estacoes button { padding: 2px 4px !important; }
+  #radio-nome { display: none; }
+}
+@media (max-width: 640px) {
+  #radio-titulo, .radio-icone { display: none; }
+  #radio { font-size: 11px; }
+  .radio-barra { gap: 4px; padding: 0 4px; justify-content: space-between; }
+  #radio button { padding: 2px 5px; }
+}
+#radio-player { flex: none; }

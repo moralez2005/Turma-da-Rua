@@ -85,15 +85,17 @@
       return this.songs()[this.index];
     },
 
-    ensurePlayer(videoId, autoplay) {
+    // inicio: segundos pra pular no começo do vídeo (campo "inicio" no radio.json)
+    ensurePlayer(videoId, autoplay, inicio) {
       const make = () => {
+        const opcoes = { videoId, startSeconds: inicio || 0 };
         if (this.player) {
-          if (autoplay) this.player.loadVideoById(videoId); else this.player.cueVideoById(videoId);
+          if (autoplay) this.player.loadVideoById(opcoes); else this.player.cueVideoById(opcoes);
           return;
         }
         this.player = new YT.Player('radio-player', {
           width: 200, height: 200, videoId,
-          playerVars: { playsinline: 1, rel: 0, autoplay: autoplay ? 1 : 0 },
+          playerVars: { playsinline: 1, rel: 0, autoplay: autoplay ? 1 : 0, start: inicio || 0 },
           events: {
             onReady: () => { this.ready = true; if (autoplay) this.player.playVideo(); this.emit(); },
             onStateChange: (ev) => {
@@ -129,7 +131,7 @@
       this.open();
       if (!list.length) { this.msg('Essa JBL ainda não tem músicas com link. Veja src/data/radio.json.'); this.emit(); return; }
       if (this.offline) { this.msg('Sem conexão com o YouTube agora.'); this.emit(); return; }
-      this.ensurePlayer(list[this.index].videoId, true);
+      this.ensurePlayer(list[this.index].videoId, true, list[this.index].inicio);
       this.emit();
     },
     playIndex(i) {
@@ -138,7 +140,7 @@
       this.avulsa = null;
       this.index = i;
       this.open();
-      this.ensurePlayer(list[i].videoId, true);
+      this.ensurePlayer(list[i].videoId, true, list[i].inicio);
       this.emit();
     },
     toggle() {
@@ -165,7 +167,7 @@
       this.mode = 'radio';
       if (!this.station) this.station = 'pedro';
       this.open();
-      this.ensurePlayer(m.videoId, true);
+      this.ensurePlayer(m.videoId, true, m.inicio);
       this.emit();
     },
     playFinal() {

@@ -1,5 +1,5 @@
 {
-  "_como_usar": "Cada música precisa do videoId do YouTube: o código depois de watch?v= ou de youtu.be/ (sem o ?si=...). Para adicionar, copie uma linha, troque titulo, artista e videoId e confira as vírgulas. Músicas da lista 'sem_link' ainda não tocam: é só achar o vídeo e mover a linha para 'musicas'. O orelhão do esconde-esconde toca a música de 'orelhao': cole o videoId do clipe lá.",
+  "_como_usar": "Cada música precisa do videoId do YouTube: o código depois de watch?v= ou de youtu.be/ (sem o ?si=...). Para adicionar, copie uma linha, troque titulo, artista e videoId e confira as vírgulas. Músicas da lista 'sem_link' ainda não tocam: é só achar o vídeo e mover a linha para 'musicas'. Para a música começar depois do início, coloque \"inicio\": 10 (em segundos). O orelhão do esconde-esconde toca a música de 'orelhao': cole o videoId do clipe lá.",
   "estacoes": [
     {
       "id": "lucas",
@@ -12,19 +12,22 @@
         { "titulo": "Stressed Out", "artista": "twenty one pilots", "videoId": "pXRviuL6vMY" },
         { "titulo": "Believer", "artista": "Imagine Dragons", "videoId": "7wtfhZwyrcc" },
         { "titulo": "Bad Liar", "artista": "Imagine Dragons", "videoId": "I-QfPUz1es8" },
-        { "titulo": "Someone You Loved", "artista": "Lewis Capaldi", "videoId": "zABLecsR5UE" }
+        { "titulo": "Someone You Loved", "artista": "Lewis Capaldi", "videoId": "zABLecsR5UE" },
+        { "titulo": "Old Town Road", "artista": "Lil Nas X ft. Billy Ray Cyrus", "videoId": "r7qovpFAGrQ" },
+        { "titulo": "Call Out My Name", "artista": "The Weeknd", "videoId": "rsEne1ZiQrk" },
+        { "titulo": "Moonlight", "artista": "XXXTentacion", "videoId": "GX8Hg6kWQYI" },
+        { "titulo": "Sunflower", "artista": "Post Malone e Swae Lee", "videoId": "3E78T8h5EhA" },
+        { "titulo": "Happier", "artista": "Marshmello ft. Bastille", "videoId": "m7Bc3pLyij0" },
+        { "titulo": "Mood", "artista": "24kGoldn ft. iann dior", "videoId": "GrAchTdepsU" }
       ],
       "sem_link": [
         { "titulo": "Heathens", "artista": "twenty one pilots", "videoId": "" },
         { "titulo": "Pompeii", "artista": "Bastille", "videoId": "" },
-        { "titulo": "Happier", "artista": "Marshmello e Bastille", "videoId": "" },
         { "titulo": "High Hopes", "artista": "Panic! at the Disco", "videoId": "" },
         { "titulo": "Sweater Weather", "artista": "The Neighbourhood", "videoId": "" },
         { "titulo": "Do I Wanna Know?", "artista": "Arctic Monkeys", "videoId": "" },
-        { "titulo": "Old Town Road", "artista": "Lil Nas X", "videoId": "" },
         { "titulo": "Jenifer", "artista": "Gabriel Diniz", "videoId": "" },
         { "titulo": "Caneta Azul", "artista": "Manoel Gomes", "videoId": "" },
-        { "titulo": "Atrasadinha", "artista": "Felipe Araújo e Ferrugem", "videoId": "" },
         { "titulo": "Lençol Dobrado", "artista": "João Gustavo e Murilo", "videoId": "" }
       ]
     },
@@ -33,8 +36,22 @@
       "nome": "JBL do Pedro",
       "musicas": [
         { "titulo": "Zé Guaritinha", "artista": "MC Jottapê e Mano Brown", "videoId": "KqRGpEWvbZk" },
-        { "titulo": "Gaiola É o Troco", "artista": "MC Du Black", "videoId": "13hspXgLXto" },
-        { "titulo": "Parado no Bailão", "artista": "MC L da Vinte e MC Gury", "videoId": "upCptHeThio" }
+        { "titulo": "Parado no Bailão", "artista": "MC L da Vinte e MC Gury", "videoId": "upCptHeThio" },
+        { "titulo": "Gaiola É o Troco", "artista": "MC Du Black", "videoId": "0nsT5Uci640" },
+        { "titulo": "Deixe-me Ir", "artista": "Acústico 1Kilo (Baviera, Knust e Pablo Martins)", "videoId": "TQ5DUv_ZwRg", "inicio": 10 },
+        { "titulo": "Perdição", "artista": "L7NNON", "videoId": "uzSme3PRhZ0" },
+        { "titulo": "Vagalumes", "artista": "Pollo part. Ivo Mozart", "videoId": "kszkoFI84JU" },
+        { "titulo": "Barcelona", "artista": "L7NNON, PK e Mun Ra", "videoId": "NPvfOuJngMw" },
+        { "titulo": "Vem Cá", "artista": "Pelé MilFlows", "videoId": "lV2plyhSRBU" },
+        { "titulo": "Os Mlk é Liso", "artista": "MC Rodolfinho", "videoId": "8ii-UWVU6Os", "inicio": 30 },
+        { "titulo": "Nois Tá Bolando Um Plano", "artista": "MC Hariel e MC Don Juan", "videoId": "pXceloIEs9k" },
+        { "titulo": "Jogo do Amor", "artista": "MC Bruninho", "videoId": "yQwbfvz4kqc" },
+        { "titulo": "Atrasadinha", "artista": "Felipe Araújo e Ferrugem", "videoId": "M76qUQTt_Sw" },
+        { "titulo": "Cidade Vizinha", "artista": "Henrique e Juliano", "videoId": "BN7CJkvbt3I" },
+        { "titulo": "Amor Falso", "artista": "Wesley Safadão e Aldair Playboy ft. Kevinho", "videoId": "fOrPSLkuI54" },
+        { "titulo": "Preta do Cabelo Cacheado", "artista": "MC Roginho", "videoId": "c-0P3F2e_NQ" },
+        { "titulo": "Ela É do Tipo", "artista": "MC Kevin o Chris", "videoId": "stoeQbRrusA" },
+        { "titulo": "Evoluiu", "artista": "MC Kevin o Chris feat. Sodré", "videoId": "_VsBsZFG51Q" }
       ],
       "sem_link": [
         { "titulo": "Vamos pra Gaiola", "artista": "MC Kevin o Chris", "videoId": "" },
@@ -50,6 +67,6 @@
       ]
     }
   ],
-  "orelhao": { "titulo": "Atoladinha", "artista": "Bola de Fogo e as Foguentas", "videoId": "" },
+  "orelhao": { "titulo": "Piririn (Atoladinha)", "artista": "Bola de Fogo e as Foguentas", "videoId": "2ha3rJKIgUU" },
   "cenaFinal": { "titulo": "Música do fim de tarde", "artista": "", "videoId": "9qo5v22F6MU" }
 }

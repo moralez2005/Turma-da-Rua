@@ -38,6 +38,9 @@ class Futebol extends Phaser.Scene {
     this.chuvaTimer = clima === 'chuva' ? Phaser.Math.Between(25, 45) : (clima === 'surpresa' && Math.random() < 0.4 ? Phaser.Math.Between(40, 120) : -1);
     this.timeLeft = times.opcoes.tempo;
     this.golsPraVencer = times.opcoes.gols;
+    // o dia vai acabando conforme o tempo da partida passa
+    const total = times.opcoes.tempo;
+    TR.anoitecer(this, () => 1 - this.timeLeft / total, (t) => TR.bubble(this, Phaser.Utils.Array.GetRandom(this.players).spr, t, 1.8), [584, 70]);
     this.state = 'intro';
     this.carTimer = Phaser.Math.Between(35, 55);
     this.car = null;

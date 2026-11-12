@@ -47,6 +47,9 @@ Na queimada as habilidades são outras, próprias do jogo: Braço longo (Pernalo
 
 ## Controles
 
+**No celular:** vire o celular deitado. Aparece um direcional à esquerda e os botões da brincadeira à direita (Passe, Chute, Agachar...). O botão ⛶ deixa em tela cheia.
+
+
 | Tecla | Ação |
 | --- | --- |
 | Setas / WASD | Andar |
@@ -63,6 +66,8 @@ Na queimada as habilidades são outras, próprias do jogo: Braço longo (Pernalo
 | Esc | Voltar para a rua |
 
 **Rádio da Rua:** uma barra fica suspensa no topo da tela o tempo todo. Escolha a JBL do Lucas (eletrônica, gringas e o rap do Minecraft) ou a do Pedro (funk) ali em cima, ou clique numa JBL no cenário. O player oficial do YouTube fica pendurado ao lado do jogo, com a lista de músicas, e a música continua tocando nas brincadeiras. O botão ▴ pausa e recolhe o player.
+
+**Fim de tarde de verdade:** no futebol, na queimada e no esconde-esconde, o céu vai ficando dourado, depois escurece e o poste acende conforme o tempo da partida passa.
 
 **Fusca azul:** o placar de petelecos dados e levados aparece no menu da rua e fica guardado no navegador.
 

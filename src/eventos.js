@@ -9,6 +9,10 @@
  * TR.chuva(scene, segundos, fim)
  *   Escurece a tela, cai chuva com som e, depois de alguns segundos, para e chama fim().
  *
+ * TR.anoitecer(scene, progresso, falar)
+ *   Conforme a partida passa (progresso() vai de 0 a 1), o céu fica alaranjado, depois escurece e o poste acende.
+ *   falar(texto) é chamado uma vez, quando começa a escurecer.
+ *
  * TR.orelhao(scene, falante)
  *   O orelhão toca um toque 8-bit original (assets/sons/orelhao.wav, feito por ferramentas/gerador/orelhao.py).
  *   Se a JBL estiver tocando, ela pausa enquanto o orelhão toca.
@@ -51,6 +55,10 @@ TR.fusca = (scene, o) => {
   const fundo = scene.add.rectangle(480, 120, aviso.width + 30, aviso.height + 14, 0x0c0810, 0.85).setDepth(6600).setScrollFactor(0)
     .setStrokeStyle(3, 0x3c7ed8);
   scene.tweens.add({ targets: aviso, alpha: 0.4, yoyo: true, repeat: -1, duration: 160 });
+  // no celular: tocar no aviso vale como apertar F
+  fundo.setInteractive({ useHandCursor: true }).on('pointerdown', () => apertou());
+  const avisoTxt = document.body.classList.contains('toque') ? 'FUSCA AZUL! Toca aqui!' : null;
+  if (avisoTxt) { aviso.setText(avisoTxt); fundo.setSize(aviso.width + 30, aviso.height + 14); }
   let resolvido = false;
   const terminar = (vocePrimeiro) => {
     if (resolvido) return;
@@ -116,6 +124,28 @@ TR.chuva = (scene, segundos, fim) => {
     if (fim) fim();
   });
   scene.events.once('shutdown', () => { scene.events.off('update', desenha); if (som) som.destroy(); });
+};
+
+TR.anoitecer = (scene, progresso, falar, poste) => {
+  const camada = scene.add.rectangle(480, 270, 960, 540, 0xff9a4a, 0).setDepth(4800).setScrollFactor(0);
+  const luz = poste ? scene.add.circle(poste[0], poste[1], 70, 0xffe08a, 0).setDepth(4801) : null;
+  const laranja = Phaser.Display.Color.ValueToColor(0xff9a4a), noite = Phaser.Display.Color.ValueToColor(0x1c2a5a);
+  let avisou = false;
+  const passo = () => {
+    if (!camada.active) return;
+    const p = Phaser.Math.Clamp(progresso(), 0, 1);
+    if (p < 0.5) {
+      camada.setFillStyle(0xff9a4a, (p / 0.5) * 0.16);           // fim de tarde: tudo mais dourado
+    } else {
+      const k = (p - 0.5) / 0.5;
+      const c = Phaser.Display.Color.Interpolate.ColorWithColor(laranja, noite, 100, k * 100);
+      camada.setFillStyle(Phaser.Display.Color.GetColor(c.r, c.g, c.b), 0.16 + k * 0.42);   // vai escurecendo
+    }
+    if (luz) luz.setFillStyle(0xffe08a, p > 0.7 ? Math.min(0.3, (p - 0.7) * 1.2) : 0);   // o poste acende
+    if (!avisou && p > 0.72 && falar) { avisou = true; falar(Phaser.Utils.Array.GetRandom(['Tá escurecendo...', 'Mais 5 minutos, mãe!', 'Já vai acender o poste!'])); }
+  };
+  scene.events.on('update', passo);
+  scene.events.once('shutdown', () => scene.events.off('update', passo));
 };
 
 // Orelhão: toca o toque 8-bit do jogo, sem precisar do YouTube

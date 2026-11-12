@@ -38,6 +38,8 @@ class Queimada extends Phaser.Scene {
   montar(times) {
     this.state = 'intro';
     this.timeLeft = times.opcoes.tempo;
+    const total = times.opcoes.tempo;
+    TR.anoitecer(this, () => 1 - this.timeLeft / total, (t) => { const p = this.players.find((q) => q.alive); if (p) TR.bubble(this, p.spr, t, 1.8); }, [584, 70]);
     this.charge = 0;
     this.catchWin = 0;
     this.targetIdx = 0;

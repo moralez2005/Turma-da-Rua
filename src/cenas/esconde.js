@@ -157,6 +157,8 @@ class EscondeEsconde extends Phaser.Scene {
     const P = this.pique;
     this.found = 0; this.saved = 0;
     this.timeLeft = modo === 'esconder' ? 150 : 170;
+    const total = this.timeLeft;
+    TR.anoitecer(this, () => (this.state === 'search' || this.state === 'end' ? 1 - this.timeLeft / total : 0), null, [1120, 440]);
     this.kids = [];
     const mk = (id, x, y, role) => {
       const spr = TR.kid(this, id, x, y);

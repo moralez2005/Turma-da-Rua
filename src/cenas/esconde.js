@@ -207,7 +207,11 @@ class EscondeEsconde extends Phaser.Scene {
     this.count = this.modo === 'esconder' ? 20 : 12;
     // cada escondido escolhe um esconderijo livre
     const free = Phaser.Utils.Array.Shuffle(this.spots.slice());
-    this.aiHiders.forEach((k) => {
+    // a Manu escolhe primeiro: a casinha do cachorro é dela
+    this.aiHiders.slice().sort((a, b) => (b.id === 'manu') - (a.id === 'manu')).forEach((k) => {
+      // a Manu (IA) prefere a casinha do cachorro, que só ela cabe
+      const casinha = free.find((s) => !s.used && s.obj && s.obj.tipo === 'casinha');
+      if (k.id === 'manu' && casinha) { casinha.used = true; k.spot = casinha; k.state = 'going'; k.path = this.path(k.x, k.y, casinha.x, casinha.y); return; }
       const far = free.filter((s) => !s.used).sort((a, b) => this.d2(b, this.pique) - this.d2(a, this.pique));
       const pick = far[Phaser.Math.Between(0, Math.min(8, far.length - 1))];
       if (!pick) return;
@@ -264,7 +268,11 @@ class EscondeEsconde extends Phaser.Scene {
     if (this.state !== 'search' || this.habCd > 0) return;
     this.habCd = this.modo === 'esconder' ? 8 : 15;
     TR.sfx(this, 'habilidade', 0.5);
-    if (this.modo === 'esconder') { this.human.boost = 1.6; TR.bubble(this, this.human.spr, 'Corre!', 1); }
+    if (this.modo === 'esconder') {
+      const h = this.human;
+      if (h.id === 'matheus') { h.boost = 3; h.bike = true; TR.bike(this, h.spr, 3); TR.bubble(this, h.spr, 'Bike do nada!', 1.2); this.time.delayedCall(3000, () => { h.bike = false; }); }
+      else { h.boost = 1.6; TR.bubble(this, h.spr, h.id === 'manu' ? 'Ninguém me acha!' : 'Corre!', 1); }
+    }
     else {
       const t = this.aiHiders.filter((k) => k.state === 'hidden').sort((a, b) => this.d2(a, this.human) - this.d2(b, this.human))[0];
       if (t) { this.arrowTarget = t; this.arrowT = 2.5; TR.bubble(this, this.human.spr, this.human.id === 'daniel' ? 'Estrategista!' : 'Achei a pista!', 1); }
@@ -274,6 +282,11 @@ class EscondeEsconde extends Phaser.Scene {
   // ------------------------------------------------------------ visão
   hiddenAmount(k) {
     if (k.state === 'run') return 0;
+    // a Manu é pequena: agachada atrás de objeto baixo (casinha, caixa d'água, tanque, pneus...) ninguém vê
+    if (k.id === 'manu' && k.crouch) {
+      const baixo = this.objs.find((o) => ['casinha', 'tanque', 'pneus', 'caixa', 'lixeira', 'tambor'].includes(o.tipo) && Math.abs(k.x - o.x) < o.w / 2 + 6 && k.y < o.y + 6 && k.y > o.y - o.h - 10);
+      if (baixo) return 1;
+    }
     for (const s of this.spots) if (s.escuro && Math.hypot(k.x - s.x, k.y - s.y) < s.raio + 10) return 1;
     let best = 0;
     for (const o of this.objs) {
@@ -354,7 +367,7 @@ class EscondeEsconde extends Phaser.Scene {
     if ((mx || my) && h.crouch && this.modo === 'esconder') { h.crouch = false; }
     const run = k.SHIFT.isDown;
     h.boost = Math.max(0, (h.boost || 0) - dt);
-    const spd = h.spd * (run ? 1.35 : 1) * (h.boost > 0 ? 1.6 : 1);
+    const spd = h.spd * (run ? 1.35 : 1) * (h.boost > 0 ? (h.bike ? 2.3 : 1.6) : 1);
     this.moveBody(h, mx, my, spd, dt);
     if ((mx || my) && run) h.lastNoise = 0.4;
     h.lastNoise = Math.max(0, h.lastNoise - dt);

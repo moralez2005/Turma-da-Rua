@@ -43,6 +43,10 @@ Antes de cada brincadeira você escolhe com quem joga. No futebol e na queimada,
 | **Daniel** | Estrategista: mostra onde está o alvo ou o escondido mais perto |
 | **Gabriel** | Gato: pulo de goleiro mais rápido |
 
+| **Matheus** *(novo)* | Bike do nada: aparece numa bike e dispara (no esconde-esconde, foge rapidinho) |
+| **Guilherme** *(novo)* | Treta: arruma treta e trava quem está perto (o Pedro fica mais tempo discutindo) |
+| **Manu** *(nova)* | Pequenininha: ninguém rouba a bola dela; no esconde-esconde, cabe em lugares que ninguém cabe, como a casinha do cachorro |
+
 Na queimada as habilidades são outras, próprias do jogo: Braço longo (Pernalonga), Ginga (Cezar), Mira calculada (Daniel), Zoeira (Lucas), Bomba do MC (Pedro) e Mão de goleiro (Gabriel).
 
 ## Controles
@@ -91,7 +95,7 @@ Para abrir direto numa brincadeira: `http://localhost:8000/?cena=Futebol`. Tamb�
 
 - **Motor:** [Phaser 3.87](https://phaser.io), que já vem em `lib/`, sem build e sem CDN.
 - **Arte:** pixel art gerada por scripts em Python (Pillow/numpy) em `ferramentas/gerador/`. Isso inclui sprites em 4 direções, cenários em 960×540, o mapa de 1920×1440 do esconde-esconde (`esconde_mapa_real.py`) e os objetos. A única foto é a da homenagem no final: a turma de verdade.
-- **Sons:** efeitos retrô, o toque do orelhão e a chuva, todos sintetizados por código (`ferramentas/gerador/sons.py`, `orelhao.py` e `chuva.py`).
+- **Sons:** efeitos retrô, o toque do orelhão, a chuva e a música de fundo original "Tarde na Rua", todos sintetizados por código (`ferramentas/gerador/sons.py`, `orelhao.py`, `chuva.py` e `fundo.py`). O botão ♫ na barra da rádio liga e desliga a música de fundo, que abaixa sozinha quando a JBL toca.
 - **Fonte:** Unifont, renderizada como fonte bitmap.
 
 ### Feito com IA

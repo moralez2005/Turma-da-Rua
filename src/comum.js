@@ -10,6 +10,10 @@ const TR = {
     lucas: { nome: 'Lucas', vel: 225, chute: 3, hab: 'Zoeira', habDesc: 'zoa quem está perto e deixa todo mundo lento' },
     daniel: { nome: 'Daniel', vel: 205, chute: 3, hab: 'Estrategista', habDesc: 'mostra onde está o alvo' },
     gabriel: { nome: 'Gabriel', vel: 220, chute: 2, hab: 'Gato', habDesc: 'pulo de goleiro mais rápido' },
+    // desbloqueáveis (novo: true). Não têm sprite na cena final (semFinal).
+    matheus: { nome: 'Matheus', vel: 225, chute: 3, hab: 'Bike do nada', habDesc: 'aparece numa bike e dispara', novo: true, semFinal: true },
+    guilherme: { nome: 'Guilherme', vel: 215, chute: 3, hab: 'Treta', habDesc: 'arruma treta e trava quem está perto (o Pedro mais ainda)', novo: true, semFinal: true },
+    manu: { nome: 'Manu', vel: 210, chute: 2, hab: 'Pequenininha', habDesc: 'passa por baixo de todo mundo; se esconde onde ninguém cabe', novo: true, semFinal: true },
   },
   // Falas soltas de cada um (o jeitão de cada moleque)
   FRASES: {
@@ -27,6 +31,9 @@ const TR = {
       'Calma, que dá tempo'],
     gabriel: ['Vou pro gol!', 'Ô Pedro, chorão!', 'Defendeu!', 'Dona Juliete chorou kkk', 'Eu sou pequeno mas sou rápido',
       'Daniel, me espera!'],
+    matheus: ['Relaxa, sou de boa', 'Quem quer aprontar?', 'Vou ali e já volto', 'Cadê minha bike?', 'Bora, bora!'],
+    guilherme: ['Pedro, sai daqui!', 'Ninguém me segura', 'O Pedro que começou!', 'Bora jogar sério', 'Passa a bola, mano!'],
+    manu: ['Eu também quero jogar!', 'Ninguém me acha!', 'Vou contar pra mãe!', 'Me espera!', 'Eu caibo em qualquer lugar'],
     pernalonga: ['Calma, gente!', 'Toca a bola!', 'Não faz besteira, hein', 'Ninguém briga, é só brincadeira',
       'Cezar, nem pensa nisso', 'Pedro, volta, ninguém vai te zoar', 'Bora, turma!'],
   },
@@ -38,6 +45,9 @@ const TR = {
       kaua: ['Normal, acontece.', 'Bora virar.'], gabriel: ['Foi sem querer!', 'A bola tava rápida!'],
       cezar: ['Na próxima eu derrubo!', 'Ah, mano!'], pernalonga: ['Calma, dá pra virar!'], lucas: ['Foi zoeira, deixei.'], daniel: ['Bug no jogo!'] },
     zoa: ['Dona Juliete! kkkk', 'Ó a Juliete!', 'Olha a orelha!', 'Juliete chorou!'],
+    // a treta do Guilherme com o Pedro (sem motivo nenhum)
+    treta: ['Pedro, tu tá me olhando?', 'Sai da minha frente, Pedro!', 'Pedro, cala a boca!', 'Tá rindo de quê, Pedro?'],
+    tretaPedro: ['Eu nem fiz nada, mano!', 'Que isso, Guilherme?!', 'Ó o Guilherme de novo...', 'Tu tem problema comigo?'],
     pedroResponde: ['Para, mano! Vou levar a bola!', 'Não é Juliete! É Pedro!', 'Vou embora, hein!', 'Fica zoando, fica...'],
     pazPernalonga: ['Calma, gente, é brincadeira.', 'Para de zoar o Pedro, vai.', 'Pedro, volta, joga com nós.'],
   },
@@ -58,7 +68,11 @@ const TR = {
       if (!scene.sys.isActive()) return;
       if (can()) {
         const zoeiros = ['lucas', 'daniel', 'gabriel'].filter((i) => ids.includes(i) && spr(i));
-        if (Math.random() < 0.35 && zoeiros.length && spr('pedro')) {
+        if (Math.random() < 0.4 && spr('guilherme') && spr('pedro')) {
+          TR.bubble(scene, spr('guilherme'), Phaser.Utils.Array.GetRandom(TR.REACT.treta), 1.6);
+          scene.time.delayedCall(1300, () => { if (spr('pedro')) TR.bubble(scene, spr('pedro'), Phaser.Utils.Array.GetRandom(TR.REACT.tretaPedro), 1.6); });
+          if (spr('pernalonga')) scene.time.delayedCall(2700, () => { if (spr('pernalonga')) TR.bubble(scene, spr('pernalonga'), 'Vocês dois, parem!', 1.4); });
+        } else if (Math.random() < 0.35 && zoeiros.length && spr('pedro')) {
           const z = zoeiros[Math.floor(Math.random() * zoeiros.length)];
           TR.bubble(scene, spr(z), TR.REACT.zoa[Math.floor(Math.random() * TR.REACT.zoa.length)], 1.6);
           scene.time.delayedCall(1300, () => { if (spr('pedro')) TR.bubble(scene, spr('pedro'), TR.REACT.pedroResponde[Math.floor(Math.random() * 4)], 1.8); });

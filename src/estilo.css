@@ -121,3 +121,6 @@ body.toque #jogo canvas, body.toque #toque { touch-action: none; -webkit-user-se
   #radio-painel { padding: 6px; }
   #radio-musicas { display: none; }
 }
+
+#radio #radio-fundo.desligado { color: #8a7a96; text-decoration: line-through; }
+#radio[data-estacao="final"] #radio-fundo { display: none; }

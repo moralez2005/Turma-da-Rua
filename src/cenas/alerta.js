@@ -36,7 +36,8 @@ class Alerta extends Phaser.Scene {
 
   montar(voce) {
     // você primeiro, depois o resto da turma
-    const ids = [voce].concat(TR.ORDEM.filter((id) => id !== voce));
+    // cada tema tem 7 palavras: você + 6 da turma (os desbloqueáveis só entram se você escolher um deles)
+    const ids = [voce].concat(TR.ORDEM.filter((id) => id !== voce && !TR.KIDS[id].novo)).slice(0, 7);
     this.players = ids.map((id, i) => {
       const a = (i / ids.length) * Math.PI * 2;
       const x = 480 + Math.cos(a) * 120, y = 396 + Math.sin(a) * 60;

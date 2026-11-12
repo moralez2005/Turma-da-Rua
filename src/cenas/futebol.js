@@ -269,6 +269,16 @@ class Futebol extends Phaser.Scene {
       TR.bubble(this, p.spr, 'kkkkk Dona Juliete!', 1.4); return;
     } else if (p.id === 'pedro') { p.bomb = true; }
     else if (p.id === 'kaua' || p.id === 'gabriel') { p.boost = 1.2; p.boostMul = 1.5; }
+    else if (p.id === 'matheus') { p.boost = 1.4; p.boostMul = 1.9; TR.bike(this, p.spr, 1.4); }
+    else if (p.id === 'manu') { p.boost = 0.8; p.boostMul = 1.5; p.immune = 1.6; }
+    else if (p.id === 'guilherme') {
+      // arruma treta: quem está perto fica parado discutindo (o Pedro fica mais tempo)
+      this.players.forEach((q) => { if (q.team !== p.team && this.dist(q, p) < 200) q.slow = q.id === 'pedro' ? 3.5 : 1.6; });
+      const ped = this.players.find((q) => q.id === 'pedro');
+      TR.bubble(this, p.spr, ped ? 'Pedro, vem cá!' : 'Treta!', 1.2);
+      if (ped) this.time.delayedCall(700, () => TR.bubble(this, ped.spr, Phaser.Utils.Array.GetRandom(TR.REACT.tretaPedro), 1.4));
+      return;
+    }
     TR.bubble(this, p.spr, nome + '!', 1.2);
   }
 

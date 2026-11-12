@@ -101,9 +101,15 @@ def side(c, frame=0):
                 cv.p(x, hy0 - 2, hc)
         if c["hs"] == "topete":
             cv.r(hx0 + 3, hy0 - 2, hx1 - 1, hy0 - 2, hc)
+        if c["hs"] == "longo":
+            cv.r(hx0 - 1, hy0 + 3, hx0 + 4, hy1 + 5, hc)
+            cv.r(hx1 - 5, hy0 + 3, hx1, hy0 + 4, hc)
         for x in range(hx0 + 2, hx1 - 2, 3):
             cv.p(x, hy0, hl)
     cv.clear(hx1, hy0 - 1)
+    if c.get("cap_frente"):
+        cv.r(hx0, hy0 - 3, hx1, hy0 + 2, c["cap_frente"])
+        cv.r(hx1 - 1, hy0 + 2, hx1 + 5, hy0 + 3, dark(c["cap_frente"], 0.7))   # aba pra frente
     if c.get("cap"):
         cv.r(hx0, hy0 - 2, hx1, hy0 + 2, c["cap"])
         cv.r(hx0 - 4, hy0 + 1, hx0 - 1, hy0 + 2, dark(c["cap"], 0.85))  # aba pra tras

@@ -14,7 +14,7 @@ class Boot extends Phaser.Scene {
     this.load.bitmapFont('pixel', 'assets/fonte/pixel.png', 'assets/fonte/pixel.xml');
     Object.keys(TR.KIDS).forEach((id) => {
       this.load.spritesheet(id, 'assets/personagens/' + id + '.png', { frameWidth: 80, frameHeight: 136 });
-      this.load.spritesheet('final_' + id, 'assets/final/' + id + '.png', { frameWidth: 80, frameHeight: 136 });
+      if (!TR.KIDS[id].semFinal) this.load.spritesheet('final_' + id, 'assets/final/' + id + '.png', { frameWidth: 80, frameHeight: 136 });
     });
     this.load.image('rua', 'assets/cenarios/rua.png');
     this.load.image('rua_tarde', 'assets/cenarios/rua_tarde.png');
@@ -33,11 +33,12 @@ class Boot extends Phaser.Scene {
     ['pipa', 'bola', 'bola_queimada', 'logo'].forEach((k) => this.load.image(k, 'assets/itens/' + k + '.png'));
     ['abertura', 'achou', 'alerta', 'apito', 'arremesso', 'bip', 'carro', 'chute', 'clique', 'congelar', 'derrota', 'gol',
       'habilidade', 'hover', 'la_vou_eu', 'mato', 'passe', 'pegar', 'pulo', 'queimado', 'quique', 'salvou', 'selecionar',
-      'tecla', 'vitoria', 'orelhao', 'chuva'].forEach((k) => this.load.audio(k, 'assets/sons/' + k + '.wav'));
+      'tecla', 'vitoria', 'orelhao', 'chuva', 'fundo'].forEach((k) => this.load.audio(k, 'assets/sons/' + k + '.wav'));
   }
 
   create() {
     TR.makeAnims(this);
+    TR.musicaFundo.iniciar(this);
     this.scene.start(TR.startScene || 'Abertura', TR.startData);
   }
 }

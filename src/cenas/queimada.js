@@ -13,6 +13,9 @@ const QHAB = {
   pedro: { nome: 'Bomba do MC', desc: 'próximo arremesso é uma pedrada' },
   gabriel: { nome: 'Mão de goleiro', desc: 'agarra a próxima bola que vier' },
   kaua: { nome: 'Paredão', desc: 'agarra as próximas bolas que vierem' },
+  matheus: { nome: 'Bike do nada', desc: 'some numa bike e foge rapidinho' },
+  guilherme: { nome: 'Treta', desc: 'trava o time rival (o Pedro mais ainda)' },
+  manu: { nome: 'Pequenininha', desc: 'a bola passa por cima dela por um tempo' },
 };
 
 class Queimada extends Phaser.Scene {
@@ -188,6 +191,9 @@ class Queimada extends Phaser.Scene {
     else if (p.id === 'lucas') { this.enemiesOf(p).forEach((q) => { q.slow = 2.2; }); TR.bubble(this, p.spr, 'kkkkk Dona Juliete!', 1.4); return; }
     else if (p.id === 'pedro') { p.bomb = true; }
     else if (p.id === 'gabriel' || p.id === 'kaua') { p.luva = 4; }
+    else if (p.id === 'matheus') { p.boost = 1.2; p.boostMul = 2; TR.bike(this, p.spr, 1.2); }
+    else if (p.id === 'manu') { p.inv = 1.8; }
+    else if (p.id === 'guilherme') { this.enemiesOf(p).forEach((q) => { q.slow = q.id === 'pedro' ? 3.5 : 1.6; }); }
     TR.bubble(this, p.spr, QHAB[p.id].nome + '!', 1.1);
   }
 

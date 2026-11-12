@@ -8,7 +8,7 @@ class Rua extends Phaser.Scene {
     this.add.image(0, 0, 'rua').setOrigin(0);
 
     this.items = [
-      { key: 'futebol', cena: 'Futebol', nome: 'Futebol de rua', x: 170, y: 420, desc: 'Traves de chinelo, 3 contra 3. Quem fizer 2 gols ganha.' },
+      { key: 'futebol', cena: 'Futebol', nome: 'Futebol de rua', x: 170, y: 420, desc: 'Traves de chinelo, 3 contra 3. Você escolhe os times e o tempo.' },
       { key: 'esconde', cena: 'EscondeEsconde', nome: 'Esconde-esconde', x: 330, y: 352, desc: 'O quarteirão inteiro. Esconda-se ou procure a turma.' },
       { key: 'queimada', cena: 'Queimada', nome: 'Queimada', x: 490, y: 430, desc: 'Queime o time do Lucas antes que ele queime o seu.' },
       { key: 'alerta', cena: 'Alerta', nome: 'Alerta', x: 650, y: 352, desc: 'Gritou seu nome? Pega a bola e grita ALERTA!' },
@@ -44,6 +44,12 @@ class Rua extends Phaser.Scene {
     g.fillStyle(0x0c0810, 0.85).fillRect(0, 0, 960, 34);
     TR.txt(this, 16, 9, 'Escolha uma brincadeira:  ← →  e  Enter   |   clique numa JBL (ou na rádio lá em cima) pra tocar música', 1, 0xffe0b0).setDepth(4001);
     this.info = TR.panel(this, 480, 506, 600, 54, 4000);
+    // placar dos petelecos do Fusca azul (canto de cima, à direita)
+    const plBg = this.add.rectangle(950, 44, 10, 22, 0x0c0810, 0.8).setOrigin(1, 0).setDepth(4000);
+    const pl = TR.txt(this, 942, 47, '', 1, 0x9ccfff).setOrigin(1, 0).setDepth(4001);
+    const atualizaPlacar = () => { pl.setText(TR.textoPlacar()); plBg.setSize(pl.width + 16, 22); };
+    atualizaPlacar();
+    this.events.on('peteleco', atualizaPlacar);
     this.infoTitle = TR.txt(this, 196, 486, '', 1, 0xffd36a).setDepth(4001);
     this.infoDesc = TR.txt(this, 196, 506, '', 1, 0xf4e9d8).setDepth(4001);
     this.infoGo = TR.txt(this, 764, 494, 'Enter ▶', 1, 0xffd36a).setOrigin(1, 0).setDepth(4001);

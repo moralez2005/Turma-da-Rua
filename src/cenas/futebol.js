@@ -18,6 +18,11 @@ class Futebol extends Phaser.Scene {
       titulo: 'Futebol: monte os times',
       papeis: ['Atacante', 'Defesa', 'Goleiro'],
       padrao: { azul: ['pernalonga', 'cezar', 'kaua'], vermelho: ['lucas', 'pedro', 'gabriel'] },
+      opcoes: [
+        { chave: 'tempo', rotulo: 'Tempo', tecla: 'T', padrao: 180, valores: [[120, '2 min'], [180, '3 min'], [300, '5 min'], [600, '10 min']] },
+        { chave: 'gols', rotulo: 'Vence com', tecla: 'G', padrao: 2, valores: [[2, '2 gols'], [3, '3 gols'], [5, '5 gols'], [0, 'sem limite']] },
+        { chave: 'clima', rotulo: 'Clima', tecla: 'K', padrao: 'surpresa', valores: [['sol', 'sol'], ['surpresa', 'surpresa'], ['chuva', 'vai chover']] },
+      ],
     }, (t) => this.montar(t));
   }
 
@@ -26,7 +31,13 @@ class Futebol extends Phaser.Scene {
     const F = this.F;
 
     this.score = [0, 0];
-    this.timeLeft = 180;
+    this.opcoes = times.opcoes;
+    this.aguaTimer = undefined;
+    // chuva: 'chuva' = com certeza, 'surpresa' = às vezes, 'sol' = nunca
+    const clima = times.opcoes.clima;
+    this.chuvaTimer = clima === 'chuva' ? Phaser.Math.Between(25, 45) : (clima === 'surpresa' && Math.random() < 0.4 ? Phaser.Math.Between(40, 120) : -1);
+    this.timeLeft = times.opcoes.tempo;
+    this.golsPraVencer = times.opcoes.gols;
     this.state = 'intro';
     this.carTimer = Phaser.Math.Between(35, 55);
     this.car = null;
@@ -82,7 +93,7 @@ class Futebol extends Phaser.Scene {
       '   + ↑ ou ↓ ........ escolhe o canto do gol',
       'E .................. habilidade do jogador',
       'Q .................. trocar de jogador',
-      'Encoste em quem está com a bola pra roubar. 2 gols ganha!',
+      'Encoste em quem está com a bola pra roubar. ' + (this.golsPraVencer ? this.golsPraVencer + ' gols ganha!' : 'Ganha quem tiver mais gols no fim!'),
     ], () => { this.state = 'play'; TR.sfx(this, 'apito', 0.5); TR.bubble(this, this.daniel, 'Vai, ' + TR.KIDS[this.human.id].nome + '!', 2); });
     const byId = {}; this.players.forEach((p) => { byId[p.id] = p.spr; }); times.fora.forEach((id, i) => { byId[id] = this.torcida[i]; });
     TR.chatter(this, (id) => byId[id], { can: () => this.state === 'play', first: 6000 });
@@ -126,6 +137,14 @@ class Futebol extends Phaser.Scene {
       this.timeLeft -= dt;
       this.carTimer -= dt;
       if (this.carTimer <= 0) this.startCar();
+      if (this.chuvaTimer > 0) { this.chuvaTimer -= dt; if (this.chuvaTimer <= 0) return this.comecaChuva(); }
+      // de vez em quando a Dona Tita oferece água pra turma
+      this.aguaTimer = (this.aguaTimer === undefined ? Phaser.Math.Between(50, 80) : this.aguaTimer) - dt;
+      if (this.aguaTimer <= 0) {
+        this.aguaTimer = Phaser.Math.Between(70, 110);
+        const quem = Phaser.Utils.Array.GetRandom(this.players);
+        TR.vizinhaEspia(this, 'tita', 'agua', () => TR.bubble(this, quem.spr, Phaser.Utils.Array.GetRandom(TR.VIZINHAS.tita.falas.respostaAgua), 1.6));
+      }
       if (this.timeLeft <= 0) return this.endGame();
       if (!this.human) this.human = this.players.find((p) => p.team === 0 && p.role !== 'gk');
       this.players.forEach((p) => this.tickEffects(p, dt));
@@ -135,6 +154,7 @@ class Futebol extends Phaser.Scene {
       this.updateBall(dt);
     }
     if (this.car) this.updateCar(dt);
+    if (this.state === 'chuva') this.correPraCoberta(dt);
     this.render(time);
   }
 
@@ -399,6 +419,8 @@ class Futebol extends Phaser.Scene {
     if (b.y < F.y0) {
       const viz = TR.vizinhaDaFaixa(b.x);
       if (viz && (b.z > 30 || Math.hypot(b.vx, b.vy) > 380)) return this.bolaNaVizinha(viz);
+      // bateu no portão sem entrar: às vezes a vizinha sai pra reclamar
+      if (viz && Math.hypot(b.vx, b.vy) > 200 && Math.random() < 0.45) TR.vizinhaEspia(this, viz, 'portao');
       b.y = F.y0; b.vy = Math.abs(b.vy) * 0.6; TR.sfx(this, 'quique', 0.3);
     }
     if (b.y > F.y1) { b.y = F.y1; b.vy = -Math.abs(b.vy) * 0.6; TR.sfx(this, 'quique', 0.3); }
@@ -481,7 +503,7 @@ class Futebol extends Phaser.Scene {
     const quem = ped || gol;
     this.time.delayedCall(600, () => TR.bubble(this, quem.spr, TR.fala(quem.id, 'sofreu'), 1.6));
     this.time.delayedCall(1700, () => {
-      if (this.score[team] >= 2) return this.endGame();
+      if (this.golsPraVencer && this.score[team] >= this.golsPraVencer) return this.endGame();
       this.kickoff(team === 0 ? 1 : 0);
       this.state = 'play';
       TR.sfx(this, 'apito', 0.4);
@@ -506,6 +528,7 @@ class Futebol extends Phaser.Scene {
     const fusca = Math.random() < 0.4;
     if (fusca) TR._texturaFusca(this);
     this.car = this.add.image(-120, 420, fusca ? 'fusca' : 'obj_carro').setOrigin(0.5, 1).setDepth(900);
+    if (fusca) this.events.once('peteleco', () => this.flash(TR.textoPlacar().replace('Petelecos: ', '')));
     if (fusca) TR.fusca(this, { semCarro: true, voce: () => this.human.spr, kids: () => this.players.map((p) => p.spr).concat(this.torcida) });
     TR.sfx(this, 'carro', 0.5);
     const near = this.players.slice().sort((a, b) => this.dist(a, this.ball) - this.dist(b, this.ball))[0];
@@ -521,6 +544,43 @@ class Futebol extends Phaser.Scene {
       this.car.destroy(); this.car = null;
       if (this.state === 'car') { this.state = 'play'; this.players.forEach((p) => { p.dir = p.team === 0 ? 'right' : 'left'; }); }
     }
+  }
+
+  // ------------------------------------------------------------------ chuva
+  comecaChuva() {
+    this.state = 'chuva';
+    const b = this.ball;
+    if (b.owner) { b.owner.hold = 0; b.owner = null; }
+    b.vx = b.vy = 0;
+    const quem = Phaser.Utils.Array.GetRandom(this.players);
+    TR.bubble(this, quem.spr, 'CHUVA! Corre pro barracão!', 1.8);
+    // cada um vai pra um lugar na calçada, na frente do barracão
+    this.players.forEach((p, i) => { p.coberta = { x: 330 + i * 40, y: 286 - (i % 2) * 6 }; p.moving = true; });
+    this.time.delayedCall(2600, () => {
+      const pe = this.players.find((p) => p.id === 'pedro');
+      if (pe) TR.bubble(this, pe.spr, 'Molhou meu boné!', 1.5);
+    });
+    TR.chuva(this, 8, () => {
+      const q = Phaser.Utils.Array.GetRandom(this.players);
+      TR.bubble(this, q.spr, 'Passou! Bora voltar!', 1.6);
+      this.time.delayedCall(1300, () => {
+        if (this.state !== 'chuva') return;
+        this.players.forEach((p) => { p.coberta = null; });
+        this.kickoff(this.ball.last && this.ball.last.team === 0 ? 1 : 0);
+        this.state = 'play';
+        TR.sfx(this, 'apito', 0.4);
+      });
+    });
+  }
+
+  correPraCoberta(dt) {
+    this.players.forEach((p) => {
+      if (!p.coberta) return;
+      const dx = p.coberta.x - p.x, dy = p.coberta.y - p.y, d = Math.hypot(dx, dy);
+      if (d < 4) { p.moving = false; p.dir = 'down'; return; }
+      const v = Math.min(d, p.spd * 1.2 * dt);
+      p.x += dx / d * v; p.y += dy / d * v; p.moving = true; p.dir = TR.dirFrom(dx, dy, p.dir);
+    });
   }
 
   // ------------------------------------------------------------------ fim

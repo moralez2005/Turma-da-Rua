@@ -29,12 +29,15 @@ class Queimada extends Phaser.Scene {
     TR.escolherTimes(this, 'queimada', {
       titulo: 'Queimada: monte os times',
       padrao: { azul: ['pernalonga', 'cezar', 'daniel'], vermelho: ['lucas', 'pedro', 'gabriel'] },
+      opcoes: [
+        { chave: 'tempo', rotulo: 'Tempo', tecla: 'T', padrao: 180, valores: [[120, '2 min'], [180, '3 min'], [300, '5 min'], [600, '10 min']] },
+      ],
     }, (t) => this.montar(t));
   }
 
   montar(times) {
     this.state = 'intro';
-    this.timeLeft = 180;
+    this.timeLeft = times.opcoes.tempo;
     this.charge = 0;
     this.catchWin = 0;
     this.targetIdx = 0;

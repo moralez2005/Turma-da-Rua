@@ -33,7 +33,7 @@ class Boot extends Phaser.Scene {
     ['pipa', 'bola', 'bola_queimada', 'logo'].forEach((k) => this.load.image(k, 'assets/itens/' + k + '.png'));
     ['abertura', 'achou', 'alerta', 'apito', 'arremesso', 'bip', 'carro', 'chute', 'clique', 'congelar', 'derrota', 'gol',
       'habilidade', 'hover', 'la_vou_eu', 'mato', 'passe', 'pegar', 'pulo', 'queimado', 'quique', 'salvou', 'selecionar',
-      'tecla', 'vitoria', 'orelhao'].forEach((k) => this.load.audio(k, 'assets/sons/' + k + '.wav'));
+      'tecla', 'vitoria', 'orelhao', 'chuva'].forEach((k) => this.load.audio(k, 'assets/sons/' + k + '.wav'));
   }
 
   create() {

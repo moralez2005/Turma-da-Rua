@@ -5,6 +5,9 @@
  * Como funciona: a cena chama TR.bolaNaCasa(scene, 'tita' | 'vera', { volta, furou }).
  *   - volta(x, y): a vizinha devolveu a bola, que sai da porta (x, y) de volta pra rua.
  *   - furou(): a bola furou. Fim de jogo.
+ *
+ * TR.vizinhaEspia(scene, 'tita' | 'vera', 'portao' | 'agua', depois)
+ *   A vizinha aparece um instante na porta, fala e some. O jogo não para.
  */
 TR.VIZINHAS = {
   tita: {
@@ -19,6 +22,9 @@ TR.VIZINHAS = {
       chega: ['Já vai, já vai!', 'Ô, meninos...', 'Peraí que eu pego!'],
       devolve: ['Toma! Cuidado com a janela, hein!', 'Aqui, ó. Joguem direitinho!', 'Pega! E nada de briga, viu?'],
       marido: ['O marido dela jogou de volta!', 'Seu marido devolveu na hora!'],
+      portao: ['Olha a minha janela, hein!', 'Devagar com essa bola, meninos!'],
+      agua: ['Meninos, querem água gelada?', 'Tá quente, hein! Vem pegar água!'],
+      respostaAgua: ['Valeu, Dona Tita!', 'Opa, quero!', 'Já vou, Dona Tita!'],
     },
   },
   vera: {
@@ -34,6 +40,7 @@ TR.VIZINHAS = {
       chega: ['DE NOVO?!', 'Toda vez isso!', 'Vocês não cansam, não?!'],
       devolve: ['Última vez, ouviram?!', 'Próxima eu não devolvo!', 'Vai, toma! E some daqui!'],
       filha: ['A filha da Dona Vera pegou a bola...', 'Ih... a filha dela tá com uma faca...'],
+      portao: ['MEU PORTÃO!', 'Vai amassar o portão!', 'Já falei pra jogar longe daqui!'],
     },
   },
 };
@@ -55,6 +62,22 @@ TR.desenhaVizinha = (scene, v, x, y) => {
   g.setScale(1, 0.1);
   scene.tweens.add({ targets: g, scaleY: 1, duration: 260, ease: 'Back.Out' });
   return g;
+};
+
+TR.vizinhaEspia = (scene, id, tipo, depois) => {
+  const v = TR.VIZINHAS[id];
+  const falas = v.falas[tipo];
+  if (!falas) return false;
+  const agora = scene.time.now;
+  scene._espiaAte = scene._espiaAte || {};
+  if (agora < (scene._espiaAte[id] || 0)) return false;   // espera um pouco entre uma bronca e outra
+  scene._espiaAte[id] = agora + 12000;
+  const [px, py] = v.porta;
+  const dona = TR.desenhaVizinha(scene, v, px, py);
+  TR.bubble(scene, [px, py], Phaser.Utils.Array.GetRandom(falas), 2, { offY: 104 });
+  scene.time.delayedCall(2200, () => scene.tweens.add({ targets: dona, alpha: 0, duration: 300, onComplete: () => dona.destroy() }));
+  if (depois) scene.time.delayedCall(900, depois);
+  return true;
 };
 
 TR.bolaNaCasa = (scene, id, cb) => {

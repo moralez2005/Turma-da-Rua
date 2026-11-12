@@ -5,7 +5,9 @@
  *   Monta dois times com qualquer um da turma. Clique num moleque (ou aperte 1 a 7) pra mudar:
  *   fora → time azul → time vermelho → fora. O primeiro do time azul é você.
  *   cfg = { titulo, porTime: 3, papeis: ['Atacante', 'Defesa', 'Goleiro'] (opcional), padrao: { azul: [...], vermelho: [...] } }
- *   cb({ azul: [ids], vermelho: [ids], fora: [ids] })
+ *   cfg.opcoes (opcional): botões de partida que mudam a cada clique, ex.:
+ *     [{ chave: 'tempo', rotulo: 'Tempo', tecla: 'T', valores: [[120, '2 min'], [180, '3 min']], padrao: 180 }]
+ *   cb({ azul: [ids], vermelho: [ids], fora: [ids], opcoes: { tempo: 180, ... } })
  *
  * TR.escolherVoce(scene, chave, cfg, cb)
  *   Escolhe só com quem você vai jogar. cfg = { titulo, padrao: 'pernalonga', dica }
@@ -18,7 +20,7 @@ TR.escolhas = {};
 TR._telaEscolha = (scene, titulo, alturaExtra) => {
   const itens = [];
   const add = (o) => { itens.push(o); return o; };
-  add(TR.panel(scene, 480, 270, 880, 420 + (alturaExtra || 0), 7000));
+  add(TR.panel(scene, 480, 270 + (alturaExtra || 0) / 2, 880, 420 + (alturaExtra || 0), 7000));
   add(TR.txt(scene, 480, 78, titulo, 2, 0xffd36a).setOrigin(0.5).setScrollFactor(0).setDepth(7001));
   return { itens, add, fechar: () => itens.forEach((o) => o.destroy()) };
 };
@@ -44,11 +46,28 @@ TR.escolherTimes = (scene, chave, cfg, cb) => {
   const n = cfg.porTime || 3;
   const salvo = TR.escolhas[chave] || cfg.padrao;
   let azul = salvo.azul.slice(), vermelho = salvo.vermelho.slice();
-  const tela = TR._telaEscolha(scene, cfg.titulo || 'Monte os times');
+  const tela = TR._telaEscolha(scene, cfg.titulo || 'Monte os times', cfg.opcoes ? 50 : 0);
+  const ops = cfg.opcoes || [];
+  const escolhidas = Object.assign({}, ...ops.map((o) => ({ [o.chave]: o.padrao })), (salvo.opcoes || {}));
   tela.add(TR.txt(scene, 480, 108, 'Clique (ou 1 a 7) pra trocar: fora → AZUL → VERMELHO. O 1º do azul é você.', 1, 0xc9b8d8)
     .setOrigin(0.5).setScrollFactor(0).setDepth(7001));
-  const resumo = tela.add(TR.txt(scene, 480, 340, '', 1, 0xfff1d6).setOrigin(0.5, 0).setScrollFactor(0).setDepth(7001));
-  const aviso = tela.add(TR.txt(scene, 480, 396, '', 1, 0xff9a7a).setOrigin(0.5, 0).setScrollFactor(0).setDepth(7001));
+  const yOp = 392, yBot = ops.length ? 466 : 450;
+  const resumo = tela.add(TR.txt(scene, 480, 326, '', 1, 0xfff1d6).setOrigin(0.5, 0).setScrollFactor(0).setDepth(7001));
+  const aviso = tela.add(TR.txt(scene, 480, ops.length ? 422 : 396, '', 1, 0xff9a7a).setOrigin(0.5, 0).setScrollFactor(0).setDepth(7001));
+  // botões de partida (tempo, gols, clima...): cada clique passa pro próximo valor
+  const rotuloOp = (o) => o.rotulo + ': ' + (o.valores.find((v) => v[0] === escolhidas[o.chave]) || o.valores[0])[1] + ' (' + o.tecla + ')';
+  const proxOp = (o) => {
+    const i = o.valores.findIndex((v) => v[0] === escolhidas[o.chave]);
+    escolhidas[o.chave] = o.valores[(i + 1) % o.valores.length][0];
+    TR.sfx(scene, 'clique', 0.3);
+    redesenhaOps();
+  };
+  let botoesOp = [];
+  const redesenhaOps = () => {
+    botoesOp.forEach((b) => b.destroy());
+    botoesOp = ops.map((o, i) => TR.button(scene, 480 + (i - (ops.length - 1) / 2) * 250, yOp, rotuloOp(o), () => proxOp(o), { fixed: true, depth: 7003, w: 220 }));
+  };
+  redesenhaOps();
 
   const ciclo = (id) => {
     TR.sfx(scene, 'clique', 0.3);
@@ -79,21 +98,23 @@ TR.escolherTimes = (scene, chave, cfg, cb) => {
   };
   const jogar = () => {
     if (azul.length !== n || vermelho.length !== n) { TR.sfx(scene, 'derrota', 0.3); return; }
-    TR.escolhas[chave] = { azul: azul.slice(), vermelho: vermelho.slice() };
+    TR.escolhas[chave] = { azul: azul.slice(), vermelho: vermelho.slice(), opcoes: Object.assign({}, escolhidas) };
     scene.input.keyboard.off('keydown', teclas);
     tela.fechar();
+    botoesOp.forEach((b) => b.destroy());
     // espera um instante: o mesmo Enter não pode pular a tela de instruções que vem depois
-    scene.time.delayedCall(60, () => cb({ azul, vermelho, fora: TR.ORDEM.filter((id) => !azul.includes(id) && !vermelho.includes(id)) }));
+    scene.time.delayedCall(60, () => cb({ azul, vermelho, fora: TR.ORDEM.filter((id) => !azul.includes(id) && !vermelho.includes(id)), opcoes: escolhidas }));
   };
   const teclas = (ev) => {
     const d = parseInt(ev.key, 10);
     if (d >= 1 && d <= 7) ciclo(TR.ORDEM[d - 1]);
     if (ev.code === 'KeyR') sortear();
     if (ev.code === 'Enter') jogar();
+    ops.forEach((o) => { if (ev.code === 'Key' + o.tecla) proxOp(o); });
   };
-  tela.add(TR.button(scene, 300, 450, 'Sortear (R)', sortear, { fixed: true, depth: 7003, w: 170 }));
-  tela.add(TR.button(scene, 480, 450, 'Padrão', () => { azul = cfg.padrao.azul.slice(); vermelho = cfg.padrao.vermelho.slice(); desenha(); }, { fixed: true, depth: 7003, w: 170 }));
-  tela.add(TR.button(scene, 660, 450, 'Jogar (Enter)', jogar, { fixed: true, depth: 7003, w: 170 }));
+  tela.add(TR.button(scene, 300, yBot, 'Sortear (R)', sortear, { fixed: true, depth: 7003, w: 170 }));
+  tela.add(TR.button(scene, 480, yBot, 'Padrão', () => { azul = cfg.padrao.azul.slice(); vermelho = cfg.padrao.vermelho.slice(); desenha(); }, { fixed: true, depth: 7003, w: 170 }));
+  tela.add(TR.button(scene, 660, yBot, 'Jogar (Enter)', jogar, { fixed: true, depth: 7003, w: 170 }));
   scene.time.delayedCall(200, () => scene.input.keyboard.on('keydown', teclas));
   desenha();
 };

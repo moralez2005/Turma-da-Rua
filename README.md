@@ -12,7 +12,7 @@ Um jogo indie em pixel art sobre uma tarde de brincadeiras na rua com sete amigo
 
 | | Brincadeira | Como funciona |
 | --- | --- | --- |
-| ⚽ | **Futebol de rua** | 3 contra 3 com traves de chinelo. A bola sobe, quica e rola. Passe, chute carregado, troca de jogador e habilidades. De vez em quando passa um carro e todo mundo vai pra calçada. Se a bola cair na casa rosa, a Dona Tita devolve rapidinho. Se cair na lilás, a Dona Vera reclama e demora... e se a filha dela pegar a bola, ela fura e acabou o jogo. |
+| ⚽ | **Futebol de rua** | 3 contra 3 com traves de chinelo. A bola sobe, quica e rola. Passe, chute carregado, troca de jogador e habilidades. Antes do jogo você monta os times e escolhe o tempo, quantos gols pra vencer e o clima. Passa carro (e às vezes um Fusca azul: aperta F!), pode cair uma chuva que manda todo mundo pro barracão, e as vizinhas participam: a Dona Tita devolve a bola e oferece água, e a Dona Vera reclama do portão, demora pra devolver... e se a filha dela pegar a bola, ela fura e acabou o jogo. |
 | 👁 | **Esconde-esconde** | O quarteirão inteiro, desenhado a partir do mapa da rua de verdade: a rua principal, as duas ruas que sobem (a do Cezar e do Lucas) e a descida até a casa do Pernalonga. Tem a escadinha do Kauã, o barracão inacabado sem telhado, o portão de madeira do Pedro, as casas da Dona Tita e da Dona Vera e mais de 30 esconderijos. Você pode se esconder enquanto o Daniel procura, ou procurar a turma. |
 | 🔴 | **Queimada** | Seu time contra o time do Lucas. Mire, carregue e arremesse. Agarre a bola na hora certa. Quem é queimado vai pro cemitério e volta se queimar alguém de lá. |
 | ❗ | **Alerta** | Escolha um tema (frutas, times, países, games...) e a sua palavra. Gritaram a sua? Corre pegar a bola e grita ALERTA! Todo mundo congela, você dá 3 passos e arremessa. 3 vidas cada. |
@@ -64,6 +64,8 @@ Na queimada as habilidades são outras, próprias do jogo: Braço longo (Pernalo
 
 **Rádio da Rua:** uma barra fica suspensa no topo da tela o tempo todo. Escolha a JBL do Lucas (eletrônica, gringas e o rap do Minecraft) ou a do Pedro (funk) ali em cima, ou clique numa JBL no cenário. O player oficial do YouTube fica pendurado ao lado do jogo, com a lista de músicas, e a música continua tocando nas brincadeiras. O botão ▴ pausa e recolhe o player.
 
+**Fusca azul:** o placar de petelecos dados e levados aparece no menu da rua e fica guardado no navegador.
+
 **Orelhão:** no esconde-esconde, aperte T perto do orelhão pra ele tocar: um trim-trim e uma musiquinha 8-bit original, feita por código (`ferramentas/gerador/orelhao.py`), sem precisar do YouTube.
 
 **Vizinhas:** os nomes são inventados e tudo delas (nome, cor, falas, demora e chance de furar a bola) fica em `src/vizinhas.js`.
@@ -84,7 +86,7 @@ Para abrir direto numa brincadeira: `http://localhost:8000/?cena=Futebol`. Tamb�
 
 - **Motor:** [Phaser 3.87](https://phaser.io), que já vem em `lib/`, sem build e sem CDN.
 - **Arte:** pixel art gerada por scripts em Python (Pillow/numpy) em `ferramentas/gerador/`. Isso inclui sprites em 4 direções, cenários em 960×540, o mapa de 1920×1440 do esconde-esconde (`esconde_mapa_real.py`) e os objetos. A única foto é a da homenagem no final: a turma de verdade.
-- **Sons:** efeitos retrô e o toque do orelhão, todos sintetizados por código (`ferramentas/gerador/sons.py` e `orelhao.py`).
+- **Sons:** efeitos retrô, o toque do orelhão e a chuva, todos sintetizados por código (`ferramentas/gerador/sons.py`, `orelhao.py` e `chuva.py`).
 - **Fonte:** Unifont, renderizada como fonte bitmap.
 
 ### Feito com IA

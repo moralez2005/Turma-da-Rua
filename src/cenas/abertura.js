@@ -119,7 +119,7 @@ class Abertura extends Phaser.Scene {
     // meninos correndo atrás da bola
     this.runner1.x += 210 * dt; this.runner2.x += 214 * dt;
     this.ball.x = this.runner1.x + 26; this.ball.y = 416 + Math.abs(Math.sin(time / 120)) * -4;
-    this.ball.setAngle(time / 3);
+    this.ball.setFrame(Math.floor(time / 50) % 8);
     if (this.runner2.x > 1100) { this.runner1.x = -60; this.runner2.x = -170; }
     this.dog.x += 60 * dt;
     if (this.dog.x > 1040) this.dog.x = -80;

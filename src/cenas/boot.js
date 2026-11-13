@@ -18,6 +18,10 @@ class Boot extends Phaser.Scene {
     });
     this.load.image('rua', 'assets/cenarios/rua.png');
     this.load.image('rua_tarde', 'assets/cenarios/rua_tarde.png');
+    this.load.image('barracao_dentro', 'assets/cenarios/barracao_dentro.png');
+    this.load.image('rua_sem_ceu', 'assets/cenarios/rua_sem_ceu.png');
+    this.load.json('rua_luzes', 'assets/cenarios/rua_luzes.json');
+    this.load.json('barracao_dentro', 'assets/cenarios/barracao_dentro.json');
     this.load.image('turma14', 'assets/final/turma14.png');
     this.load.image('final_fundo', 'assets/final/fundo_480.png');
     this.load.image('esc_chao', 'assets/esconde/chao.png');
@@ -32,7 +36,9 @@ class Boot extends Phaser.Scene {
     this.load.spritesheet('jbl_pedro', 'assets/itens/jbl_pedro.png', { frameWidth: 36, frameHeight: 26 });
     this.load.spritesheet('caramelo', 'assets/itens/caramelo.png', { frameWidth: 40, frameHeight: 30 });
     ['futebol', 'esconde', 'queimada', 'alerta', 'fim'].forEach((k) => this.load.image('token_' + k, 'assets/itens/token_' + k + '.png'));
-    ['pipa', 'bola', 'bola_queimada', 'logo'].forEach((k) => this.load.image(k, 'assets/itens/' + k + '.png'));
+    ['pipa', 'logo'].forEach((k) => this.load.image(k, 'assets/itens/' + k + '.png'));
+    // bolas: 8 quadros de giro (ferramentas/gerador/bolas.py)
+    ['bola', 'bola_queimada'].forEach((k) => this.load.spritesheet(k, 'assets/itens/' + k + '.png', { frameWidth: 14, frameHeight: 14 }));
     ['abertura', 'achou', 'alerta', 'apito', 'arremesso', 'bip', 'carro', 'chute', 'clique', 'congelar', 'derrota', 'gol',
       'habilidade', 'hover', 'la_vou_eu', 'mato', 'passe', 'pegar', 'pulo', 'queimado', 'quique', 'salvou', 'selecionar',
       'tecla', 'vitoria', 'orelhao', 'chuva', 'fundo'].forEach((k) => this.load.audio(k, 'assets/sons/' + k + '.wav'));

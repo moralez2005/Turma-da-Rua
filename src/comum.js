@@ -87,6 +87,9 @@ const TR = {
     scene.time.delayedCall(opts.first || 5000, loop);
   },
   DIRS: { down: 0, left: 1, right: 2, up: 3 },
+  // folha de cada personagem: 8 colunas x 7 linhas (ferramentas/gerador/sprites_hd.py)
+  COLS: 8,
+  Q: { agachaFrente: 32, agachaCostas: 33, pisca: 34, fala: 35, seguraDir: 40, agarraDir: 45, seguraEsq: 48, agarraEsq: 53 },
 
   // ---------- texto pixelado ----------
   txt(scene, x, y, str, size = 1, color = 0xffffff) {
@@ -101,19 +104,26 @@ const TR = {
       ['down', 'left', 'right', 'up'].forEach((d, row) => {
         const k = id + '_run_' + d;
         if (!scene.anims.exists(k)) {
-          scene.anims.create({ key: k, frames: scene.anims.generateFrameNumbers(id, { start: row * 4, end: row * 4 + 3 }), frameRate: 10, repeat: -1 });
+          scene.anims.create({ key: k, frames: scene.anims.generateFrameNumbers(id, { start: row * TR.COLS, end: row * TR.COLS + 7 }), frameRate: 16, repeat: -1 });
         }
       });
       const blink = id + '_idle';
       if (!scene.anims.exists(blink)) {
-        scene.anims.create({ key: blink, frames: [{ key: id, frame: 0, duration: 2600 }, { key: id, frame: 18, duration: 140 }], repeat: -1 });
+        scene.anims.create({ key: blink, frames: [{ key: id, frame: 0, duration: 2600 }, { key: id, frame: TR.Q.pisca, duration: 140 }], repeat: -1 });
       }
+      // arremesso (queimada): prepara, prepara mais, solta, acompanha
+      ['right', 'left'].forEach((lado) => {
+        const k2 = id + '_arremessa_' + lado, base = (lado === 'right' ? 5 : 6) * TR.COLS;
+        if (!scene.anims.exists(k2)) scene.anims.create({ key: k2, frames: [1, 2, 3, 4].map((n) => ({ key: id, frame: base + n, duration: n === 3 ? 90 : 70 })), repeat: 0 });
+      });
     });
     if (!scene.anims.exists('matheus_pedala')) {
       scene.anims.create({ key: 'matheus_pedala', frames: scene.anims.generateFrameNumbers('matheus_bike', { start: 0, end: 5 }), frameRate: 14, repeat: -1 });
+      scene.anims.create({ key: 'matheus_pedala_costas', frames: scene.anims.generateFrameNumbers('matheus_bike', { start: 6, end: 11 }), frameRate: 14, repeat: -1 });
+      scene.anims.create({ key: 'matheus_pedala_frente', frames: scene.anims.generateFrameNumbers('matheus_bike', { start: 12, end: 17 }), frameRate: 14, repeat: -1 });
       ['tita', 'marido', 'vera', 'filha'].forEach((v) => {
-        scene.anims.create({ key: 'viz_' + v + '_idle', frames: [{ key: 'viz_' + v, frame: 0, duration: 2200 }, { key: 'viz_' + v, frame: 18, duration: 140 }], repeat: -1 });
-        scene.anims.create({ key: 'viz_' + v + '_fala', frames: [{ key: 'viz_' + v, frame: 19, duration: 140 }, { key: 'viz_' + v, frame: 0, duration: 140 }], repeat: 5 });
+        scene.anims.create({ key: 'viz_' + v + '_idle', frames: [{ key: 'viz_' + v, frame: 0, duration: 2200 }, { key: 'viz_' + v, frame: TR.Q.pisca, duration: 140 }], repeat: -1 });
+        scene.anims.create({ key: 'viz_' + v + '_fala', frames: [{ key: 'viz_' + v, frame: TR.Q.fala, duration: 140 }, { key: 'viz_' + v, frame: 0, duration: 140 }], repeat: 5 });
       });
     }
     if (!scene.anims.exists('caramelo_anda')) {
@@ -135,12 +145,22 @@ const TR = {
       if (!spr.anims.isPlaying || spr.anims.currentAnim.key !== k) spr.play(k, true);
     } else {
       spr.stop();
-      spr.setFrame(TR.DIRS[dir] * 4);
+      spr.setFrame(TR.DIRS[dir] * TR.COLS);
     }
   },
   dirFrom(dx, dy, fallback) {
     if (Math.abs(dx) < 0.01 && Math.abs(dy) < 0.01) return fallback;
     return Math.abs(dx) > Math.abs(dy) * 0.9 ? (dx > 0 ? 'right' : 'left') : (dy > 0 ? 'down' : 'up');
+  },
+
+  // ---------- bola ----------
+  // gira trocando os 8 quadros (conforme a velocidade) e amassa logo depois de quicar
+  giraBola(spr, b, scene, extra = 0) {
+    spr.giro = (spr.giro || 0) + Math.hypot(b.vx || 0, b.vy || 0) * 0.004 + extra;
+    const dir = (b.vx || 0) < 0 ? -1 : 1;
+    spr.setFrame(((Math.floor(spr.giro * dir) % 8) + 8) % 8);
+    const amassa = b.quique && scene.time.now - b.quique < 90;
+    spr.setScale(amassa ? 2.35 : 2, amassa ? 1.6 : 2);
   },
 
   // ---------- som ----------

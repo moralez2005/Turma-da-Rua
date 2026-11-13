@@ -1,3 +1,4 @@
+import math
 """Spritesheets de 4 direcoes (frente, esquerda, direita, costas) x 4 quadros de corrida, 40x68 cada.
 Linha 0 = baixo (frente), 1 = esquerda, 2 = direita, 3 = cima (costas). Colunas = quadros 0..3."""
 import os, sys
@@ -8,7 +9,9 @@ from sprites import CHARS, Canvas, detailed, dark, mix, camo_color, up, label
 OUT_DIR = "/home/claude/turma-da-rua/assets/personagens/jogo"
 
 
-def side(c, frame=0):
+def side(c, frame=0, fase=None, braco=None, bola=None):
+    """fase (0..1): passo contínuo; braco: ângulo do braço da frente em graus (0 = pra baixo, 90 = pra frente, 180 = pra cima);
+    bola: cor da bola na mão."""
     """Perfil olhando para a direita."""
     cv = Canvas(40, 68)
     sk, sks = c["skin"]
@@ -20,8 +23,12 @@ def side(c, frame=0):
     th = c["th"]
     feet = c["feet"]
     fcol = sk if feet == "descalco" else feet
-    stride = {0: 0, 1: 4, 2: -4, 3: 0}[frame]
-    lift = {0: 0, 1: 1, 2: 1, 3: 0}[frame]
+    if fase is None:
+        stride = {0: 0, 1: 4, 2: -4, 3: 0}[frame]
+        lift = {0: 0, 1: 1, 2: 1, 3: 0}[frame]
+    else:
+        stride = round(6 * math.sin(2 * math.pi * fase))
+        lift = 2 if abs(math.sin(2 * math.pi * fase)) > 0.8 else (1 if abs(math.sin(2 * math.pi * fase)) > 0.4 else 0)
 
     def shorts_col(x, y):
         return camo_color(x, y) if c["shorts"] == "camo" else c["shorts"]
@@ -60,9 +67,26 @@ def side(c, frame=0):
         cv.r(tx0 + 3, ty0, tx0 + 4, sy0, (255, 255, 255))
     cv.r(tx0, ty0 + 1, tx0, sy0, dark(shirt, 0.82))
     # braco da frente balancando
-    swing = {0: 0, 1: -3, 2: 3, 3: 0}[frame]
+    swing = {0: 0, 1: -3, 2: 3, 3: 0}[frame] if fase is None else round(-5 * math.sin(2 * math.pi * fase))
     ax = cx - 1 + swing // 2
-    for y in range(ty0 + 1, sy0 + 3):
+    if braco is not None:   # braço apontando num ângulo (segurar / arremessar)
+        L = sy0 + 2 - ty0
+        a = math.radians(braco)
+        ox, oy = cx - 1, ty0 + 4
+        for k in range(L + 1):
+            x = round(ox + math.sin(a) * k); y = round(oy + math.cos(a) * k)
+            col = shirt if (k < 4 and c["sleeve"] != "tank") or (c["sleeve"] == "long" and k < L - 1) else sk
+            cv.r(x - 1, y - 1, x + 1, y + 1, col)
+        hx_, hy_ = round(ox + math.sin(a) * (L + 1)), round(oy + math.cos(a) * (L + 1))
+        cv.r(hx_ - 1, hy_ - 1, hx_ + 1, hy_ + 1, sk)
+        if bola:
+            bx, by = hx_ + round(math.sin(a) * 3), hy_ + round(math.cos(a) * 3)
+            for yy in range(-3, 4):
+                for xx in range(-3, 4):
+                    if xx * xx + yy * yy <= 10:
+                        cv.p(bx + xx, by + yy, bola)
+            cv.p(bx - 1, by - 2, tuple(min(255, v + 70) for v in bola)); cv.p(bx - 2, by - 1, tuple(min(255, v + 50) for v in bola))
+    for y in (range(ty0 + 1, sy0 + 3) if braco is None else []):
         k = (y - ty0) / max(1, (sy0 + 2 - ty0))
         x = ax + int(swing * k)
         if c["sleeve"] == "long":
@@ -110,10 +134,9 @@ def side(c, frame=0):
             cv.r(hx0 + 3, hy0 - 2, hx1 - 1, hy0 - 2, hc)
         if c["hs"] == "coque":
             cv.r(hx0 - 2, hy0 + 1, hx0 + 1, hy0 + 5, hc)                 # coque atrás
-        if c.get("oculos"):
-            cv.r(ex - 2, eye_y - 1, ex + 2, eye_y - 1, c["oculos"]); cv.r(ex - 2, eye_y + 2, ex + 2, eye_y + 2, c["oculos"])
-            cv.r(ex + 2, eye_y - 1, ex + 2, eye_y + 2, c["oculos"]); cv.r(ex - 2, eye_y - 1, ex - 2, eye_y + 2, c["oculos"])
-            cv.r(ex - 6, eye_y, ex - 3, eye_y, c["oculos"])
+        if c.get("oculos"):   # armação fininha de perfil
+            cv.r(ex - 2, eye_y - 1, ex + 2, eye_y - 1, c["oculos"]); cv.p(ex + 2, eye_y, c["oculos"])
+            cv.r(ex - 6, eye_y - 1, ex - 3, eye_y - 1, c["oculos"])
         if c["hs"] == "longo":
             cv.r(hx0 - 1, hy0 + 3, hx0 + 4, hy1 + 5, hc)
             cv.r(hx1 - 5, hy0 + 3, hx1, hy0 + 4, hc)

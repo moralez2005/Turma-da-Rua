@@ -8,7 +8,7 @@ from sprites import CHARS, detailed, up, label
 from sprites4 import side
 from hd import scale2x, hd_refine
 
-OUT = "/home/claude/jogo/assets/personagens"
+OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "assets", "personagens")
 os.makedirs(OUT, exist_ok=True)
 FW, FH = 80, 136
 
@@ -17,21 +17,45 @@ def hd(c, img):
     return hd_refine(scale2x(img), c, rim=None)
 
 
+COLS, ROWS = 8, 7
+BOLA_QUEIMADA = (214, 52, 52)
+
+
+def _sobe(img, dy):
+    """desloca o quadro pra cima (sobe-e-desce da passada)."""
+    if not dy:
+        return img
+    out = Image.new("RGBA", img.size, (0, 0, 0, 0))
+    out.paste(img, (0, -dy))
+    return out
+
+
 def sheet(c, seed=3):
-    s = Image.new("RGBA", (FW * 4, FH * 5), (0, 0, 0, 0))
-    seq = [0, 1, 0, 2]
-    for col, f in enumerate(seq):
-        s.paste(hd(c, detailed(c, "stand", seed=seed, frame=f)), (col * FW, 0))
-    for col, f in enumerate([0, 1, 3, 2]):
-        r = hd(c, side(c, f))
+    """Folha 8x7 (quadros de 80x136):
+    linha 0 frente, 1 esquerda, 2 direita, 3 costas — 8 quadros de passo cada, com sobe-e-desce;
+    linha 4: agachado frente, agachado costas, piscando, falando;
+    linha 5: arremesso pra direita (segura, prepara, prepara+, solta, acompanha, agarra);
+    linha 6: o mesmo pra esquerda."""
+    import math
+    s = Image.new("RGBA", (FW * COLS, FH * ROWS), (0, 0, 0, 0))
+    for col in range(COLS):
+        f = col / COLS
+        sobe = round(abs(math.sin(2 * math.pi * f)) * 3)
+        s.paste(_sobe(hd(c, detailed(c, "stand", seed=seed, fase=f)), sobe), (col * FW, 0))
+        r = _sobe(hd(c, side(c, fase=f)), sobe)
         s.paste(ImageOps.mirror(r), (col * FW, FH))
         s.paste(r, (col * FW, FH * 2))
-    for col, f in enumerate(seq):
-        s.paste(hd(c, detailed(c, "stand", seed=seed, frame=f, view="back")), (col * FW, FH * 3))
+        s.paste(_sobe(hd(c, detailed(c, "stand", seed=seed, fase=f, view="back")), sobe), (col * FW, FH * 3))
     extras = [detailed(c, "sit", seed=seed), detailed(c, "sit", seed=seed, view="back"),
               detailed(c, "stand", seed=seed, blink=True), detailed(c, "stand", seed=seed, talk=True)]
     for col, e in enumerate(extras):
         s.paste(hd(c, e), (col * FW, FH * 4))
+    # arremesso: (ângulo do braço, bola na mão?)
+    poses = [(110, True), (165, True), (200, True), (70, False), (35, False), (95, False)]
+    for col, (ang, bola) in enumerate(poses):
+        r = hd(c, side(c, fase=0.12 if col in (3, 4) else 0, braco=ang, bola=BOLA_QUEIMADA if bola else None))
+        s.paste(r, (col * FW, FH * 5))
+        s.paste(ImageOps.mirror(r), (col * FW, FH * 6))
     return s
 
 

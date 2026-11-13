@@ -25,7 +25,9 @@ class Alerta extends Phaser.Scene {
     this._saindo = false;
     this.players = null;   // ao jogar de novo, a cena reaproveita o objeto: limpa o que sobrou da partida anterior
     this.cameras.main.fadeIn(300, 18, 13, 24);
-    this.add.image(0, 0, 'rua').setOrigin(0);
+    TR.ruaComCeu(this);
+    const inicio = this.time.now;
+    TR.cicloDoDia(this, () => (this.time.now - inicio) / 300000);   // 5 minutos da tarde até a noite
     this.F = { x0: 40, x1: 920, y0: 296, y1: 496, cx: 480, cy: 396 };
     TR.backButton(this);
     TR.escolherVoce(this, 'alerta', {
@@ -326,7 +328,7 @@ class Alerta extends Phaser.Scene {
       this.scatterT += dt;
       // bola no ar
       b.x += b.vx * dt; b.y += b.vy * dt; b.vz -= 760 * dt; b.z += b.vz * dt;
-      if (b.z <= 0) { b.z = 0; if (b.vz < -100) { b.vz = -b.vz * 0.4; TR.sfx(this, 'quique', 0.35); } else b.vz = 0; }
+      if (b.z <= 0) { b.z = 0; if (b.vz < -100) { b.vz = -b.vz * 0.4; b.quique = this.time.now; TR.sfx(this, 'quique', 0.35); } else b.vz = 0; }
       const fr = Math.pow(b.z > 0 ? 0.95 : 0.3, dt); b.vx *= fr; b.vy *= fr;
       b.x = Phaser.Math.Clamp(b.x, F.x0, F.x1); b.y = Phaser.Math.Clamp(b.y, F.y0, F.y1);
       // movimento
@@ -419,6 +421,7 @@ class Alerta extends Phaser.Scene {
     const b = this.ball;
     this.ballShadow.setPosition(Math.round(b.x), Math.round(b.y)).setDepth(3).setScale(Math.max(0.3, 1 - b.z / 400));
     this.ballSpr.setPosition(Math.round(b.x), Math.round(b.y - 8 - b.z)).setDepth(b.y + 2);
+    TR.giraBola(this.ballSpr, b, this);
     this.marker.setPosition(Math.round(this.human.x), Math.round(this.human.y) - 168).setAngle(180).setVisible(!this.human.out);
     this.aimG.clear();
     if ((this.state === 'steps' || this.state === 'aim') && this.ball.owner === this.human) {

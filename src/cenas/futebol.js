@@ -10,7 +10,7 @@ class Futebol extends Phaser.Scene {
     this.players = null;   // ao jogar de novo, a cena reaproveita o objeto: limpa o que sobrou da partida anterior
     this.cameras.main.fadeIn(300, 18, 13, 24);
     this.F = { x0: 24, x1: 936, y0: 292, y1: 498, mid: 480, gy0: 344, gy1: 444 };
-    this.add.image(0, 0, 'rua').setOrigin(0);
+    TR.ruaComCeu(this);
     this.drawField();
     TR.backButton(this);
     this.state = 'escolha';
@@ -33,6 +33,7 @@ class Futebol extends Phaser.Scene {
     this.score = [0, 0];
     this.opcoes = times.opcoes;
     this.aguaTimer = undefined;
+    this.dentroDoBarracao = false; this.torcedoresCorrendo = [];
     // chuva: 'chuva' = com certeza, 'surpresa' = às vezes, 'sol' = nunca
     const clima = times.opcoes.clima;
     this.chuvaTimer = clima === 'chuva' ? Phaser.Math.Between(25, 45) : (clima === 'surpresa' && Math.random() < 0.4 ? Phaser.Math.Between(40, 120) : -1);
@@ -40,7 +41,7 @@ class Futebol extends Phaser.Scene {
     this.golsPraVencer = times.opcoes.gols;
     // o dia vai acabando conforme o tempo da partida passa
     const total = times.opcoes.tempo;
-    TR.anoitecer(this, () => 1 - this.timeLeft / total, (t) => TR.bubble(this, Phaser.Utils.Array.GetRandom(this.players).spr, t, 1.8), [584, 70]);
+    TR.cicloDoDia(this, () => 1 - this.timeLeft / total, (t) => TR.bubble(this, Phaser.Utils.Array.GetRandom(this.players).spr, t, 1.8));
     this.state = 'intro';
     this.carTimer = Phaser.Math.Between(35, 55);
     this.car = null;
@@ -422,7 +423,7 @@ class Futebol extends Phaser.Scene {
     b.vz -= 980 * dt; b.z += b.vz * dt;
     if (b.z <= 0) {
       b.z = 0;
-      if (b.vz < -90) { b.vz = -b.vz * 0.48; TR.sfx(this, 'quique', Math.min(0.5, -b.vz / 600)); }
+      if (b.vz < -90) { b.vz = -b.vz * 0.48; b.quique = this.time.now; TR.sfx(this, 'quique', Math.min(0.5, -b.vz / 600)); }
       else b.vz = 0;
     }
     const fr = Math.pow(b.z > 0 ? 0.85 : 0.32, dt);
@@ -567,32 +568,110 @@ class Futebol extends Phaser.Scene {
     b.vx = b.vy = 0;
     const quem = Phaser.Utils.Array.GetRandom(this.players);
     TR.bubble(this, quem.spr, 'CHUVA! Corre pro barracão!', 1.8);
-    // cada um vai pra um lugar na calçada, na frente do barracão
-    this.players.forEach((p, i) => { p.coberta = { x: 330 + i * 40, y: 286 - (i % 2) * 6 }; p.moving = true; });
-    this.time.delayedCall(2600, () => {
-      const pe = this.players.find((p) => p.id === 'pedro');
-      if (pe) TR.bubble(this, pe.spr, 'Molhou meu boné!', 1.5);
+    // todo mundo corre pra porta do barracão (na calçada) e entra
+    this.PORTA = { x: 358, y: 236 };
+    this.players.concat(this.torcida.map((spr) => ({ spr, torcida: true, x: spr.x, y: spr.y, spd: 200 }))).forEach((p, i) => {
+      p.coberta = { x: this.PORTA.x + ((i % 3) - 1) * 10, y: this.PORTA.y };
+      p.dentro = false; p.moving = true;
+      if (p.torcida) this.torcedoresCorrendo = (this.torcedoresCorrendo || []).concat([p]);
     });
-    TR.chuva(this, 8, () => {
-      const q = Phaser.Utils.Array.GetRandom(this.players);
-      TR.bubble(this, q.spr, 'Passou! Bora voltar!', 1.6);
-      this.time.delayedCall(1300, () => {
-        if (this.state !== 'chuva') return;
-        this.players.forEach((p) => { p.coberta = null; });
-        this.kickoff(this.ball.last && this.ball.last.team === 0 ? 1 : 0);
-        this.state = 'play';
-        TR.sfx(this, 'apito', 0.4);
-      });
-    });
+    TR.chuva(this, 13, () => {});
+    // se alguém demorar, entra mesmo assim
+    this.time.delayedCall(3800, () => { if (this.state === 'chuva' && !this.dentroDoBarracao) this.entraNoBarracao(); });
   }
 
+  // cada um corre até a porta; quando chega, some pra dentro
   correPraCoberta(dt) {
-    this.players.forEach((p) => {
-      if (!p.coberta) return;
+    const todos = this.players.concat(this.torcedoresCorrendo || []);
+    todos.forEach((p) => {
+      if (!p.coberta || p.dentro) return;
       const dx = p.coberta.x - p.x, dy = p.coberta.y - p.y, d = Math.hypot(dx, dy);
-      if (d < 4) { p.moving = false; p.dir = 'down'; return; }
-      const v = Math.min(d, p.spd * 1.2 * dt);
+      if (d < 6) {
+        p.dentro = true; p.moving = false; p.dir = 'up';
+        this.tweens.add({ targets: p.spr, alpha: 0, y: p.spr.y - 8, duration: 220 });
+        if (p.sh) p.sh.setVisible(false);
+        return;
+      }
+      const v = Math.min(d, (p.spd || 200) * 1.25 * dt);
       p.x += dx / d * v; p.y += dy / d * v; p.moving = true; p.dir = TR.dirFrom(dx, dy, p.dir);
+      if (p.torcida) { p.spr.setPosition(p.x, p.y).setDepth(p.y); TR.pose(p.spr, p.dir, true); }
+    });
+    if (!this.dentroDoBarracao && todos.every((p) => p.dentro)) this.entraNoBarracao();
+  }
+
+  // a câmera "entra" no barracão: tela de dentro, com a chuva lá fora e a goteira no balde
+  entraNoBarracao() {
+    if (this.dentroDoBarracao) return;
+    this.dentroDoBarracao = true;
+    const cam = this.cameras.main;
+    cam.fadeOut(300, 10, 8, 14);
+    cam.once('camerafadeoutcomplete', () => {
+      const D = this.cache.json.get('barracao_dentro');
+      const cont = this.add.container(0, 0).setDepth(7400).setScrollFactor(0);
+      cont.add(this.add.image(0, 0, 'barracao_dentro').setOrigin(0));
+      const chuvaG = this.add.graphics(); cont.add(chuvaG);
+      const pingo = this.add.graphics(); cont.add(pingo);
+      // a turma lá dentro: uns em pé, outros sentados no chão
+      const ids = this.players.map((p) => p.id).concat(this.torcida.map((s) => s.texture.key));
+      const dentro = ids.map((id, i) => {
+        const [x, y] = D.lugares[i % D.lugares.length];
+        const s = this.add.sprite(x, y, id, 0).setOrigin(0.5, 0.97);
+        if (i % 3 === 1) s.setFrame(TR.Q.agachaFrente); else { s.play(id + '_idle'); s.anims.setProgress(Math.random()); }
+        cont.add(s);
+        return s;
+      });
+      dentro.sort((a, b) => a.y - b.y).forEach((s, k) => cont.moveTo(s, 3 + k));
+      cam.fadeIn(350, 10, 8, 14);
+      // chuva caindo nos vãos da janela e da porta
+      const gotas = Array.from({ length: 60 }, () => ({ r: Math.random(), y: Math.random(), v: 0.9 + Math.random() * 0.6 }));
+      let gotaY = D.goteira[1], respingo = 0;
+      const anima = (t, dms) => {
+        const dt = dms / 1000;
+        chuvaG.clear().lineStyle(1, 0xbcd4ff, 0.7);
+        [D.janela, D.porta].forEach(([x0, y0, x1, y1], q) => {
+          gotas.forEach((g, i) => {
+            if (i % 2 !== q) return;
+            g.y = (g.y + g.v * dt * 1.4) % 1;
+            const x = x0 + g.r * (x1 - x0), y = y0 + g.y * (y1 - y0);
+            chuvaG.lineBetween(x, y, x - 2, Math.min(y1, y + 10));
+          });
+        });
+        // goteira: a gota cai no balde e respinga
+        gotaY += dt * 320;
+        if (gotaY > D.balde[1] - 26) { gotaY = D.goteira[1]; respingo = 0.25; TR.sfx(this, 'bip', 0.08, 2.4); }
+        respingo = Math.max(0, respingo - dt);
+        pingo.clear().fillStyle(0xbcd4ff, 0.9).fillRect(D.goteira[0] - 1, gotaY, 3, 6);
+        if (respingo > 0) pingo.fillRect(D.balde[0] - 8, D.balde[1] - 30, 2, 2).fillRect(D.balde[0] + 6, D.balde[1] - 31, 2, 2);
+      };
+      this.events.on('update', anima);
+      // conversa enquanto a chuva não passa
+      const falas = [['Ainda bem que tem o barracão!', 0], ['Molhou meu boné!', 'pedro'], ['Bora jogar adedonha enquanto isso?', 0],
+        ['Olha a goteira kkkk', 'lucas'], ['Já já passa...', 'pernalonga']];
+      falas.forEach(([f, id], k) => this.time.delayedCall(900 + k * 1700, () => {
+        const i = typeof id === 'string' ? ids.indexOf(id) : -1;
+        const s = dentro[i >= 0 ? i : (k * 3) % dentro.length];
+        if (s && s.active) TR.bubble(this, s, f, 1.6);
+      }));
+      // passou: sai do barracão e volta pro jogo
+      this.time.delayedCall(9500, () => {
+        const q = Phaser.Utils.Array.GetRandom(dentro);
+        TR.bubble(this, q, 'Parou! Bora voltar!', 1.4);
+        this.time.delayedCall(1200, () => {
+          cam.fadeOut(300, 10, 8, 14);
+          cam.once('camerafadeoutcomplete', () => {
+            this.events.off('update', anima);
+            cont.destroy(true);
+            this.dentroDoBarracao = false;
+            this.players.forEach((p) => { p.coberta = null; p.dentro = false; p.spr.setAlpha(1); if (p.sh) p.sh.setVisible(true); });
+            (this.torcedoresCorrendo || []).forEach((p, i) => { p.spr.setAlpha(1).setPosition(660 - i * 70, 258).setDepth(258); p.spr.play(p.spr.texture.key + '_idle'); });
+            this.torcedoresCorrendo = [];
+            this.kickoff(this.ball.last && this.ball.last.team === 0 ? 1 : 0);
+            cam.fadeIn(350, 10, 8, 14);
+            this.state = 'play';
+            TR.sfx(this, 'apito', 0.4);
+          });
+        });
+      });
     });
   }
 
@@ -625,7 +704,7 @@ class Futebol extends Phaser.Scene {
     });
     this.ballShadow.setPosition(Math.round(b.x), Math.round(b.y)).setDepth(3).setScale(Math.max(0.5, 1 - b.z / 200));
     this.ballSpr.setPosition(Math.round(b.x), Math.round(b.y - 7 - b.z)).setDepth(b.y + 1);
-    this.ballSpr.rotation += Math.hypot(b.vx, b.vy) * 0.0006 + (b.owner && b.owner.moving ? 0.15 : 0);
+    TR.giraBola(this.ballSpr, b, this, b.owner && b.owner.moving ? 0.35 : 0);
     const h = this.human;
     if (h) this.marker.setPosition(Math.round(h.x), Math.round(h.y) - 146).setAngle(180);
     if (h && b.owner === h && this.state === 'play') {

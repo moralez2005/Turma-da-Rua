@@ -95,6 +95,9 @@ Para abrir direto numa brincadeira: `http://localhost:8000/?cena=Futebol`. Tamb�
 
 - **Motor:** [Phaser 3.87](https://phaser.io), que já vem em `lib/`, sem build e sem CDN.
 - **Arte:** pixel art gerada por scripts em Python (Pillow/numpy) em `ferramentas/gerador/`, incluindo as vizinhas (`vizinhas_hd.py`) e o Matheus pedalando a bike (`bike_hd.py`). Isso inclui sprites em 4 direções, cenários em 960×540, o mapa de 1920×1440 do esconde-esconde (`esconde_mapa_real.py`) e os objetos. A única foto é a da homenagem no final: a turma de verdade.
+- **Animação:** cada personagem tem 8 quadros por direção (andar com balanço do corpo, piscar, falar, sentar e arremessar a bola na queimada). As bolas giram em 8 quadros e amassam quando quicam. O Matheus pedala de lado, de costas e de frente.
+- **Ciclo do dia:** nas partidas, o sol vai se pondo atrás das casas conforme o tempo passa: tarde, hora dourada, crepúsculo e noite, com as janelas acendendo uma por uma e o poste ligando (`rua_camadas.py` separa o céu da rua). No menu da rua é sempre hora dourada.
+- **Chuva:** quando chove no futebol, a turma corre pro barracão, a câmera entra junto (`barracao_dentro.py`) e o jogo volta quando a chuva passa.
 - **Sons:** efeitos retrô, o toque do orelhão, a chuva e a música de fundo original "Tarde na Rua", todos sintetizados por código (`ferramentas/gerador/sons.py`, `orelhao.py`, `chuva.py` e `fundo.py`). O botão ♫ na barra da rádio liga e desliga a música de fundo, que abaixa sozinha quando a JBL toca.
 - **Fonte:** Unifont, renderizada como fonte bitmap.
 

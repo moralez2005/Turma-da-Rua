@@ -551,7 +551,7 @@ class EscondeEsconde extends Phaser.Scene {
       const crouch = k.crouch && !k.moving;
       k.spr.setPosition(Math.round(k.x), Math.round(k.y)).setDepth(k.y + 1);
       k.sh.setPosition(Math.round(k.x), Math.round(k.y));
-      if (crouch) { k.spr.stop(); k.spr.setFrame(k.dir === 'up' ? 17 : 16); }
+      if (crouch) { k.spr.stop(); k.spr.setFrame(k.dir === 'up' ? TR.Q.agachaCostas : TR.Q.agachaFrente); }
       else TR.pose(k.spr, k.dir, k.moving);
       const hid = this.hiddenAmount(k);
       k.spr.setAlpha(k === this.human && hid >= 0.95 ? 0.7 : 1);

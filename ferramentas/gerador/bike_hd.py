@@ -1,4 +1,4 @@
-"""Matheus pedalando a bike (6 quadros, virado pra direita; o jogo espelha pra esquerda).
+"""Matheus pedalando a bike: linha 0 de lado (direita; o jogo espelha), linha 1 de costas, linha 2 de frente. 6 quadros cada.
 As pernas acompanham os pedais (cinemática de duas juntas) e as rodas giram.
 Rodar: python bike_hd.py  (gera assets/personagens/matheus_bike.png, quadros de 128x136)
 """
@@ -7,6 +7,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from PIL import Image, ImageDraw
 from novos_hd import NOVOS
 from sprites4 import side
+from sprites import detailed
 import sprites_hd
 
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "assets", "personagens", "matheus_bike.png")
@@ -84,18 +85,19 @@ def quadro(n):
     linha(d, (SELIM[0] - 7, SELIM[1] - 2), (SELIM[0] + 6, SELIM[1] - 2), (40, 36, 40), 5)   # selim
     linha(d, ped[0], ped[1], (90, 90, 100), 3)                         # pedivela
     d.ellipse([PEDIVELA[0] - 5, PEDIVELA[1] - 5, PEDIVELA[0] + 5, PEDIVELA[1] + 5], fill=(120, 120, 130))
-    # corpo: cabeça e tronco do sprite de lado do Matheus, levemente inclinado pra frente
-    corpo = sprites_hd.hd(M, side(M, 0))
+    # braço de trás (mais escuro), segurando o guidão por trás do corpo
+    ombro_t = (QUADRIL[0] + 4, QUADRIL[1] - 22)
+    linha(d, ombro_t, (GUIDAO[0] - 6, GUIDAO[1] + 1), SKS, 5)
+    # corpo: cabeça e tronco de lado, com o braço da frente já apontando pro guidão
+    corpo = sprites_hd.hd(M, side(M, 0, braco=62))
     px = corpo.load()
     corte = next(y for y in range(corpo.height) if any(px[x, y][:3] == tuple(SHORTS) and px[x, y][3] for x in range(corpo.width)))
     tronco = corpo.crop((0, 0, corpo.width, corte + 4)).rotate(-8, resample=Image.NEAREST, expand=True)
     bb = tronco.getbbox()
     tronco = tronco.crop(bb)
     im.alpha_composite(tronco, (int(QUADRIL[0] - tronco.width / 2 + 4), int(QUADRIL[1] - tronco.height + 6)))
-    # braço até o guidão
-    ombro = (QUADRIL[0] + 8, QUADRIL[1] - 30)
-    linha(d, ombro, (ombro[0] + 10, ombro[1] + 10), M["shirt"], 6)
-    linha(d, (ombro[0] + 10, ombro[1] + 10), (GUIDAO[0] - 2, GUIDAO[1]), SK, 5)
+    # mão da frente fechada no guidão
+    d.ellipse([GUIDAO[0] - 5, GUIDAO[1] - 3, GUIDAO[0] + 1, GUIDAO[1] + 3], fill=SK)
     # perna da frente, na frente da bike
     pe_f = ped[0]
     jf = ik(QUADRIL, pe_f, COXA, CANELA)
@@ -106,10 +108,54 @@ def quadro(n):
     return im
 
 
+def quadro_frente_costas(n, costas):
+    """vista de trás (indo embora) ou de frente (vindo): pneu fino, pernas subindo e descendo dos dois lados."""
+    ang = n / N * 2 * math.pi
+    im = Image.new("RGBA", (FW, FH), (0, 0, 0, 0))
+    d = ImageDraw.Draw(im)
+    cx = FW // 2
+    # pneu (de frente/trás ele é fino) e garfo
+    d.rounded_rectangle([cx - 5, 92, cx + 5, 132], 5, fill=PNEU)
+    d.line([(cx, 96), (cx, 128)], fill=(90, 90, 100), width=1)
+    gira = int(4 * math.sin(ang * 1.6))
+    d.rectangle([cx - 1, 108 + gira, cx + 1, 112 + gira], fill=ARO)          # o pneu "rolando"
+    linha(d, (cx, 74), (cx, 96), QUADRO, 5)
+    # pedais: um sobe enquanto o outro desce
+    for k, lado in enumerate((-1, 1)):
+        py = 110 + math.sin(ang + k * math.pi) * 9
+        px_ = cx + lado * 14
+        joelho = (cx + lado * 13, 86 + (py - 110) * 0.6)
+        corS = SHORTS if (k == 1) != costas else tuple(int(v * 0.85) for v in SHORTS)
+        corP = SK if (k == 1) != costas else SKS
+        linha(d, (cx + lado * 5, 72), joelho, corS, 7)
+        linha(d, joelho, (px_, py), corP, 6)
+        linha(d, (px_ - 4, py + 3), (px_ + 4, py + 3), TENIS, 5)
+        linha(d, (cx, 110), (px_, py), (90, 90, 100), 2)                    # pedivela
+    # selim
+    linha(d, (cx - 8, 72), (cx + 8, 72), (40, 36, 40), 5)
+    # tronco e cabeça (sprite de frente/costas do Matheus, sem as pernas)
+    corpo = sprites_hd.hd(M, detailed(M, "stand", seed=3, view="back" if costas else "front"))
+    px = corpo.load()
+    corte = next(y for y in range(corpo.height) if any(px[x, y][:3] == tuple(SHORTS) and px[x, y][3] for x in range(corpo.width)))
+    tronco = corpo.crop((0, 0, corpo.width, corte + 6))
+    bb = tronco.getbbox(); tronco = tronco.crop(bb)
+    im.alpha_composite(tronco, (cx - tronco.width // 2, 76 - tronco.height))
+    # guidão com as duas mãos
+    gy = 58 if costas else 62
+    linha(d, (cx - 22, gy), (cx + 22, gy), (60, 60, 66), 4)
+    for lado in (-1, 1):
+        d.ellipse([cx + lado * 20 - 3, gy - 3, cx + lado * 20 + 3, gy + 3], fill=SK)
+        linha(d, (cx + lado * 11, 50), (cx + lado * 19, gy - 1), SK if not costas else SKS, 4)
+    contorno(im)
+    return im
+
+
 if __name__ == "__main__":
-    folha = Image.new("RGBA", (FW * N, FH), (0, 0, 0, 0))
+    folha = Image.new("RGBA", (FW * N, FH * 3), (0, 0, 0, 0))
     for n in range(N):
         folha.alpha_composite(quadro(n), (n * FW, 0))
+        folha.alpha_composite(quadro_frente_costas(n, True), (n * FW, FH))
+        folha.alpha_composite(quadro_frente_costas(n, False), (n * FW, FH * 2))
     folha.save(OUT)
-    folha.resize((FW * N * 2, FH * 2), Image.NEAREST).save("/tmp/bike_prev.png")
+    folha.resize((FW * N, FH * 3), Image.NEAREST).save("/tmp/bike_prev.png")
     print("ok")

@@ -1,3 +1,4 @@
+import math
 """Gerador de pixel art: personagens da turma da rua, rua (gameplay) e cena do por do sol.
 Tudo desenhado pixel a pixel com Pillow, sem fotos no resultado final."""
 import random
@@ -93,7 +94,7 @@ def camo_color(x, y):
 
 
 # ---------------- personagem detalhado (cena final / retrato) ----------------
-def detailed(c, pose="stand", with_item=False, seed=1, frame=0, blink=False, talk=False, look=0, item=None, view="front"):
+def detailed(c, pose="stand", with_item=False, seed=1, frame=0, blink=False, talk=False, look=0, item=None, view="front", fase=None):
     cv = Canvas(40, 68)
     rnd = random.Random(seed)
     cx = 20
@@ -122,8 +123,13 @@ def detailed(c, pose="stand", with_item=False, seed=1, frame=0, blink=False, tal
         lh = c["lh"]
         lx0, lx1 = cx - 1 - leg_w, cx - 2
         rx0, rx1 = cx + 1, cx + leg_w
-        la, ra = {0: (0, 0), 1: (2, 0), 2: (0, 2)}[frame]
-        sh = {0: (0, 0), 1: (-1, 1), 2: (1, -1)}[frame]
+        if fase is None:
+            la, ra = {0: (0, 0), 1: (2, 0), 2: (0, 2)}[frame]
+            sh = {0: (0, 0), 1: (-1, 1), 2: (1, -1)}[frame]
+        else:   # passo contínuo
+            s_ = math.sin(2 * math.pi * fase)
+            la, ra = round(2 * max(0, s_)), round(2 * max(0, -s_))
+            sh = (-round(s_), round(s_))
         lx0, lx1, rx0, rx1 = lx0 + sh[0], lx1 + sh[0], rx0 + sh[1], rx1 + sh[1]
         foot(lx0 - 1, lx1, bottom - 1 - la)
         foot(rx0, rx1 + 1, bottom - 1 - ra)
@@ -171,7 +177,7 @@ def detailed(c, pose="stand", with_item=False, seed=1, frame=0, blink=False, tal
     cv.clear(tx1, ty0)
 
     # bracos
-    swing = {0: 0, 1: 1, 2: -1}[frame] if pose == "stand" else 0
+    swing = ({0: 0, 1: 1, 2: -1}[frame] if fase is None else round(math.sin(2 * math.pi * fase))) if pose == "stand" else 0
     for side, ax0 in enumerate((tx0 - 3, tx1 + 1)):
         dy = swing if side == 0 else -swing
         arm_top, arm_bot = ty0 + 1 + max(0, dy), sy0 + 2 + dy
@@ -380,10 +386,11 @@ def detailed(c, pose="stand", with_item=False, seed=1, frame=0, blink=False, tal
         cv.r(hx1, hy0 - 1, hx1 + 1, hy0 + 1, dark(capc, 0.85))
     if c.get("oculos") and view != "back":       # óculos de armação (vizinhas)
         oc = c["oculos"]
-        for ex in (eye_l, eye_r):
-            cv.r(ex - 2, eye_y - 1, ex + 2, eye_y - 1, oc); cv.r(ex - 2, eye_y + 2, ex + 2, eye_y + 2, oc)
-            cv.r(ex - 2, eye_y - 1, ex - 2, eye_y + 2, oc); cv.r(ex + 2, eye_y - 1, ex + 2, eye_y + 2, oc)
-        cv.r(eye_l + 3, eye_y, eye_r - 3, eye_y, oc)
+        for ex in (eye_l, eye_r):   # armação fininha: só a parte de cima e as pontinhas
+            cv.r(ex - 2, eye_y - 1, ex + 2, eye_y - 1, oc)
+            cv.p(ex - 2, eye_y, oc); cv.p(ex + 2, eye_y, oc)
+            cv.p(ex - 1, eye_y + 2, mix(oc, sk, 0.6)); cv.p(ex + 1, eye_y + 2, mix(oc, sk, 0.6))
+        cv.p(eye_l + 3, eye_y - 1, oc)
     if c.get("juliet") and view != "back":
         cv.r(hx0, eye_y - 1, hx1, eye_y - 1, (40, 40, 52))
         lens = [(60, 120, 230), (90, 100, 220), (140, 80, 200), (210, 100, 120), (240, 140, 60)]

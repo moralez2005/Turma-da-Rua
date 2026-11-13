@@ -25,7 +25,7 @@ class Queimada extends Phaser.Scene {
     this._saindo = false;
     this.players = null;   // ao jogar de novo, a cena reaproveita o objeto: limpa o que sobrou da partida anterior
     this.cameras.main.fadeIn(300, 18, 13, 24);
-    this.add.image(0, 0, 'rua').setOrigin(0);
+    TR.ruaComCeu(this);
     this.F = { x0: 24, x1: 936, y0: 296, y1: 496, mid: 480, cem: 64 };
     this.drawField();
     TR.backButton(this);
@@ -42,7 +42,7 @@ class Queimada extends Phaser.Scene {
     this.state = 'intro';
     this.timeLeft = times.opcoes.tempo;
     const total = times.opcoes.tempo;
-    TR.anoitecer(this, () => 1 - this.timeLeft / total, (t) => { const p = this.players.find((q) => q.alive); if (p) TR.bubble(this, p.spr, t, 1.8); }, [584, 70]);
+    TR.cicloDoDia(this, () => 1 - this.timeLeft / total, (t) => { const p = this.players.find((q) => q.alive); if (p) TR.bubble(this, p.spr, t, 1.8); });
     this.charge = 0;
     this.catchWin = 0;
     this.targetIdx = 0;
@@ -280,12 +280,30 @@ class Queimada extends Phaser.Scene {
     TR.sfx(this, 'pegar', 0.35);
   }
 
+  // lado do arremesso: pra onde ele está olhando (ou pro campo adversário)
+  ladoDe(p) {
+    if (p.dir === 'left' || p.dir === 'right') return p.dir;
+    const praDireita = (p.team === 0) === p.alive;
+    return praDireita ? 'right' : 'left';
+  }
+
   throwAt(p, tx, ty, charge) {
+    // animação: prepara, prepara mais, SOLTA (a bola sai aqui), acompanha
+    if (p.soltando) return;
+    p.soltando = true;
+    const lado = (tx >= p.x) ? 'right' : 'left';
+    p.dir = lado;
+    p.poseAte = this.time.now + 380;
+    p.spr.play(p.id + '_arremessa_' + lado);
+    this.time.delayedCall(140, () => { p.soltando = false; if (this.ball.owner === p && this.state === 'play') this.lanca(p, tx, ty, charge); });
+  }
+
+  lanca(p, tx, ty, charge) {
     const b = this.ball;
     let sp = 520 + charge * 380;
     if (p.longo) { sp *= 1.25; p.longo = false; TR.bubble(this, p.spr, 'Toma!', 0.8); }
     if (p.bomb) { sp *= 1.4; p.bomb = false; this.cameras.main.shake(150, 0.005); TR.bubble(this, p.spr, 'BOMBA!', 1); }
-    const sx = p.x, sy = p.y - 50;
+    const sx = p.x + (p.dir === 'left' ? -26 : 26), sy = p.y - 50;
     const dx = tx - sx, dy = (ty + 40) - p.y, d = Math.hypot(dx, dy) || 1;
     Object.assign(b, { owner: null, live: true, thrower: p, x: sx, y: p.y, z: 50, vx: dx / d * sp, vy: dy / d * sp, vz: 60 + d * 0.05 });
     if (p.sure) { const en = this.enemiesOf(p); b.homing = en.length ? this.currentTarget(p) : null; p.sure = false; }
@@ -308,7 +326,7 @@ class Queimada extends Phaser.Scene {
     b.vz -= 700 * dt; b.z += b.vz * dt;
     if (b.z <= 0) {
       b.z = 0;
-      if (b.vz < -80) { b.vz = -b.vz * 0.45; TR.sfx(this, 'quique', 0.3); } else b.vz = 0;
+      if (b.vz < -80) { b.vz = -b.vz * 0.45; b.quique = this.time.now; TR.sfx(this, 'quique', 0.3); } else b.vz = 0;
       if (b.live) { b.live = false; b.homing = null; }
     }
     const fr = Math.pow(b.z > 0 ? 0.92 : 0.25, dt);
@@ -326,6 +344,8 @@ class Queimada extends Phaser.Scene {
           if (p.luva > 0) { tries = 1; p.luva = 0; }
           if (Math.random() < tries) {
             this.give(p);
+            p.poseAte = this.time.now + 260; p.spr.stop();                   // pose de agarrar
+            p.spr.setFrame(this.ladoDe(p) === 'right' ? TR.Q.agarraDir : TR.Q.agarraEsq);
             TR.bubble(this, p.spr, 'PEGUEI!', 1);
             TR.sfx(this, 'pegar', 0.6);
             return;
@@ -394,12 +414,23 @@ class Queimada extends Phaser.Scene {
       p.sh.setPosition(Math.round(p.x), Math.round(p.y)).setDepth(2);
       p.spr.setAlpha(p.alive ? 1 : 0.75);
       if (this.ball.owner === p && !p.moving) p.dir = p.team === 0 ? (p.alive ? 'right' : 'left') : (p.alive ? 'left' : 'right');
+      const agora = this.time.now;
+      if (p.poseAte && agora < p.poseAte) return;                     // tocando arremesso / agarrando
+      if (this.ball.owner === p && !p.moving) {                        // segurando a bola (pose com a bola na mão)
+        const dir = this.ladoDe(p) === 'right';
+        let q = dir ? TR.Q.seguraDir : TR.Q.seguraEsq;
+        if (p === this.human && this.charge > 0) q += this.charge > 0.5 ? 2 : 1;   // carregando: braço vai pra trás
+        p.spr.stop(); p.spr.setFrame(q);
+        return;
+      }
       TR.pose(p.spr, p.dir, p.moving && this.state === 'play');
     });
     const b = this.ball;
+    const naMao = b.owner && !b.owner.moving;                        // a bola está desenhada na mão do sprite
+    this.ballSpr.setVisible(!naMao); this.ballShadow.setVisible(!naMao);
     this.ballShadow.setPosition(Math.round(b.x), Math.round(b.y)).setDepth(3).setScale(Math.max(0.4, 1 - b.z / 260));
     this.ballSpr.setPosition(Math.round(b.x), Math.round(b.y - 8 - b.z)).setDepth(b.y + 2);
-    this.ballSpr.rotation += Math.hypot(b.vx, b.vy) * 0.0005;
+    TR.giraBola(this.ballSpr, b, this);
     const h = this.human;
     if (h) this.marker.setPosition(Math.round(h.x), Math.round(h.y) - 146).setAngle(180);
     const t = h && b.owner === h ? this.currentTarget(h) : null;

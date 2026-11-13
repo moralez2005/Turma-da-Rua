@@ -5,7 +5,8 @@ class Rua extends Phaser.Scene {
   create() {
     this._saindo = false;
     this.cameras.main.fadeIn(350, 18, 13, 24);
-    this.add.image(0, 0, 'rua').setOrigin(0);
+    TR.ruaComCeu(this);
+    TR.cicloDoDia(this, () => 0.36);   // o menu fica sempre na hora dourada
 
     this.items = [
       { key: 'futebol', cena: 'Futebol', nome: 'Futebol de rua', x: 170, y: 420, desc: 'Traves de chinelo, 3 contra 3. Você escolhe os times e o tempo.' },

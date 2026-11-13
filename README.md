@@ -94,7 +94,7 @@ Para abrir direto numa brincadeira: `http://localhost:8000/?cena=Futebol`. Tamb�
 ## Como foi feito
 
 - **Motor:** [Phaser 3.87](https://phaser.io), que já vem em `lib/`, sem build e sem CDN.
-- **Arte:** pixel art gerada por scripts em Python (Pillow/numpy) em `ferramentas/gerador/`. Isso inclui sprites em 4 direções, cenários em 960×540, o mapa de 1920×1440 do esconde-esconde (`esconde_mapa_real.py`) e os objetos. A única foto é a da homenagem no final: a turma de verdade.
+- **Arte:** pixel art gerada por scripts em Python (Pillow/numpy) em `ferramentas/gerador/`, incluindo as vizinhas (`vizinhas_hd.py`) e o Matheus pedalando a bike (`bike_hd.py`). Isso inclui sprites em 4 direções, cenários em 960×540, o mapa de 1920×1440 do esconde-esconde (`esconde_mapa_real.py`) e os objetos. A única foto é a da homenagem no final: a turma de verdade.
 - **Sons:** efeitos retrô, o toque do orelhão, a chuva e a música de fundo original "Tarde na Rua", todos sintetizados por código (`ferramentas/gerador/sons.py`, `orelhao.py`, `chuva.py` e `fundo.py`). O botão ♫ na barra da rádio liga e desliga a música de fundo, que abaixa sozinha quando a JBL toca.
 - **Fonte:** Unifont, renderizada como fonte bitmap.
 

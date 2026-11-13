@@ -38,9 +38,16 @@ def side(c, frame=0):
     sy0 = sy1 - 5
     tx0 = cx - tw // 2
     tx1 = tx0 + tw - 1
-    for y in range(sy0, sy1 + 1):
-        for x in range(tx0, tx1 + 1):
-            cv.p(x, y, shorts_col(x, y))
+    if c.get("vestido"):   # saia rodada, na frente das pernas
+        saia = c.get("saia", 7)
+        for k, y in enumerate(range(sy0, sy1 + saia)):
+            abre = k // 3
+            for x in range(tx0 - abre, tx1 + abre + 1):
+                cv.p(x, y, c["shirt"] if k < 2 else c["shorts"])
+    else:
+        for y in range(sy0, sy1 + 1):
+            for x in range(tx0, tx1 + 1):
+                cv.p(x, y, shorts_col(x, y))
     ty0 = sy0 - th
     shirt = c["shirt"]
     cv.r(tx0, ty0, tx1, sy0, shirt)
@@ -101,15 +108,23 @@ def side(c, frame=0):
                 cv.p(x, hy0 - 2, hc)
         if c["hs"] == "topete":
             cv.r(hx0 + 3, hy0 - 2, hx1 - 1, hy0 - 2, hc)
+        if c["hs"] == "coque":
+            cv.r(hx0 - 2, hy0 + 1, hx0 + 1, hy0 + 5, hc)                 # coque atrás
+        if c.get("oculos"):
+            cv.r(ex - 2, eye_y - 1, ex + 2, eye_y - 1, c["oculos"]); cv.r(ex - 2, eye_y + 2, ex + 2, eye_y + 2, c["oculos"])
+            cv.r(ex + 2, eye_y - 1, ex + 2, eye_y + 2, c["oculos"]); cv.r(ex - 2, eye_y - 1, ex - 2, eye_y + 2, c["oculos"])
+            cv.r(ex - 6, eye_y, ex - 3, eye_y, c["oculos"])
         if c["hs"] == "longo":
             cv.r(hx0 - 1, hy0 + 3, hx0 + 4, hy1 + 5, hc)
             cv.r(hx1 - 5, hy0 + 3, hx1, hy0 + 4, hc)
         for x in range(hx0 + 2, hx1 - 2, 3):
             cv.p(x, hy0, hl)
     cv.clear(hx1, hy0 - 1)
-    if c.get("cap_frente"):
-        cv.r(hx0, hy0 - 3, hx1, hy0 + 2, c["cap_frente"])
-        cv.r(hx1 - 1, hy0 + 2, hx1 + 5, hy0 + 3, dark(c["cap_frente"], 0.7))   # aba pra frente
+    if c.get("cap_frente"):   # boné rente, aba curta e curva pra frente
+        cv.r(hx0, hy0 - 1, hx1, hy0 + 3, c["cap_frente"])
+        cv.r(hx0 + 2, hy0 - 2, hx1 - 2, hy0 - 2, c["cap_frente"])
+        cv.r(hx1 - 1, hy0 + 4, hx1 + 3, hy0 + 4, dark(c["cap_frente"], 0.7))
+        cv.p(hx1 + 4, hy0 + 5, dark(c["cap_frente"], 0.6))
     if c.get("cap"):
         cv.r(hx0, hy0 - 2, hx1, hy0 + 2, c["cap"])
         cv.r(hx0 - 4, hy0 + 1, hx0 - 1, hy0 + 2, dark(c["cap"], 0.85))  # aba pra tras

@@ -109,6 +109,13 @@ const TR = {
         scene.anims.create({ key: blink, frames: [{ key: id, frame: 0, duration: 2600 }, { key: id, frame: 18, duration: 140 }], repeat: -1 });
       }
     });
+    if (!scene.anims.exists('matheus_pedala')) {
+      scene.anims.create({ key: 'matheus_pedala', frames: scene.anims.generateFrameNumbers('matheus_bike', { start: 0, end: 5 }), frameRate: 14, repeat: -1 });
+      ['tita', 'marido', 'vera', 'filha'].forEach((v) => {
+        scene.anims.create({ key: 'viz_' + v + '_idle', frames: [{ key: 'viz_' + v, frame: 0, duration: 2200 }, { key: 'viz_' + v, frame: 18, duration: 140 }], repeat: -1 });
+        scene.anims.create({ key: 'viz_' + v + '_fala', frames: [{ key: 'viz_' + v, frame: 19, duration: 140 }, { key: 'viz_' + v, frame: 0, duration: 140 }], repeat: 5 });
+      });
+    }
     if (!scene.anims.exists('caramelo_anda')) {
       scene.anims.create({ key: 'caramelo_anda', frames: scene.anims.generateFrameNumbers('caramelo', { start: 0, end: 3 }), frameRate: 8, repeat: -1 });
       scene.anims.create({ key: 'jbl_lucas_pulsa', frames: scene.anims.generateFrameNumbers('jbl_lucas', { start: 0, end: 1 }), frameRate: 6, repeat: -1 });

@@ -133,11 +133,19 @@ def detailed(c, pose="stand", with_item=False, seed=1, frame=0, blink=False, tal
         cv.r(rx1, ly0, rx1, bottom - 2 - ra, sks)
         sy1 = ly0 + 2
         sy0 = sy1 - 5
-        for y in range(sy0, sy1 + 1):
-            for x in range(tx0, tx1 + 1):
-                cv.p(x, y, shorts_col(x, y))
-        cv.clear(cx - 1, sy1)
-        cv.clear(cx, sy1)
+        if c.get("vestido"):
+            saia = c.get("saia", 7)
+            for k, y in enumerate(range(sy0, sy1 + saia)):
+                abre = k // 3
+                for x in range(tx0 - abre, tx1 + abre + 1):
+                    cv.p(x, y, c["shirt"] if k < 2 else c["shorts"])
+            cv.r(tx0 - (saia + 5) // 3, sy1 + saia - 1, tx1 + (saia + 5) // 3, sy1 + saia - 1, dark(c["shorts"], 0.8))
+        else:
+            for y in range(sy0, sy1 + 1):
+                for x in range(tx0, tx1 + 1):
+                    cv.p(x, y, shorts_col(x, y))
+            cv.clear(cx - 1, sy1)
+            cv.clear(cx, sy1)
     else:  # sentado no meio-fio
         lh = 6 if c["lh"] < 14 else 8
         sy1 = bottom - 2 - lh
@@ -332,6 +340,9 @@ def detailed(c, pose="stand", with_item=False, seed=1, frame=0, blink=False, tal
                     cv.p(x, hy0 + 5, hc)
             cv.r(hx0, hy0 + 5, hx0 + 1, hy0 + 8, hc)
             cv.r(hx1 - 1, hy0 + 5, hx1, hy0 + 7, hc)
+        if hs == "coque":   # cabelo preso pra trás, com coque no alto
+            cv.r(hx0 + 4, hy0 - 4, hx1 - 4, hy0 - 2, hc)
+            cv.r(hx0 + 5, hy0 - 5, hx1 - 5, hy0 - 5, hl)
         if hs == "longo":   # cabelo comprido, caindo pelos lados até o ombro
             cv.r(hx0, hy0 + 3, cx + 1, hy0 + 4, hc)
             cv.r(hx0 - 1, hy0 + 2, hx0 + 1, hy1 + 5, hc)
@@ -348,13 +359,16 @@ def detailed(c, pose="stand", with_item=False, seed=1, frame=0, blink=False, tal
             cv.p(x, hy0, hl)
         cv.p(hx0 + 3, hy0 + 1, hl)
 
-    if c.get("cap_frente") and view != "back":   # boné com a aba pra frente
+    if c.get("cap_frente") and view != "back":   # boné curvo, rente à cabeça, com a aba baixinha pra frente
         capc = c["cap_frente"]
-        cv.r(hx0 - 1, hy0 - 3, hx1 + 1, hy0 + 2, capc)
-        cv.clear(hx0 - 1, hy0 - 3); cv.clear(hx1 + 1, hy0 - 3)
-        cv.r(hx0 + 3, hy0 - 2, hx0 + 5, hy0 - 1, mix(capc, (255, 255, 255), 0.18))   # brilho
-        cv.r(hx0 - 2, hy0 + 3, hx1 + 2, hy0 + 4, dark(capc, 0.7))                    # aba
-        cv.r(hx0, hy0 + 5, hx1, hy0 + 5, dark(sk, 0.82))                             # sombra da aba no rosto
+        cv.r(hx0, hy0 - 1, hx1, hy0 + 3, capc)                 # copa colada na cabeça
+        cv.r(hx0 + 2, hy0 - 2, hx1 - 2, hy0 - 2, capc)         # topo arredondado
+        cv.clear(hx0, hy0 - 1); cv.clear(hx1, hy0 - 1)
+        cv.r(hx0 + 3, hy0 - 1, hx0 + 5, hy0, mix(capc, (255, 255, 255), 0.2))   # brilho
+        # aba curva: desce no meio, sobe nas pontas
+        cv.r(hx0, hy0 + 4, hx1, hy0 + 4, dark(capc, 0.75))
+        cv.r(hx0 + 2, hy0 + 5, hx1 - 2, hy0 + 5, dark(capc, 0.6))
+        cv.r(hx0 + 1, hy0 + 6, hx1 - 1, hy0 + 6, dark(sk, 0.8))       # sombra da aba nos olhos
     if c.get("cap"):
         capc = c["cap"]
         cv.r(hx0 - 1, hy0 - 2, hx1 + 1, hy0 + 2, capc)
@@ -364,6 +378,12 @@ def detailed(c, pose="stand", with_item=False, seed=1, frame=0, blink=False, tal
         cv.r(cx - 2, hy0 + 1, cx + 1, hy0 + 2, hc)        # abertura do snapback (aba pra tras)
         cv.r(cx - 2, hy0, cx + 1, hy0, (60, 60, 70))       # tirinha de ajuste
         cv.r(hx1, hy0 - 1, hx1 + 1, hy0 + 1, dark(capc, 0.85))
+    if c.get("oculos") and view != "back":       # óculos de armação (vizinhas)
+        oc = c["oculos"]
+        for ex in (eye_l, eye_r):
+            cv.r(ex - 2, eye_y - 1, ex + 2, eye_y - 1, oc); cv.r(ex - 2, eye_y + 2, ex + 2, eye_y + 2, oc)
+            cv.r(ex - 2, eye_y - 1, ex - 2, eye_y + 2, oc); cv.r(ex + 2, eye_y - 1, ex + 2, eye_y + 2, oc)
+        cv.r(eye_l + 3, eye_y, eye_r - 3, eye_y, oc)
     if c.get("juliet") and view != "back":
         cv.r(hx0, eye_y - 1, hx1, eye_y - 1, (40, 40, 52))
         lens = [(60, 120, 230), (90, 100, 220), (140, 80, 200), (210, 100, 120), (240, 140, 60)]
@@ -384,6 +404,10 @@ def detailed(c, pose="stand", with_item=False, seed=1, frame=0, blink=False, tal
             cv.r(hx0 + 1, hy0 + 8, hx1 - 1, hy1, sk)
             for x in range(hx0 + 1, hx1, 2):
                 cv.p(x, hy0 + 2, hl)
+        elif c["hs"] == "coque":
+            cv.r(hx0, hy0 - 1, hx1, hy0 + 10, hc)
+            cv.r(hx0 + 4, hy0 - 4, hx1 - 4, hy0 - 1, hc)
+            cv.r(hx0 + 2, hy0 + 11, hx1 - 2, hy1, sk)
         elif c["hs"] == "longo":
             cv.r(hx0 - 1, hy0 - 1, hx1 + 1, hy1 + 6, hc)
             for x in range(hx0 + 1, hx1, 3):
@@ -399,8 +423,9 @@ def detailed(c, pose="stand", with_item=False, seed=1, frame=0, blink=False, tal
             cv.r(hx0 - 1, hy0 - 2, hx1 + 1, hy0 + 2, c["cap"])
             cv.r(cx - 3, hy0 + 2, cx + 2, hy0 + 3, dark(c["cap"], 0.8))  # aba virada pra tras
         if c.get("cap_frente"):
-            cv.r(hx0 - 1, hy0 - 3, hx1 + 1, hy0 + 3, c["cap_frente"])
-            cv.r(cx - 2, hy0 + 2, cx + 1, hy0 + 3, (60, 60, 70))         # regulagem atrás
+            cv.r(hx0, hy0 - 1, hx1, hy0 + 4, c["cap_frente"])
+            cv.r(hx0 + 2, hy0 - 2, hx1 - 2, hy0 - 2, c["cap_frente"])
+            cv.r(cx - 2, hy0 + 3, cx + 1, hy0 + 4, (60, 60, 70))         # regulagem atrás
     # itens na mao (cena final)
     if with_item:
         item = item or c.get("item")

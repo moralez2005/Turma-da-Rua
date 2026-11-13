@@ -26,6 +26,8 @@ class Boot extends Phaser.Scene {
       'pneus', 'manga', 'varal', 'casinha', 'bananeira', 'caixa', 'tanque', 'carro_vermelho'].forEach((k) => {
       this.load.image('obj_' + k, 'assets/esconde/obj_' + k + '.png');
     });
+    this.load.spritesheet('matheus_bike', 'assets/personagens/matheus_bike.png', { frameWidth: 128, frameHeight: 136 });
+    ['tita', 'marido', 'vera', 'filha'].forEach((v) => this.load.spritesheet('viz_' + v, 'assets/vizinhas/' + v + '.png', { frameWidth: 80, frameHeight: 136 }));
     this.load.spritesheet('jbl_lucas', 'assets/itens/jbl_lucas.png', { frameWidth: 36, frameHeight: 26 });
     this.load.spritesheet('jbl_pedro', 'assets/itens/jbl_pedro.png', { frameWidth: 36, frameHeight: 26 });
     this.load.spritesheet('caramelo', 'assets/itens/caramelo.png', { frameWidth: 40, frameHeight: 30 });

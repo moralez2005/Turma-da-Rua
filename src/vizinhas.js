@@ -59,40 +59,14 @@ TR.PESSOAS = {
   filha: { pele: 0xf2c8a8, cabelo: 0x8a5a30, penteado: 'coque', oculos: null, largura: 38, altura: 96, roupa: 0x5a5a64, detalhe: 0x76767e, perna: 0x2a2a34, brava: true },
 };
 
+// Cada pessoa é um sprite feito pelo mesmo gerador dos meninos (ferramentas/gerador/vizinhas_hd.py)
 TR.desenhaPessoa = (scene, quem, x, y) => {
-  const P = TR.PESSOAS[quem];
-  const g = scene.add.graphics().setDepth(y + 1);
-  const o = 0x241a2c, L = P.largura, A = P.altura, hx = 12;           // hx = meia largura da cabeça
-  const topo = -A, cabY = topo + 4;
-  // contorno geral
-  g.fillStyle(o, 1).fillRect(-L / 2 - 2, topo + 26, L + 4, A - 26).fillRect(-hx - 2, topo, hx * 2 + 4, 30);
-  // pernas e pés
-  g.fillStyle(P.perna, 1).fillRect(-L / 2 + 4, -16, 8, 16).fillRect(L / 2 - 12, -16, 8, 16);
-  g.fillStyle(o, 1).fillRect(-L / 2 + 3, -3, 10, 3).fillRect(L / 2 - 13, -3, 10, 3);
-  // corpo (roupa) e braços
-  g.fillStyle(P.roupa, 1).fillRect(-L / 2, topo + 28, L, A - 44);
-  g.fillStyle(P.detalhe, 1);
-  for (let k = 0; k < 6; k++) g.fillRect(-L / 2 + 4 + (k * 7) % (L - 8), topo + 34 + k * 7, 3, 3);
-  g.fillStyle(P.pele, 1).fillRect(-L / 2 - 6, topo + 32, 6, 26).fillRect(L / 2, topo + 32, 6, 26);
-  // cabeça
-  g.fillStyle(P.pele, 1).fillRect(-hx, cabY + 2, hx * 2, 22);
-  // cabelo
-  g.fillStyle(P.cabelo, 1).fillRect(-hx - 1, cabY - 2, hx * 2 + 2, 8);
-  if (P.penteado === 'coque') g.fillRect(-5, cabY - 8, 10, 7);
-  if (P.penteado === 'solto') g.fillRect(-hx - 2, cabY + 2, 5, 24).fillRect(hx - 3, cabY + 2, 5, 24);
-  if (P.penteado === 'curto') g.fillRect(-hx - 1, cabY + 2, 3, 8).fillRect(hx - 2, cabY + 2, 3, 8);
-  // olhos, óculos e boca
-  const oy = cabY + 12;
-  if (P.oculos !== null) {
-    g.lineStyle(2, P.oculos, 1).strokeRect(-9, oy - 3, 7, 6).strokeRect(2, oy - 3, 7, 6).lineBetween(-2, oy, 2, oy);
-  }
-  g.fillStyle(o, 1).fillRect(-6, oy - 1, 2, 3).fillRect(5, oy - 1, 2, 3);
-  if (P.brava) g.fillRect(-8, oy - 5, 5, 2).fillRect(4, oy - 5, 5, 2);            // sobrancelha franzida
-  g.fillStyle(0x7a3038, 1).fillRect(-3, oy + 7, 6, 2);
-  g.setPosition(x, y);
-  g.setScale(1, 0.1);
-  scene.tweens.add({ targets: g, scaleY: 1, duration: 260, ease: 'Back.Out' });
-  return g;
+  const spr = scene.add.sprite(x, y, 'viz_' + quem, 0).setOrigin(0.5, 0.97).setDepth(y + 1).setScale(1.06, 0.1);
+  spr.play('viz_' + quem + '_idle');
+  scene.tweens.add({ targets: spr, scaleY: 1.06, duration: 260, ease: 'Back.Out' });
+  spr.fala = () => { if (spr.active) { spr.play('viz_' + quem + '_fala'); spr.once('animationcomplete', () => { if (spr.active) spr.play('viz_' + quem + '_idle'); }); } };
+  scene.time.delayedCall(280, () => spr.fala());
+  return spr;
 };
 // compatibilidade: a vizinha "dona da casa"
 TR.desenhaVizinha = (scene, v, x, y, quem) => TR.desenhaPessoa(scene, quem || v.pessoa, x, y);

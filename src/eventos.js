@@ -149,22 +149,33 @@ TR.anoitecer = (scene, progresso, falar, poste) => {
 };
 
 // Bike do Matheus: aparece do nada embaixo dele e some depois de alguns segundos
+// Bike do nada (Matheus): o sprite dele some e aparece ele pedalando (assets/personagens/matheus_bike.png)
 TR.bike = (scene, spr, segundos) => {
-  const g = scene.add.graphics();
-  const desenha = () => {
-    if (!spr.active) return;
-    g.clear().setDepth(spr.depth + 1);
-    const x = spr.x, y = spr.y - 6;
-    g.lineStyle(3, 0x241a2c, 1).strokeCircle(x - 18, y, 10).strokeCircle(x + 18, y, 10);
-    g.lineStyle(2, 0xd23c3c, 1).strokeCircle(x - 18, y, 9).strokeCircle(x + 18, y, 9);
-    g.lineStyle(3, 0x3c7ed8, 1).lineBetween(x - 18, y, x, y - 12).lineBetween(x, y - 12, x + 18, y).lineBetween(x - 18, y, x + 6, y - 14);
-    g.lineStyle(2, 0x241a2c, 1).lineBetween(x + 14, y - 18, x + 22, y - 18);
+  const bike = scene.add.sprite(spr.x, spr.y, 'matheus_bike', 0).setOrigin(0.5, 0.97).setDepth(spr.depth);
+  bike.play('matheus_pedala');
+  spr.setVisible(false);
+  let ultX = spr.x, ultY = spr.y;
+  const segue = () => {
+    if (!spr.active || !bike.active) return;
+    bike.setPosition(spr.x, spr.y).setDepth(spr.depth);
+    const andou = Math.hypot(spr.x - ultX, spr.y - ultY);
+    if (spr.x < ultX - 0.5) bike.setFlipX(true); else if (spr.x > ultX + 0.5) bike.setFlipX(false);
+    else if (spr.dir === 'left') bike.setFlipX(true); else if (spr.dir === 'right') bike.setFlipX(false);
+    // pedala quando anda, para quando para
+    if (andou > 0.3) bike.anims.resume(); else bike.anims.pause();
+    ultX = spr.x; ultY = spr.y;
   };
-  scene.events.on('postupdate', desenha);
-  const nuvem = TR.txt(scene, spr.x, spr.y - 40, 'POF!', 2, 0xffffff).setOrigin(0.5).setDepth(5000);
+  scene.events.on('postupdate', segue);
+  const nuvem = TR.txt(scene, spr.x, spr.y - 120, 'POF!', 2, 0xffffff).setOrigin(0.5).setDepth(5000);
   scene.tweens.add({ targets: nuvem, y: nuvem.y - 30, alpha: 0, duration: 600, onComplete: () => nuvem.destroy() });
   TR.sfx(scene, 'pulo', 0.5, 1.3);
-  scene.time.delayedCall(segundos * 1000, () => { scene.events.off('postupdate', desenha); g.destroy(); });
+  const acaba = () => {
+    scene.events.off('postupdate', segue);
+    if (bike.active) bike.destroy();
+    if (spr.active) spr.setVisible(true);
+  };
+  scene.time.delayedCall(segundos * 1000, acaba);
+  scene.events.once('shutdown', acaba);
 };
 
 // Orelhão: toca o toque 8-bit do jogo, sem precisar do YouTube

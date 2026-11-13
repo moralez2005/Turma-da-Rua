@@ -10,7 +10,7 @@ OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "asse
 
 NOVOS = [
     # Matheus: altura do Lucas, boné preto pra frente, camiseta preta
-    dict(id="matheus", nome="Matheus", skin=S_LIGHT2, hair=H_DBROWN, hs="curto", tw=13, th=13, lh=10,
+    dict(id="matheus", nome="Matheus", skin=S_LIGHT2, hair=H_DBROWN, hs="curto", hw=13, tw=11, th=13, lh=11, leg_w=2,
          shirt=(34, 34, 40), sleeve="short", pat="", shorts=(52, 64, 96), feet=(230, 230, 230),
          expr="smirk", cap_frente=(26, 26, 34)),
     # Guilherme: altura do Lucas, orelhas grandes, cabelo castanho curto, camiseta cinza

@@ -5,6 +5,7 @@ class Rua extends Phaser.Scene {
   create() {
     this._saindo = false;
     this.cameras.main.fadeIn(350, 18, 13, 24);
+    TR.musicaFundo.tocar(this, 'm_rua');
     TR.ruaComCeu(this);
     TR.cicloDoDia(this, () => 0.36);   // o menu fica sempre na hora dourada
 

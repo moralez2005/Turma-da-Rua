@@ -41,12 +41,11 @@ class Boot extends Phaser.Scene {
     ['bola', 'bola_queimada'].forEach((k) => this.load.spritesheet(k, 'assets/itens/' + k + '.png', { frameWidth: 14, frameHeight: 14 }));
     ['abertura', 'achou', 'alerta', 'apito', 'arremesso', 'bip', 'carro', 'chute', 'clique', 'congelar', 'derrota', 'gol',
       'habilidade', 'hover', 'la_vou_eu', 'mato', 'passe', 'pegar', 'pulo', 'queimado', 'quique', 'salvou', 'selecionar',
-      'tecla', 'vitoria', 'orelhao', 'chuva', 'fundo'].forEach((k) => this.load.audio(k, 'assets/sons/' + k + '.wav'));
+      'tecla', 'vitoria', 'orelhao', 'chuva', 'fundo', 'caneta', 'chapeu', 'zoeira'].forEach((k) => this.load.audio(k, 'assets/sons/' + k + '.wav'));
   }
 
   create() {
     TR.makeAnims(this);
-    TR.musicaFundo.iniciar(this);
     this.scene.start(TR.startScene || 'Abertura', TR.startData);
   }
 }

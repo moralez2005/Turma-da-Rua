@@ -16,7 +16,7 @@
   const TECLAS = {
     ArrowLeft: [37, 'ArrowLeft'], ArrowUp: [38, 'ArrowUp'], ArrowRight: [39, 'ArrowRight'], ArrowDown: [40, 'ArrowDown'],
     Space: [32, ' '], ShiftLeft: [16, 'Shift'], Enter: [13, 'Enter'], Escape: [27, 'Escape'],
-    KeyC: [67, 'c'], KeyZ: [90, 'z'], KeyE: [69, 'e'], KeyQ: [81, 'q'], KeyF: [70, 'f'], KeyT: [84, 't'],
+    KeyC: [67, 'c'], KeyZ: [90, 'z'], KeyE: [69, 'e'], KeyQ: [81, 'q'], KeyF: [70, 'f'], KeyT: [84, 't'], KeyX: [88, 'x'], KeyV: [86, 'v'],
   };
   const apertadas = new Set();
   const manda = (tipo, code) => {
@@ -33,7 +33,7 @@
   // botões de cada brincadeira: [texto, tecla, segurar?]
   const BOTOES_POR_CENA = {
     Rua: [['Jogar', 'Enter']],
-    Futebol: [['Passe', 'Space'], ['Chute', 'ShiftLeft', true], ['Por cima', 'KeyC'], ['Drible', 'KeyZ'], ['Habilidade', 'KeyE'], ['Trocar', 'KeyQ']],
+    Futebol: [['Passe', 'Space'], ['Chute', 'ShiftLeft', true], ['Por cima', 'KeyC'], ['Drible', 'KeyZ'], ['Caneta', 'KeyX'], ['Chapéu', 'KeyV'], ['Habilidade', 'KeyE'], ['Trocar', 'KeyQ']],
     Queimada: [['Arremessa / Agarra', 'Space', true], ['Alvo', 'KeyQ'], ['Habilidade', 'KeyE']],
     Alerta: [['Ação', 'Space'], ['Alvo', 'KeyQ'], ['Arrancada', 'KeyE']],
     EscondeEsconde: [['Agachar / Achei', 'Space'], ['Correr', 'ShiftLeft', true], ['Habilidade', 'KeyE'], ['Orelhão', 'KeyT']],
@@ -96,6 +96,7 @@
   let cenaAtual = null;
   const montaBotoes = (cena) => {
     areaBotoes.innerHTML = '';
+    areaBotoes.classList.toggle('muitos', (BOTOES_POR_CENA[cena] || []).length > 6);
     (BOTOES_POR_CENA[cena] || []).forEach(([texto, code, segurar]) => {
       const b = document.createElement('button');
       b.textContent = texto;

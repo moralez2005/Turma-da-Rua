@@ -25,6 +25,7 @@ class Alerta extends Phaser.Scene {
     this._saindo = false;
     this.players = null;   // ao jogar de novo, a cena reaproveita o objeto: limpa o que sobrou da partida anterior
     this.cameras.main.fadeIn(300, 18, 13, 24);
+    TR.musicaFundo.tocar(this, 'm_jogo');
     TR.ruaComCeu(this);
     const inicio = this.time.now;
     TR.cicloDoDia(this, () => (this.time.now - inicio) / 300000);   // 5 minutos da tarde até a noite

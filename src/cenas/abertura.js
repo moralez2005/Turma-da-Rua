@@ -4,6 +4,7 @@ class Abertura extends Phaser.Scene {
   create() {
     this._saindo = false;
     this.cameras.main.fadeIn(600, 18, 13, 24);
+    TR.musicaFundo.tocar(this, 'fundo');
     this.add.image(0, 0, 'rua_tarde').setOrigin(0);
     // nuvens andando
     this.clouds = [];

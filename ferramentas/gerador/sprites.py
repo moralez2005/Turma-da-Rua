@@ -94,7 +94,7 @@ def camo_color(x, y):
 
 
 # ---------------- personagem detalhado (cena final / retrato) ----------------
-def detailed(c, pose="stand", with_item=False, seed=1, frame=0, blink=False, talk=False, look=0, item=None, view="front", fase=None):
+def detailed(c, pose="stand", with_item=False, seed=1, frame=0, blink=False, talk=False, look=0, item=None, view="front", fase=None, vergonha=False):
     cv = Canvas(40, 68)
     rnd = random.Random(seed)
     cx = 20
@@ -178,7 +178,7 @@ def detailed(c, pose="stand", with_item=False, seed=1, frame=0, blink=False, tal
 
     # bracos
     swing = ({0: 0, 1: 1, 2: -1}[frame] if fase is None else round(math.sin(2 * math.pi * fase))) if pose == "stand" else 0
-    for side, ax0 in enumerate((tx0 - 3, tx1 + 1)):
+    for side, ax0 in enumerate((tx0 - 3, tx1 + 1) if not vergonha else ()):
         dy = swing if side == 0 else -swing
         arm_top, arm_bot = ty0 + 1 + max(0, dy), sy0 + 2 + dy
         for y in range(arm_top, arm_bot + 1):
@@ -464,6 +464,21 @@ def detailed(c, pose="stand", with_item=False, seed=1, frame=0, blink=False, tal
             cv.r(cx - 1, sy0 - 2, cx, sy0, (110, 200, 255))
             cv.r(cx - 4, sy0, cx - 3, sy0 + 1, sk)
             cv.r(cx + 2, sy0, cx + 3, sy0 + 1, sk)
+    if vergonha:   # cobre o rosto com as duas mãos, bochecha vermelha
+        corar = (232, 96, 96)
+        for ex, lado in ((eye_l, -1), (eye_r, 1)):
+            ombro = tx0 - 2 if lado < 0 else tx1 + 2
+            for k in range(0, 9):   # antebraço subindo do ombro até o rosto
+                x = round(ombro + (ex - ombro) * k / 8); y = ty0 + 4 - k
+                col = shirt if (c["sleeve"] == "long" or k < 3) and c["sleeve"] != "tank" else sk
+                cv.r(x - 1, y, x + 1, y + 1, col)
+            cv.r(ex - 2, eye_y - 1, ex + 2, eye_y + 2, mix(sk, (255, 236, 220), 0.22))   # palma (mais clara que o rosto)
+            cv.r(ex - 2 if lado < 0 else ex + 2, eye_y - 1, ex - 2 if lado < 0 else ex + 2, eye_y + 2, sks)
+            for dx in (-1, 1):
+                cv.p(ex + dx, eye_y - 2, sk)                         # dedinhos
+            cv.p(ex - 3 * lado, eye_y + 3, corar)
+            cv.p(ex - 4 * lado, eye_y + 3, corar)
+        cv.r(cx - 1, eye_y + 4, cx, eye_y + 4, (90, 34, 40))
 
     cv.outline()
     return cv.img

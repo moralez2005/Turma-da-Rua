@@ -91,6 +91,7 @@ body.toque #jogo canvas, body.toque #toque { touch-action: none; -webkit-user-se
   position: absolute; right: 8px; bottom: 8px; width: 164px; display: flex; flex-wrap: wrap-reverse;
   justify-content: flex-end; gap: 8px; pointer-events: none;
 }
+#toque-botoes.muitos { width: 250px; }   /* futebol tem 8 botões: 3 por linha pra não subir até o canto */
 .toque-botao {
   pointer-events: auto; touch-action: none; min-width: 74px; height: 40px; padding: 0 8px; border-radius: 20px;
   background: #6b3f7aaa; color: #fff1d6; border: 2px solid #241a2c; font: bold 11px "Courier New", monospace;

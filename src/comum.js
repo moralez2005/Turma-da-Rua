@@ -9,7 +9,7 @@ const TR = {
     pedro: { nome: 'Pedro', vel: 185, chute: 4, hab: 'Bomba', habDesc: 'o próximo chute sai fortíssimo' },
     lucas: { nome: 'Lucas', vel: 225, chute: 3, hab: 'Zoeira', habDesc: 'zoa quem está perto e deixa todo mundo lento' },
     daniel: { nome: 'Daniel', vel: 205, chute: 3, hab: 'Estrategista', habDesc: 'mostra onde está o alvo' },
-    gabriel: { nome: 'Gabriel', vel: 220, chute: 2, hab: 'Gato', habDesc: 'pulo de goleiro mais rápido' },
+    gabriel: { nome: 'Gabriel', vel: 220, chute: 2, hab: 'Como um gato!', habDesc: 'pulo de goleiro mais rápido' },
     // desbloqueáveis (novo: true). Não têm sprite na cena final (semFinal).
     matheus: { nome: 'Matheus', vel: 225, chute: 3, hab: 'Bike do nada', habDesc: 'aparece numa bike e dispara', novo: true, semFinal: true },
     guilherme: { nome: 'Guilherme', vel: 215, chute: 3, hab: 'Treta', habDesc: 'arruma treta e trava quem está perto (o Pedro mais ainda)', novo: true, semFinal: true },
@@ -89,7 +89,8 @@ const TR = {
   DIRS: { down: 0, left: 1, right: 2, up: 3 },
   // folha de cada personagem: 8 colunas x 7 linhas (ferramentas/gerador/sprites_hd.py)
   COLS: 8,
-  Q: { agachaFrente: 32, agachaCostas: 33, pisca: 34, fala: 35, seguraDir: 40, agarraDir: 45, seguraEsq: 48, agarraEsq: 53 },
+  Q: { agachaFrente: 32, agachaCostas: 33, pisca: 34, fala: 35, seguraDir: 40, agarraDir: 45, seguraEsq: 48, agarraEsq: 53,
+    vergonha: 56, vergonha2: 57, abreDir: 58, olhaCimaDir: 59, levantaDir: 60, abreEsq: 61, olhaCimaEsq: 62, levantaEsq: 63 },
 
   // ---------- texto pixelado ----------
   txt(scene, x, y, str, size = 1, color = 0xffffff) {

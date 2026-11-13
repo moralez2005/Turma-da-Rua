@@ -12,6 +12,7 @@ class EscondeEsconde extends Phaser.Scene {
     this._saindo = false;
     this.kids = null; this.human = null; this.seeker = null;   // ao jogar de novo, a cena reaproveita o objeto: limpa o que sobrou da partida anterior
     this.cameras.main.fadeIn(300, 18, 13, 24);
+    TR.musicaFundo.tocar(this, 'm_esconde');
     const M = this.cache.json.get('esc_mapa');
     this.M = M;
     this.WW = M.tamanho[0]; this.WH = M.tamanho[1];

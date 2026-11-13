@@ -41,13 +41,12 @@ Antes de cada brincadeira você escolhe com quem joga. No futebol e na queimada,
 | **Pedro** ("Dona Juliete") | Bomba: o próximo chute ou arremesso sai fortíssimo |
 | **Lucas** | Zoeira: deixa quem está perto mais lento |
 | **Daniel** | Estrategista: mostra onde está o alvo ou o escondido mais perto |
-| **Gabriel** | Gato: pulo de goleiro mais rápido |
-
+| **Gabriel** | Como um gato!: pulo de goleiro mais rápido |
 | **Matheus** *(novo)* | Bike do nada: aparece numa bike e dispara (no esconde-esconde, foge rapidinho) |
 | **Guilherme** *(novo)* | Treta: arruma treta e trava quem está perto (o Pedro fica mais tempo discutindo) |
 | **Manu** *(nova)* | Pequenininha: ninguém rouba a bola dela; no esconde-esconde, cabe em lugares que ninguém cabe, como a casinha do cachorro |
 
-Na queimada as habilidades são outras, próprias do jogo: Braço longo (Pernalonga), Ginga (Cezar), Mira calculada (Daniel), Zoeira (Lucas), Bomba do MC (Pedro) e Mão de goleiro (Gabriel).
+Na queimada as habilidades são outras, próprias do jogo: Braço longo (Pernalonga), Ginga (Cezar), Mira calculada (Daniel), Zoeira (Lucas), Bomba do MC (Pedro) e Mão de goleiro (Gabriel), Paredão (Kauã), Bike do nada (Matheus), Treta (Guilherme) e Menina formiga (Manu).
 
 ## Controles
 
@@ -61,6 +60,8 @@ Na queimada as habilidades são outras, próprias do jogo: Braço longo (Pernalo
 | Shift | Chute carregado (futebol) · correr (esconde) |
 | C | Passe por cima (futebol) |
 | Z | Drible / finta (futebol) |
+| X | Caneta: a bola passa por baixo das pernas do marcador (futebol) |
+| V | Chapéu: a bola passa por cima da cabeça do marcador (futebol) |
 | 1 a 7 | Escolher tema e palavra (alerta) |
 | E | Habilidade do personagem |
 | Q | Trocar jogador ou alvo |
@@ -98,7 +99,9 @@ Para abrir direto numa brincadeira: `http://localhost:8000/?cena=Futebol`. Tamb�
 - **Animação:** cada personagem tem 8 quadros por direção (andar com balanço do corpo, piscar, falar, sentar e arremessar a bola na queimada). As bolas giram em 8 quadros e amassam quando quicam. O Matheus pedala de lado, de costas e de frente.
 - **Ciclo do dia:** nas partidas, o sol vai se pondo atrás das casas conforme o tempo passa: tarde, hora dourada, crepúsculo e noite, com as janelas acendendo uma por uma e o poste ligando (`rua_camadas.py` separa o céu da rua). No menu da rua é sempre hora dourada.
 - **Chuva:** quando chove no futebol, a turma corre pro barracão, a câmera entra junto (`barracao_dentro.py`) e o jogo volta quando a chuva passa.
-- **Sons:** efeitos retrô, o toque do orelhão, a chuva e a música de fundo original "Tarde na Rua", todos sintetizados por código (`ferramentas/gerador/sons.py`, `orelhao.py`, `chuva.py` e `fundo.py`). O botão ♫ na barra da rádio liga e desliga a música de fundo, que abaixa sozinha quando a JBL toca.
+- **Dribles:** caneta (X), em que a bola passa por baixo das pernas, o marcador cobre o rosto de vergonha e a galera grita "kkkk", e chapéu (V), em que a bola passa por cima da cabeça. Os dois têm câmera lenta rapidinha.
+- **Trilha sonora original:** uma música para cada momento (rua na hora dourada, partida, barracão na chuva, esconde-esconde e o encerramento "Até amanhã, turma"), gerada em `ferramentas/gerador/trilha.py`. Cada música só carrega quando a cena abre, e a troca entre elas é suave. O botão ♫ na barra da rádio liga e desliga, e a música abaixa sozinha quando a JBL toca.
+- **Sons:** efeitos sintetizados por código (`sons.py`, `orelhao.py`, `chuva.py`, `fundo.py`), incluindo a torcida da turma rindo e fazendo "uuuh".
 - **Fonte:** Unifont, renderizada como fonte bitmap.
 
 ### Feito com IA

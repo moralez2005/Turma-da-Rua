@@ -15,7 +15,7 @@ const QHAB = {
   kaua: { nome: 'Paredão', desc: 'agarra as próximas bolas que vierem' },
   matheus: { nome: 'Bike do nada', desc: 'some numa bike e foge rapidinho' },
   guilherme: { nome: 'Treta', desc: 'trava o time rival (o Pedro mais ainda)' },
-  manu: { nome: 'Pequenininha', desc: 'a bola passa por cima dela por um tempo' },
+  manu: { nome: 'Menina formiga', desc: 'a bola passa por cima dela por um tempo' },
 };
 
 class Queimada extends Phaser.Scene {
@@ -25,6 +25,7 @@ class Queimada extends Phaser.Scene {
     this._saindo = false;
     this.players = null;   // ao jogar de novo, a cena reaproveita o objeto: limpa o que sobrou da partida anterior
     this.cameras.main.fadeIn(300, 18, 13, 24);
+    TR.musicaFundo.tocar(this, 'm_jogo');
     TR.ruaComCeu(this);
     this.F = { x0: 24, x1: 936, y0: 296, y1: 496, mid: 480, cem: 64 };
     this.drawField();

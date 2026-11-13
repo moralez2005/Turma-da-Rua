@@ -1,6 +1,6 @@
 /*
  * Futebol de rua 3 x 3 com física de bola (altura, quique, atrito) e habilidades.
- * Setas/WASD andam · Espaço passa · C passe por cima · Z drible · Shift (segurar/soltar) chuta · E habilidade · Q troca
+ * Setas/WASD andam · Espaço passa · C passe por cima · Z drible · X caneta · V chapéu · Shift (segurar/soltar) chuta · E habilidade · Q troca
  */
 class Futebol extends Phaser.Scene {
   constructor() { super('Futebol'); }
@@ -9,6 +9,7 @@ class Futebol extends Phaser.Scene {
     this._saindo = false;
     this.players = null;   // ao jogar de novo, a cena reaproveita o objeto: limpa o que sobrou da partida anterior
     this.cameras.main.fadeIn(300, 18, 13, 24);
+    TR.musicaFundo.tocar(this, 'm_jogo');
     this.F = { x0: 24, x1: 936, y0: 292, y1: 498, mid: 480, gy0: 344, gy1: 444 };
     TR.ruaComCeu(this);
     this.drawField();
@@ -79,11 +80,13 @@ class Futebol extends Phaser.Scene {
     this.big = TR.txt(this, 480, 200, '', 4, 0xffd36a).setOrigin(0.5).setDepth(6500).setVisible(false);
     TR.jblHud(this, { lucas: [548, 280], pedro: [800, 280] });
 
-    this.keys = this.input.keyboard.addKeys('UP,DOWN,LEFT,RIGHT,W,A,S,D,SPACE,SHIFT,E,Q,Z,C');
+    this.keys = this.input.keyboard.addKeys('UP,DOWN,LEFT,RIGHT,W,A,S,D,SPACE,SHIFT,E,Q,Z,C,X,V');
     this.input.keyboard.on('keydown-SPACE', () => this.humanPass());
     this.input.keyboard.on('keydown-Q', () => this.swapToNearest());
     this.input.keyboard.on('keydown-C', () => this.humanPass(true));
     this.input.keyboard.on('keydown-Z', () => this.dribble(this.human));
+    this.input.keyboard.on('keydown-X', () => this.caneta(this.human));
+    this.input.keyboard.on('keydown-V', () => this.chapeu(this.human));
     this.input.keyboard.on('keydown-E', () => this.useAbility(this.human));
     this.input.keyboard.on('keyup-SHIFT', () => this.humanShoot());
 
@@ -93,6 +96,8 @@ class Futebol extends Phaser.Scene {
       'Espaço ............. passe rasteiro (seta verde = quem recebe)',
       'C .................. passe por cima (passa por cima de quem marca)',
       'Z .................. drible / finta (ninguém rouba por um instante)',
+      'X .................. caneta (de frente pro marcador: a bola passa por baixo das pernas)',
+      'V .................. chapéu (a bola passa por cima da cabeça do marcador)',
       'Shift .............. segure pra carregar e solte pra chutar',
       '   + ↑ ou ↓ ........ escolhe o canto do gol',
       'E .................. habilidade do jogador',
@@ -112,7 +117,7 @@ class Futebol extends Phaser.Scene {
       id: r.id, team: r.team, role: r.role, home: { x: r.home[0], y: r.home[1] }, x: r.home[0], y: r.home[1],
       spd: st.vel, kick: st.chute, dir: r.team === 0 ? 'right' : 'left', face: { x: r.team === 0 ? 1 : -1, y: 0 },
       spr, sh, moving: false, stealCd: 0, aiCd: 0, hold: 0, boost: 0, boostMul: 1, slow: 0, immune: 0,
-      habCd: Phaser.Math.FloatBetween(4, 9), bomb: false, dribCd: 0, drib: null,
+      habCd: Phaser.Math.FloatBetween(4, 9), bomb: false, dribCd: 0, drib: null, preso: 0, quadro: null,
     };
   }
 
@@ -136,7 +141,8 @@ class Futebol extends Phaser.Scene {
   // ------------------------------------------------------------------ loop
   update(time, delta) {
     if (!this.players) return;   // ainda escolhendo os times
-    const dt = Math.min(delta, 50) / 1000;
+    // câmera lenta rapidinha nos dribles (this.lento = até quando)
+    const dt = Math.min(delta, 50) / 1000 * (this._teste || (this.lento && time < this.lento ? 0.4 : 1));
     if (this.state === 'play') {
       this.timeLeft -= dt;
       this.carTimer -= dt;
@@ -165,6 +171,8 @@ class Futebol extends Phaser.Scene {
   tickEffects(p, dt) {
     p.stealCd -= dt; p.aiCd -= dt; p.habCd -= dt; p.dribCd = (p.dribCd || 0) - dt;
     p.boost = Math.max(0, p.boost - dt); p.slow = Math.max(0, p.slow - dt); p.immune = Math.max(0, p.immune - dt);
+    p.preso = Math.max(0, (p.preso || 0) - dt);
+    if (p.quadro && this.time.now > p.quadro.ate) p.quadro = p.quadro.depois || null;
     if (p.boost <= 0) p.boostMul = 1;
   }
 
@@ -181,7 +189,8 @@ class Futebol extends Phaser.Scene {
     if (!p) return;
     const mx = (k.RIGHT.isDown || k.D.isDown ? 1 : 0) - (k.LEFT.isDown || k.A.isDown ? 1 : 0);
     const my = (k.DOWN.isDown || k.S.isDown ? 1 : 0) - (k.UP.isDown || k.W.isDown ? 1 : 0);
-    if (!this.doDrib(p, dt)) this.move(p, mx, my, this.speedOf(p), dt);
+    if (p.preso > 0) this.move(p, 0, 0, 0, dt);
+    else if (!this.doDrib(p, dt)) this.move(p, mx, my, this.speedOf(p), dt);
     if (k.SHIFT.isDown && this.ball.owner === p) this.charge = Math.min(1, this.charge + dt * 1.3);
     const o = this.ball.owner;
     if (o && o.team !== p.team && this.dist(p, this.ball) < 26 && p.stealCd <= 0 && o.immune <= 0) {
@@ -226,6 +235,70 @@ class Futebol extends Phaser.Scene {
     TR.sfx(this, 'pulo', 0.35, 1.3);
     const fr = { cezar: ['Caneta!', 'Olé!'], pernalonga: ['Fica aí!'], lucas: ['Sai, Juliete!'], pedro: ['Ginga de MC!'] }[p.id] || ['Olé!'];
     if (Math.random() < 0.6) TR.bubble(this, p.spr, fr[Math.floor(Math.random() * fr.length)], 0.9);
+  }
+
+  // marcador de frente, perto: quem vai levar o drible
+  vitimaNaFrente(p, alcance) {
+    const atk = p.face.x >= 0 ? 1 : -1;
+    return this.players.filter((q) => q.team !== p.team && q.preso <= 0 && (q.x - p.x) * atk > 8 && Math.abs(q.x - p.x) < alcance && Math.abs(q.y - p.y) < 34)
+      .sort((a, b) => this.dist(a, p) - this.dist(b, p))[0];
+  }
+
+  // a galera toda zoa (torcida e quem está jogando)
+  zoeira(p, q, gritos) {
+    const plateia = this.torcida.concat(this.players.filter((o) => o !== q).map((o) => o.spr));
+    Phaser.Utils.Array.Shuffle(plateia).slice(0, 4).forEach((s, i) => this.time.delayedCall(250 + i * 180, () => {
+      if (s && s.active && this.state === 'play') TR.bubble(this, s, Phaser.Utils.Array.GetRandom(gritos), 1.3);
+    }));
+    TR.sfx(this, 'zoeira', 0.55);
+  }
+
+  // CANETA: a bola passa por baixo das pernas do marcador, ele fica com vergonha e a galera grita kkkk
+  caneta(p) {
+    if (this.state !== 'play' || !p || this.ball.owner !== p || p.dribCd > 0) return;
+    const q = this.vitimaNaFrente(p, 95);
+    if (!q) return this.dribble(p);
+    p.dribCd = 2.2;
+    const atk = q.x > p.x ? 1 : -1, b = this.ball;
+    // a bola vai rasteira por entre os pés (um pouquinho atrás dele, pra aparecer entre as pernas)
+    this.kickTo(p, q.x + atk * 64, q.y - 3, 250, 0);
+    b.noPick = 0.2; b.reservada = { p, ate: this.time.now + 1100 };
+    q.preso = 1.9; q.stealCd = 2; q.face = { x: -atk, y: 0 };
+    q.quadro = { f: atk > 0 ? TR.Q.abreEsq : TR.Q.abreDir, ate: this.time.now + 560, depois: { f: TR.Q.vergonha, ate: this.time.now + 1900 } };
+    this.time.delayedCall(900, () => { if (q.quadro && q.quadro.f === TR.Q.vergonha) q.quadro.f = TR.Q.vergonha2; });
+    // quem deu a caneta contorna o marcador
+    const lado = q.y > 394 ? -1 : 1;
+    p.drib = { t: 0.8, tc: 0.52, vx: atk * 0.8, vy: lado * 0.55, solta: true }; p.immune = 0.8;
+    TR.sfx(this, 'caneta', 0.6);
+    this.lento = this.time.now + 520;
+    this.time.delayedCall(320, () => { if (this.state === 'play') { this.flash('CANETA!'); this.cameras.main.shake(120, 0.004); } });
+    TR.bubble(this, q.spr, Phaser.Utils.Array.GetRandom(['Ah não...', 'Foi sem querer!', 'Para, gente...']), 1.4);
+    this.zoeira(p, q, ['KKKKKKK', 'CANETAAA!', 'Kakakaka', 'Abriu a porteira!', 'Passou no túnel!', 'Vai pra casa!']);
+  }
+
+  // CHAPÉU: levanta a bola por cima da cabeça do marcador e pega do outro lado
+  chapeu(p) {
+    if (this.state !== 'play' || !p || this.ball.owner !== p || p.dribCd > 0) return;
+    const q = this.vitimaNaFrente(p, 110);
+    if (!q) return this.dribble(p);
+    p.dribCd = 2.2;
+    const atk = q.x > p.x ? 1 : -1, b = this.ball;
+    const alvo = { x: q.x + atk * 78, y: q.y };
+    const d = Math.hypot(alvo.x - b.x, alvo.y - b.y);
+    // tempo no ar ~0.7s: sobe por cima da cabeça (a bola passa a ~120px de altura)
+    this.kickTo(p, alvo.x, alvo.y, d / 0.72, 345);
+    b.noPick = 0.5; b.lob = true; b.reservada = { p, ate: this.time.now + 1200 };
+    p.quadro = { f: atk > 0 ? TR.Q.levantaDir : TR.Q.levantaEsq, ate: this.time.now + 260 };
+    q.preso = 1.1; q.stealCd = 1.4; q.face = { x: -atk, y: 0 };
+    q.quadro = { f: atk > 0 ? TR.Q.olhaCimaEsq : TR.Q.olhaCimaDir, ate: this.time.now + 1100 };
+    const lado = q.y > 394 ? -1 : 1;
+    this.time.delayedCall(200, () => { p.drib = { t: 0.9, tc: 0.6, vx: atk * 0.8, vy: lado * 0.55, solta: true }; });
+    p.immune = 0.9;
+    TR.sfx(this, 'chapeu', 0.6);
+    this.lento = this.time.now + 600;
+    this.time.delayedCall(380, () => { if (this.state === 'play') this.flash('CHAPÉU!'); });
+    TR.bubble(this, q.spr, Phaser.Utils.Array.GetRandom(['Cadê a bola?', 'Ué?!', 'Volta aqui!']), 1.2);
+    this.zoeira(p, q, ['UUUUH!', 'CHAPÉU!', 'Kakaka', 'Olha o chapéu!', 'Que isso!']);
   }
 
   humanShoot() {
@@ -323,6 +396,9 @@ class Futebol extends Phaser.Scene {
       }
       if (p.id === 'cezar' && pressure && p.habCd <= 0) this.useAbility(p);
       if (pressure && p.dribCd <= 0 && Math.random() < 0.02) this.dribble(p);
+      // a IA também humilha de vez em quando (o Cezar é o rei da caneta)
+      const ousadia = p.id === 'cezar' ? 0.012 : 0.004;
+      if (pressure && p.dribCd <= 0 && Math.random() < ousadia) { if (Math.random() < 0.55) this.caneta(p); else this.chapeu(p); }
     } else if (mine) {
       tx = Phaser.Math.Clamp(b.x + atk * (p.role === 'att' ? 170 : -90), F.x0 + 70, F.x1 - 70);
       ty = p.role === 'att' ? (b.y < 394 ? 452 : 336) : p.home.y;
@@ -336,6 +412,7 @@ class Futebol extends Phaser.Scene {
       }
       if (p.id === 'lucas' && p.habCd <= 0 && b.owner && b.owner.team !== p.team && this.dist(p, b.owner) < 200) this.useAbility(p);
     }
+    if (p.preso > 0) { this.move(p, 0, 0, 0, dt); return; }
     if (this.doDrib(p, dt)) return;
     const dx = tx - p.x, dy = ty - p.y, d = Math.hypot(dx, dy);
     if (d > 6) this.move(p, dx / d, dy / d, spd * 0.92, dt); else this.move(p, 0, 0, 0, dt);
@@ -344,8 +421,14 @@ class Futebol extends Phaser.Scene {
   doDrib(p, dt) {
     if (!p.drib) return false;
     p.drib.t -= dt;
-    if (p.drib.t <= 0 || this.ball.owner !== p) { p.drib = null; return false; }
+    if (p.drib.t <= 0 || (this.ball.owner !== p && !p.drib.solta)) { p.drib = null; return false; }
     const keepFace = { x: p.face.x, y: p.face.y };
+    if (p.drib.solta) {   // contorna o marcador e já vai buscar a bola do outro lado
+      const b = this.ball, dx = b.x - p.x, dy = b.y - p.y, d = Math.hypot(dx, dy) || 1, k = Phaser.Math.Clamp((p.drib.t - p.drib.tc) / 0.28, 0, 1);
+      this.move(p, p.drib.vx * k + (dx / d) * (1 - k), p.drib.vy * k + (dy / d) * (1 - k), p.spd * 1.5, dt);
+      if (d < 20 && k === 0) p.drib.t = 0;
+      return true;
+    }
     this.move(p, p.drib.vx, p.drib.vy, this.speedOf(p) * 2.1, dt);
     p.face = { x: keepFace.x * 0.6 + p.drib.vx * 0.4, y: p.drib.vy * 0.5 };
     return true;
@@ -386,6 +469,7 @@ class Futebol extends Phaser.Scene {
   separate() {
     const ps = this.players, F = this.F;
     for (let i = 0; i < ps.length; i++) for (let j = i + 1; j < ps.length; j++) {
+      if ((ps[i].drib && ps[i].drib.solta) || (ps[j].drib && ps[j].drib.solta)) continue;   // quem dribla passa colado no marcador
       const a = ps[i], b = ps[j], dx = b.x - a.x, dy = (b.y - a.y) * 1.7, d = Math.hypot(dx, dy);
       if (d > 0 && d < 34) {
         const push = (34 - d) / 2;
@@ -454,6 +538,8 @@ class Futebol extends Phaser.Scene {
     const sp = Math.hypot(b.vx, b.vy);
     let best = null, bd = 1e9;
     this.players.forEach((p) => {
+      if (p.preso > 0) return;   // quem levou o drible ainda está de cara no chão
+      if (b.reservada && this.time.now < b.reservada.ate && p !== b.reservada.p) return;   // a bola do drible é de quem driblou
       const reach = p.role === 'gk' ? (p.boost > 0 ? 44 : 32) : 22;
       const maxZ = p.role === 'gk' ? 90 : 34;
       const d = this.dist(p, b);
@@ -606,6 +692,7 @@ class Futebol extends Phaser.Scene {
     const cam = this.cameras.main;
     cam.fadeOut(300, 10, 8, 14);
     cam.once('camerafadeoutcomplete', () => {
+      TR.musicaFundo.tocar(this, 'm_chuva');
       const D = this.cache.json.get('barracao_dentro');
       const cont = this.add.container(0, 0).setDepth(7400).setScrollFactor(0);
       cont.add(this.add.image(0, 0, 'barracao_dentro').setOrigin(0));
@@ -660,6 +747,7 @@ class Futebol extends Phaser.Scene {
           cam.fadeOut(300, 10, 8, 14);
           cam.once('camerafadeoutcomplete', () => {
             this.events.off('update', anima);
+            TR.musicaFundo.tocar(this, 'm_jogo');
             cont.destroy(true);
             this.dentroDoBarracao = false;
             this.players.forEach((p) => { p.coberta = null; p.dentro = false; p.spr.setAlpha(1); if (p.sh) p.sh.setVisible(true); });
@@ -698,7 +786,8 @@ class Futebol extends Phaser.Scene {
       p.spr.setPosition(Math.round(p.x), Math.round(p.y)).setDepth(p.y);
       p.sh.setPosition(Math.round(p.x), Math.round(p.y)).setDepth(2);
       if (!p.moving) p.dir = TR.dirFrom(b.x - p.x, (b.y - p.y) * 0.5, p.dir);
-      TR.pose(p.spr, p.dir, p.moving && this.state !== 'goal' && this.state !== 'end');
+      if (p.quadro) { p.spr.stop(); p.spr.setFrame(p.quadro.f); }
+      else TR.pose(p.spr, p.dir, p.moving && this.state !== 'goal' && this.state !== 'end');
       p.spr.setTint(p.slow > 0 ? 0xaab8ff : (p.boost > 0 || p.drib ? 0xfff0b0 : 0xffffff));
       if (p.slow <= 0 && p.boost <= 0 && !p.drib) p.spr.clearTint();
     });

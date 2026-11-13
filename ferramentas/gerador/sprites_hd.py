@@ -17,7 +17,7 @@ def hd(c, img):
     return hd_refine(scale2x(img), c, rim=None)
 
 
-COLS, ROWS = 8, 7
+COLS, ROWS = 8, 8
 BOLA_QUEIMADA = (214, 52, 52)
 
 
@@ -56,6 +56,15 @@ def sheet(c, seed=3):
         r = hd(c, side(c, fase=0.12 if col in (3, 4) else 0, braco=ang, bola=BOLA_QUEIMADA if bola else None))
         s.paste(r, (col * FW, FH * 5))
         s.paste(ImageOps.mirror(r), (col * FW, FH * 6))
+    # linha 7 (dribles): 0-1 vergonha (frente), 2 pernas abertas (dir), 3 olha pra cima (dir), 4 levanta a bola (dir),
+    # 5 pernas abertas (esq), 6 olha pra cima (esq), 7 levanta a bola (esq)
+    s.paste(hd(c, detailed(c, "stand", seed=seed, vergonha=True)), (0, FH * 7))
+    s.paste(_sobe(hd(c, detailed(c, "stand", seed=seed, vergonha=True)), 2), (FW, FH * 7))
+    extra = [hd(c, side(c, fase=0, pose="abre", braco=118)), hd(c, side(c, fase=0, pose="olha_cima", braco=100)),
+             _sobe(hd(c, side(c, fase=0, pose="levanta", braco=40)), 3)]
+    for k, r in enumerate(extra):
+        s.paste(r, ((2 + k) * FW, FH * 7))
+        s.paste(ImageOps.mirror(r), ((5 + k) * FW, FH * 7))
     return s
 
 

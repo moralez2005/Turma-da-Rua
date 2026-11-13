@@ -9,7 +9,7 @@ from sprites import CHARS, Canvas, detailed, dark, mix, camo_color, up, label
 OUT_DIR = "/home/claude/turma-da-rua/assets/personagens/jogo"
 
 
-def side(c, frame=0, fase=None, braco=None, bola=None):
+def side(c, frame=0, fase=None, braco=None, bola=None, pose=None):
     """fase (0..1): passo contínuo; braco: ângulo do braço da frente em graus (0 = pra baixo, 90 = pra frente, 180 = pra cima);
     bola: cor da bola na mão."""
     """Perfil olhando para a direita."""
@@ -29,12 +29,25 @@ def side(c, frame=0, fase=None, braco=None, bola=None):
     else:
         stride = round(6 * math.sin(2 * math.pi * fase))
         lift = 2 if abs(math.sin(2 * math.pi * fase)) > 0.8 else (1 if abs(math.sin(2 * math.pi * fase)) > 0.4 else 0)
+    # poses especiais: "abre" (pernas abertas, levou caneta), "levanta" (perna da frente subindo a bola), "olha_cima"
+    if pose == "abre":
+        stride, lift = 9, 0
+    elif pose == "levanta":
+        stride, lift = 7, 7
 
     def shorts_col(x, y):
         return camo_color(x, y) if c["shorts"] == "camo" else c["shorts"]
 
     # perna de tras (mais escura) e da frente
     for k, (dx, col, lf) in enumerate(((-stride, sks, 0), (stride, sk, lift))):
+        if pose == "levanta" and k == 1:   # perna da frente esticada pra frente e pra cima, levantando a bola
+            hx, hy = cx, bottom - 1 - lh
+            for t in range(lh + 1):
+                x = round(hx + t * 0.75); y = round(hy + t * 0.62)
+                cv.r(x, y, x + 2, y + 1, col)
+            fx, fy = round(hx + lh * 0.75), round(hy + lh * 0.62)
+            cv.r(fx, fy, fx + 5, fy + 1, fcol if feet != "descalco" else col)
+            continue
         x0 = cx - 2 + dx // 2
         ly0 = bottom - 1 - lh
         cv.r(x0, ly0, x0 + 3, bottom - 2 - lf, col)
@@ -110,9 +123,18 @@ def side(c, frame=0, fase=None, braco=None, bola=None):
     cv.p(hx1 + 1, hy0 + 9, sk)            # nariz
     eye_y = hy0 + 8
     ex = hx1 - 3
-    cv.r(ex, eye_y, ex, eye_y + 1, (28, 20, 24))
-    cv.r(ex - 1, eye_y - 2, ex + 1, eye_y - 2, hc)
-    cv.r(hx1 - 3, hy0 + 12, hx1 - 1, hy0 + 12, (90, 34, 40))  # boca
+    if pose == "olha_cima":   # olho pra cima e boca de "ué"
+        cv.r(ex, eye_y - 1, ex + 1, eye_y, (28, 20, 24))
+        cv.r(ex - 1, eye_y - 3, ex + 1, eye_y - 3, hc)
+        cv.r(hx1 - 2, hy0 + 11, hx1 - 1, hy0 + 12, (90, 34, 40))
+    elif pose == "abre":      # olho arregalado, boca aberta
+        cv.r(ex, eye_y, ex, eye_y + 1, (28, 20, 24)); cv.p(ex - 1, eye_y, (250, 250, 250))
+        cv.r(ex - 1, eye_y - 3, ex + 1, eye_y - 3, hc)
+        cv.r(hx1 - 3, hy0 + 11, hx1 - 1, hy0 + 12, (90, 34, 40))
+    else:
+        cv.r(ex, eye_y, ex, eye_y + 1, (28, 20, 24))
+        cv.r(ex - 1, eye_y - 2, ex + 1, eye_y - 2, hc)
+        cv.r(hx1 - 3, hy0 + 12, hx1 - 1, hy0 + 12, (90, 34, 40))  # boca
     cv.r(hx0 + 1, hy1 - 1, hx1 - 1, hy1 - 1, mix(sk, sks, 0.5))
     # orelha
     ear_x = hx0 + 4

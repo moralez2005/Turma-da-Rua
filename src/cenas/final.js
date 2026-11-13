@@ -28,8 +28,9 @@ class Final extends Phaser.Scene {
       this.kids[id] = s;
     });
 
+    TR.musicaFundo.tocar(this, 'm_fim', { loop: false, volume: 1.3 });
     Radio.playFinal();
-    this.hint = TR.txt(this, 16, 14, '♪ Aperte o play no vídeo ao lado pra ouvir a música do fim de tarde', 1, 0xffe0b0).setDepth(9000).setScrollFactor(0);
+    this.hint = TR.txt(this, 16, 14, '♪ Até amanhã, turma · ou aperte o play no vídeo ao lado', 1, 0xffe0b0).setDepth(9000).setScrollFactor(0);
     this.tweens.add({ targets: this.hint, alpha: 0.4, yoyo: true, repeat: 6, duration: 700, onComplete: () => this.hint.setAlpha(0.8) });
     const back = TR.button(this, 880, 22, 'Voltar (Esc)', () => this.leave(), { fixed: true, depth: 9500 });
     this.input.keyboard.on('keydown-ESC', () => this.leave());

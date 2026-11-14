@@ -22,7 +22,7 @@ H_BLOND = ((150, 108, 62), (198, 154, 100))
 CHARS = [
     dict(id="cezar", nome="Cezar", skin=S_TAN, hair=H_BLACK, hs="espetado", tw=13, th=13, lh=10,
          shirt=(236, 236, 236), sleeve="long", pat="floral", shorts=(40, 48, 82), feet="descalco",
-         expr="grin", item="salgadinho"),
+         expr="grin", item="salgadinho", cap=(36, 70, 150)),   # boné azul pra trás
     dict(id="kaua", nome="Kaua Henrique", skin=S_LIGHT, hair=H_BLOND, hs="franja", tw=13, th=13, lh=11,
          shirt=(62, 70, 90), sleeve="short", pat="gang", shorts=(70, 100, 150), feet=(60, 110, 200),
          expr="calm", item="copo", goleiro=True),

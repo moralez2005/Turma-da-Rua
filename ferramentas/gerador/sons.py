@@ -205,6 +205,45 @@ def buzina(d):
     return s * adsr(len(tt_), 0.01, 0.02, 0.9, 0.03)
 save("carro", mixa(motor, atrasa(buzina(0.16) * 0.35, 0.2), atrasa(buzina(0.26) * 0.35, 0.42)), 0.55)
 
+
+# ---------------------------------------------------------------- retrô (chute, arremesso e gol no estilo 8-bit simples)
+def _onepole(x, k):
+    y = np.zeros_like(x); acc = 0.0
+    for i, v in enumerate(x):
+        acc += k * (v - acc); y[i] = acc
+    return y
+
+
+def _env(x, a=0.005, r=None):
+    n = len(x); e = np.ones(n); na = max(1, int(SR * a)); e[:na] = np.linspace(0, 1, na)
+    if r is None: e *= np.linspace(1, 0, n) ** 1.5
+    else:
+        nr = max(1, int(SR * r)); e[-nr:] *= np.linspace(1, 0, nr)
+    return x * e
+
+
+def _sweep(f0, f1, d, kind="sq"):
+    f = np.linspace(f0, f1, int(SR * d)); ph = 2 * np.pi * np.cumsum(f) / SR
+    return np.sign(np.sin(ph)) if kind == "sq" else np.sin(ph)
+
+
+def _seq(notas, d=0.09, duty=0.5, vol=0.5):
+    out = []
+    for f in notas:
+        tt = t(d)
+        out.append(np.zeros(len(tt)) if f == 0 else _env(np.where((tt * f) % 1 < duty, 1.0, -1.0), 0.003) * vol)
+    return np.concatenate(out)
+
+
+_ruido = lambda d: rng.uniform(-1, 1, int(SR * d))
+save("chute", mixa(_env(_sweep(180, 50, 0.12, "sin"), 0.001), 0.4 * _env(_onepole(_ruido(0.05), 0.5), 0.001)), 0.8, ambiente=False)
+_w = _onepole(_ruido(0.25), 0.25)
+save("arremesso", _env(_w * np.linspace(0.2, 1, len(_w)), 0.01, 0.1), 0.5, ambiente=False)
+_n = _onepole(_ruido(1.6), 0.08)
+_torcida = _n * (0.6 + 0.4 * np.sin(np.linspace(0, 9, len(_n))) ** 2)
+_fan = _seq([N["C5"], N["E5"], N["G5"], N["C6"], 0, N["G5"], N["C6"]], 0.11, 0.25, 0.6)
+save("gol", mixa(_env(_torcida, 0.05, 0.4) * 0.8, _fan), 0.7, ambiente=False)
+
 # ---------------------------------------------------------------- interface
 save("clique", tom(N["A5"], 0.12, "marimba", 1), 0.35, ambiente=False)
 save("hover", tom(N["E6"], 0.06, "marimba", 1) * 0.6, 0.18, ambiente=False)

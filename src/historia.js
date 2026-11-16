@@ -147,7 +147,7 @@ TR.gibi = (scene, paginas, fim) => {
     }
     const tudo = cont.list.slice(cont.list.indexOf(borda));
     tudo.forEach((o) => { if (o.alpha === 1) { o.alpha = 0; scene.tweens.add({ targets: o, alpha: 1, duration: 200 }); } });
-    if (p.som) TR.sfx(scene, p.som, 0.6);
+    if (p.som) TR.sfx(scene, p.som, p.som === 'louvor' ? 0.12 : 0.6);
     if (p.treme) scene.time.delayedCall(150, () => scene.cameras.main.shake(200, 0.006));
   };
   const avanca = () => {
@@ -289,27 +289,60 @@ TR.HJ = {
     const b = { x: 760, y: 360, spr: scene.add.sprite(760, 360, 'viz_beudinha', 0).setOrigin(0.5, 0.97), dir: 'left', investida: 0, tonta: 0, alvo: null, t: 0 };
     const cel = scene.add.image(0, 0, 'celular').setDepth(9000);
     const outros = ['pedro', 'daniel', 'lucas', 'kaua', 'cezar'].map((id, i) => ({ id, x: 150 + i * 170, y: 320 + (i % 2) * 140, spr: TR.kid(scene, id, 150 + i * 170, 320), dir: 'right', vx: 0, vy: 0 }));
-    const DUR = 20;
-    let tempo = 0, fim = false, proxInvestida = 6, proxAlvo = 0, esquiva = 0, recarga = 0;
-    const louvor = scene.sound.add('louvor', { loop: true, volume: 0.22 }); louvor.play();
+    const DUR = 15;
+    let tempo = 0, fim = true, proxInvestida = 6, proxAlvo = 0, esquiva = 0, recarga = 0, passada = 0, recPassada = 0;
+    const REC = 1.1, REC_P = 6;
+    const louvor = scene.sound.add('louvor', { loop: true, volume: 0.07 });
     scene.events.once('shutdown', () => louvor.destroy());
     const barra = scene.add.graphics().setDepth(9500);
-    const hud = () => TR.HP.objetivo(scene, 'FUJA DA BEUDINHA! ' + Math.max(0, Math.ceil(DUR - tempo)) + 's   ESPAÇO: esquiva ' + (recarga > 0 ? '(...)' : '(pronta!)'));
-    TR.bubble(scene, b.spr, 'TÃO RINDO DE MIM, É?!', 1.6);
+    const hud = () => TR.HP.objetivo(scene, 'FUJA DA BEUDINHA!  Faltam ' + Math.max(0, Math.ceil(DUR - tempo)) + 's');
+    // painel das habilidades (embaixo, bem visível)
+    const painel = scene.add.graphics().setDepth(9400).setScrollFactor(0);
+    const txtEsq = TR.txt(scene, 330, 512, '', 1, 0xffffff).setOrigin(0.5).setDepth(9401).setScrollFactor(0);
+    const txtPas = TR.txt(scene, 630, 512, '', 1, 0xffffff).setOrigin(0.5).setDepth(9401).setScrollFactor(0);
+    const alerta = TR.txt(scene, 0, 0, 'ESQUIVA AGORA!', 1, 0xff5a3c).setOrigin(0.5).setDepth(9600).setVisible(false);
+    const desenhaPainel = (tm) => {
+      const pronta = recarga <= 0, pp = recPassada <= 0;
+      painel.clear();
+      [[330, pronta, recarga / REC, 0x7cf27c], [630, pp, recPassada / REC_P, 0x5ab0ff]].forEach(([x, ok_, frac, cor]) => {
+        painel.fillStyle(0x0c0810, 0.9).fillRect(x - 140, 494, 280, 36);
+        painel.fillStyle(ok_ ? cor : 0x3a3040, ok_ ? 0.35 + 0.25 * Math.sin(tm / 120) : 1).fillRect(x - 136, 498, 272, 28);
+        if (!ok_) painel.fillStyle(cor, 0.6).fillRect(x - 136, 522, 272 * (1 - frac), 4);
+      });
+      txtEsq.setText(pronta ? 'ESPAÇO: ESQUIVA  ✓ PRONTA' : 'ESPAÇO: esquiva carregando...').setTint(pronta ? 0xffffff : 0x9a8aa6);
+      txtPas.setText(pp ? 'E: PASSADA LONGA  ✓ PRONTA' : (passada > 0 ? 'PASSADA LONGA!' : 'E: passada carregando...')).setTint(pp || passada > 0 ? 0xffffff : 0x9a8aa6);
+    };
     const grita = ['Volta aqui, moleque!', 'Rindo de mim?!', 'Vou contar pra sua mãe!', 'Eu só queria jogar!', 'Hic!'];
     scene.time.addEvent({ delay: 3000, loop: true, callback: () => !fim && TR.bubble(scene, b.spr, Phaser.Utils.Array.GetRandom(grita), 1.4) });
     const teclas = scene.input.keyboard.addKeys('UP,DOWN,LEFT,RIGHT,W,A,S,D');
-    // esquiva: uma arrancada rapidinha (mesmo mancando), com recarga
-    TR.HP.acao(scene, () => {
+    // esquiva (Espaço): uma arrancada rapidinha, mesmo mancando, e ela não te pega durante
+    const esquivar = () => {
       if (fim || recarga > 0) return;
-      esquiva = 0.32; recarga = 1.6;
+      esquiva = 0.45; recarga = REC;
       TR.sfx(scene, 'pulo', 0.4, 1.2);
+    };
+    scene.input.keyboard.on('keydown-SPACE', esquivar);
+    // passada longa (E): a habilidade do Pernalonga, mesmo de pé machucado: corre normal por 2,5s
+    scene.input.keyboard.on('keydown-E', () => {
+      if (fim || recPassada > 0) return;
+      passada = 2.5; recPassada = REC_P;
+      TR.sfx(scene, 'habilidade', 0.5); TR.bubble(scene, eu.spr, 'Passada longa!', 1);
     });
+    // explica antes de começar
+    TR.instructions(scene, 'Fuja da beudinha!', [
+      'Setas ou WASD ...... correr (você está mancando)',
+      'ESPAÇO ............. ESQUIVA: arrancada rápida, ela não te pega',
+      'E .................. PASSADA LONGA: corre sem mancar por um tempo',
+      'Quando ela chegar perto, aparece "ESQUIVA AGORA!"',
+      'Aguente ' + DUR + ' segundos. Ela também corre atrás da turma!',
+    ], () => { fim = false; louvor.play(); TR.bubble(scene, b.spr, 'TÃO RINDO DE MIM, É?!', 1.6); });
     TR.HP.noQuadro(scene, (tm, d) => {
       if (fim) return;
       const dt = Math.min(d, 50) / 1000;
       tempo += dt; b.t += dt;
       esquiva = Math.max(0, esquiva - dt); recarga = Math.max(0, recarga - dt);
+      passada = Math.max(0, passada - dt); recPassada = Math.max(0, recPassada - dt);
+      desenhaPainel(tm);
       // na esquiva o passo vira uma corrida (sem mancar)
       if (esquiva > 0) {
         const k = teclas;
@@ -318,6 +351,10 @@ TR.HJ = {
         const l = Math.hypot(mx, my) || 1;
         eu.x = Phaser.Math.Clamp(eu.x + mx / l * 430 * dt, 30, 930); eu.y = Phaser.Math.Clamp(eu.y + my / l * 340 * dt, 292, 500);
         eu.spr.setPosition(Math.round(eu.x), Math.round(eu.y)).setDepth(eu.y).setTint(0xfff0b0);
+      } else if (passada > 0) {   // correndo sem mancar
+        const k = teclas, mx = (k.RIGHT.isDown || k.D.isDown ? 1 : 0) - (k.LEFT.isDown || k.A.isDown ? 1 : 0), my = (k.DOWN.isDown || k.S.isDown ? 1 : 0) - (k.UP.isDown || k.W.isDown ? 1 : 0), l = Math.hypot(mx, my);
+        if (l) { eu.x = Phaser.Math.Clamp(eu.x + mx / l * 270 * dt, 30, 930); eu.y = Phaser.Math.Clamp(eu.y + my / l * 216 * dt, 292, 500); eu.dir = TR.dirFrom(mx, my, eu.dir); }
+        eu.spr.setPosition(Math.round(eu.x), Math.round(eu.y)).setDepth(eu.y).setTint(0xa0d0ff); TR.pose(eu.spr, eu.dir, l > 0);
       } else { eu.spr.clearTint(); eu.update(dt); }
       // ela escolhe quem persegue: às vezes vai atrás de outro moleque
       proxAlvo -= dt;
@@ -334,7 +371,7 @@ TR.HJ = {
       proxInvestida -= dt;
       if (proxInvestida <= 0 && alvo === eu) { proxInvestida = Phaser.Math.FloatBetween(5, 7); b.investida = 1.0; TR.bubble(scene, b.spr, '!!', 0.8); }
       b.investida = Math.max(0, b.investida - dt);
-      let v = 100 + tempo * 1.6;
+      let v = 92 + tempo * 1.4;
       if (b.investida > 0) v *= b.investida > 0.5 ? 0.15 : 1.5;   // avisa (para) e depois avança
       if (b.tonta > 0) v *= 0.1;
       const dx = alvo.x - b.x, dy = alvo.y - b.y, dd = Math.hypot(dx, dy) || 1;
@@ -357,16 +394,20 @@ TR.HJ = {
         TR.pose(o.spr, o.dir, Math.hypot(o.vx, o.vy) > 20);
       });
       // barrinha da esquiva em cima de você
-      barra.clear().fillStyle(0x241a2c, 1).fillRect(eu.x - 22, eu.y + 8, 44, 7).fillStyle(recarga > 0 ? 0x8a7a96 : 0x7cf27c, 1).fillRect(eu.x - 20, eu.y + 10, 40 * (1 - recarga / 1.6), 3);
+      barra.clear().fillStyle(0x241a2c, 1).fillRect(eu.x - 22, eu.y + 8, 44, 7).fillStyle(recarga > 0 ? 0x8a7a96 : 0x7cf27c, 1).fillRect(eu.x - 20, eu.y + 10, 40 * (1 - recarga / REC), 3);
+      // perigo: ela está perto e a esquiva está pronta
+      const perto = Math.hypot(eu.x - b.x, eu.y - b.y) < 130 && b.tonta <= 0;
+      alerta.setVisible(perto && recarga <= 0 && esquiva <= 0).setPosition(eu.spr.x, eu.spr.y - 150).setScale(1 + 0.15 * Math.sin(tm / 60));
+      if (perto) barra.lineStyle(3, recarga <= 0 ? 0xff5a3c : 0x8a7a96, 0.6 + 0.4 * Math.sin(tm / 70)).strokeEllipse(eu.x, eu.y, 70, 26);
       hud();
       const de = Math.hypot(eu.x - b.x, eu.y - b.y);
-      if (de < 26 && esquiva <= 0) {
+      if (de < 22 && esquiva <= 0) {
         fim = true; louvor.stop();
         TR.sfx(scene, 'tropeco', 0.6); scene.cameras.main.shake(200, 0.01);
         TR.bubble(scene, b.spr, 'PEGUEI!', 1.2);
         scene.time.delayedCall(900, falha);
       } else if (tempo >= DUR) {
-        fim = true; barra.clear();
+        fim = true; barra.clear(); alerta.setVisible(false);
         eu.parado = true; TR.bubble(scene, eu.spr, 'Ufa...', 1.2);
         scene.time.delayedCall(700, ok);
       }

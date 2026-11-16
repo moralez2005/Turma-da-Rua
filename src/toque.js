@@ -35,7 +35,7 @@
     Rua: [['Jogar', 'Enter']],
     Clube: [['Usar', 'KeyE'], ['Sair', 'Escape']],
     Bike: [['Campainha', 'Space'], ['Sair', 'Escape']],
-    Historia: [['Avançar', 'Space'], ['Usar', 'KeyE'], ['Sair', 'Escape']],
+    Historia: [['Avançar · Esquiva', 'Space'], ['Usar · Habilidade', 'KeyE'], ['Sair', 'Escape']],
     Videogame: [['Chutar', 'Space'], ['Sair', 'Escape']],
     Futebol: [['Passe', 'Space'], ['Chute', 'ShiftLeft', true], ['Por cima', 'KeyC'], ['Drible', 'KeyZ'], ['Caneta', 'KeyX'], ['Chapéu', 'KeyV'], ['Habilidade', 'KeyE'], ['Trocar', 'KeyQ'], ['Chutão', 'KeyB']],
     Queimada: [['Arremessa / Agarra', 'Space', true], ['Alvo', 'KeyQ'], ['Habilidade', 'KeyE']],

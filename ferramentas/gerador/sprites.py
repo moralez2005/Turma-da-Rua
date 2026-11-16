@@ -137,6 +137,11 @@ def detailed(c, pose="stand", with_item=False, seed=1, frame=0, blink=False, tal
         cv.r(lx0, ly0, lx1, bottom - 2 - la, sk)
         cv.r(rx0, ly0, rx1, bottom - 2 - ra, sk)
         cv.r(rx1, ly0, rx1, bottom - 2 - ra, sks)
+        if c.get("gesso"):   # gesso no pé esquerdo (de frente fica à direita da tela; de costas, à esquerda)
+            gx0, gx1, gl = (lx0 - 1, lx1, la) if view == "back" else (rx0, rx1 + 1, ra)
+            cv.r(gx0, bottom - 9 - gl, gx1, bottom - 1 - gl, (246, 244, 236))
+            cv.r(gx0, bottom - 9 - gl, gx1, bottom - 9 - gl, (214, 210, 200))
+            cv.p(gx0 + 1, bottom - 5 - gl, (200, 196, 186))
         sy1 = ly0 + 2
         sy0 = sy1 - 5
         if c.get("vestido"):

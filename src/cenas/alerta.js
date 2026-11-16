@@ -451,6 +451,7 @@ class Alerta extends Phaser.Scene {
     if (this.state === 'end') return;
     this.state = 'end';
     const pos = this.alive().length + (this.human.out ? 1 : 0);
+    if (won) TR.conquista('alerta', this);
     TR.sfx(this, won ? 'vitoria' : 'derrota', 0.6);
     TR.endPanel(this, won ? 'VOCÊ GANHOU!' : 'VOCÊ SAIU!', won ? 'Último na roda: é o rei do Alerta' : 'Ficou em ' + pos + 'º lugar', () => this.scene.restart());
   }

@@ -184,6 +184,7 @@ class Queimada extends Phaser.Scene {
 
   ability(p) {
     if (this.state !== 'play' || !p || p.habCd > 0) return;
+    if (p.id === 'pernalonga' && TR.comGesso()) { p.habCd = 8; if (p === this.human) TR.bubble(this, p.spr, 'Tô de gesso, mano!', 1.2); return; }
     p.habCd = 8;
     TR.sfx(this, 'habilidade', 0.5);
     if (p.id === 'pernalonga') { p.longo = true; }
@@ -399,6 +400,7 @@ class Queimada extends Phaser.Scene {
     const a = this.players.filter((q) => q.team === 0 && q.alive).length;
     const b = this.players.filter((q) => q.team === 1 && q.alive).length;
     const won = a > b, draw = a === b;
+    if (won) TR.conquista('vitoria_queimada', this);
     TR.sfx(this, won ? 'vitoria' : 'derrota', 0.6);
     TR.endPanel(this, draw ? 'EMPATE!' : won ? 'VITÓRIA!' : 'PERDEU!', 'Vivos: ' + a + ' x ' + b, () => this.scene.restart());
   }

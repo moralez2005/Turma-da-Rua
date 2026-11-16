@@ -29,6 +29,7 @@ class Final extends Phaser.Scene {
     });
 
     TR.musicaFundo.tocar(this, 'm_fim', { loop: false, volume: 1.3 });
+    this.time.delayedCall(6000, () => TR.conquista('fim', this));
     Radio.playFinal();
     this.hint = TR.txt(this, 16, 14, '♪ Até amanhã, turma · ou aperte o play no vídeo ao lado', 1, 0xffe0b0).setDepth(9000).setScrollFactor(0);
     this.tweens.add({ targets: this.hint, alpha: 0.4, yoyo: true, repeat: 6, duration: 700, onComplete: () => this.hint.setAlpha(0.8) });

@@ -20,6 +20,14 @@ class Boot extends Phaser.Scene {
     this.load.image('rua_tarde', 'assets/cenarios/rua_tarde.png');
     this.load.image('barracao_dentro', 'assets/cenarios/barracao_dentro.png');
     this.load.image('rua_sem_ceu', 'assets/cenarios/rua_sem_ceu.png');
+    this.load.image('barracao_clube', 'assets/cenarios/barracao_clube.png');
+    // modo história
+    ['escola', 'sala_cezar'].forEach((k) => this.load.image(k, 'assets/cenarios/' + k + '.png'));
+    ['maquina', 'caminhao', 'celular', 'pau'].forEach((k) => this.load.image(k, 'assets/itens/' + k + '.png'));
+    this.load.image('pernalonga_normal', 'assets/personagens/pernalonga.png');
+    this.load.image('pernalonga_gesso', 'assets/personagens/pernalonga_gesso.png');
+    this.load.spritesheet('cezar_bike', 'assets/personagens/cezar_bike.png', { frameWidth: 128, frameHeight: 136 });
+    this.load.json('barracao_clube', 'assets/cenarios/barracao_clube.json');
     this.load.json('rua_luzes', 'assets/cenarios/rua_luzes.json');
     this.load.json('barracao_dentro', 'assets/cenarios/barracao_dentro.json');
     this.load.image('turma14', 'assets/final/turma14.png');
@@ -31,20 +39,21 @@ class Boot extends Phaser.Scene {
       this.load.image('obj_' + k, 'assets/esconde/obj_' + k + '.png');
     });
     this.load.spritesheet('matheus_bike', 'assets/personagens/matheus_bike.png', { frameWidth: 128, frameHeight: 136 });
-    ['tita', 'marido', 'vera', 'filha'].forEach((v) => this.load.spritesheet('viz_' + v, 'assets/vizinhas/' + v + '.png', { frameWidth: 80, frameHeight: 136 }));
+    ['tita', 'marido', 'vera', 'filha', 'beudinha', 'geraldo'].forEach((v) => this.load.spritesheet('viz_' + v, 'assets/vizinhas/' + v + '.png', { frameWidth: 80, frameHeight: 136 }));
     this.load.spritesheet('jbl_lucas', 'assets/itens/jbl_lucas.png', { frameWidth: 36, frameHeight: 26 });
     this.load.spritesheet('jbl_pedro', 'assets/itens/jbl_pedro.png', { frameWidth: 36, frameHeight: 26 });
     this.load.spritesheet('caramelo', 'assets/itens/caramelo.png', { frameWidth: 40, frameHeight: 30 });
-    ['futebol', 'esconde', 'queimada', 'alerta', 'fim'].forEach((k) => this.load.image('token_' + k, 'assets/itens/token_' + k + '.png'));
+    ['futebol', 'esconde', 'queimada', 'alerta', 'fim', 'clube', 'historia'].forEach((k) => this.load.image('token_' + k, 'assets/itens/token_' + k + '.png'));
     ['pipa', 'logo'].forEach((k) => this.load.image(k, 'assets/itens/' + k + '.png'));
     // bolas: 8 quadros de giro (ferramentas/gerador/bolas.py)
     ['bola', 'bola_queimada'].forEach((k) => this.load.spritesheet(k, 'assets/itens/' + k + '.png', { frameWidth: 14, frameHeight: 14 }));
     ['abertura', 'achou', 'alerta', 'apito', 'arremesso', 'bip', 'carro', 'chute', 'clique', 'congelar', 'derrota', 'gol',
       'habilidade', 'hover', 'la_vou_eu', 'mato', 'passe', 'pegar', 'pulo', 'queimado', 'quique', 'salvou', 'selecionar',
-      'tecla', 'vitoria', 'orelhao', 'chuva', 'fundo', 'caneta', 'chapeu', 'zoeira'].forEach((k) => this.load.audio(k, 'assets/sons/' + k + '.wav'));
+      'tecla', 'vitoria', 'orelhao', 'chuva', 'fundo', 'caneta', 'chapeu', 'zoeira', 'louvor', 'grito', 'batida', 'susto', 'tropeco', 'areia', 'pagina'].forEach((k) => this.load.audio(k, 'assets/sons/' + k + '.wav'));
   }
 
   create() {
+    TR.aplicaSkins(this);
     TR.makeAnims(this);
     this.scene.start(TR.startScene || 'Abertura', TR.startData);
   }

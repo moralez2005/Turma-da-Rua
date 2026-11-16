@@ -173,10 +173,10 @@ class EscondeEsconde extends Phaser.Scene {
       const quemProcura = quem === 'daniel' ? 'gabriel' : 'daniel';
       this.human = mk(quem, P.x - 60, P.y + 70, 'hider');
       this.seeker = mk(quemProcura, P.x, P.y + 12, 'seeker');
-      TR.ORDEM.filter((id) => id !== quem && id !== quemProcura).forEach((id, i) => mk(id, P.x - 120 + i * 50, P.y + 110, 'hider'));
+      TR.ORDEM.filter((id) => id !== quem && id !== quemProcura && !TR.bloqueado(id)).forEach((id, i) => mk(id, P.x - 120 + i * 50, P.y + 110, 'hider'));
     } else {
       this.human = this.seeker = mk(quem, P.x, P.y + 12, 'seeker');
-      TR.ORDEM.filter((id) => id !== quem).forEach((id, i) => mk(id, P.x - 150 + i * 60, P.y + 110, 'hider'));
+      TR.ORDEM.filter((id) => id !== quem && !TR.bloqueado(id)).forEach((id, i) => mk(id, P.x - 150 + i * 60, P.y + 110, 'hider'));
     }
     const N = this.nomeSeeker = TR.KIDS[this.seeker.id].nome;
     this.hiders = this.kids.filter((k) => k.role === 'hider');
@@ -267,6 +267,7 @@ class EscondeEsconde extends Phaser.Scene {
 
   ability() {
     if (this.state !== 'search' || this.habCd > 0) return;
+    if (this.human && this.human.id === 'pernalonga' && TR.comGesso()) { this.habCd = 8; TR.bubble(this, this.human.spr, 'Tô de gesso, mano!', 1.2); return; }
     this.habCd = this.modo === 'esconder' ? 8 : 15;
     TR.sfx(this, 'habilidade', 0.5);
     if (this.modo === 'esconder') {
@@ -628,6 +629,7 @@ class EscondeEsconde extends Phaser.Scene {
       won = caught >= this.saved;
       sub = 'Pegos ' + caught + ' · Salvos ' + this.saved;
     }
+    if (won) TR.conquista('esconde', this);
     TR.sfx(this, won ? 'vitoria' : 'derrota', 0.6);
     TR.endPanel(this, title, sub, () => this.scene.restart({ modo: this.modo, quem: this.quem }));
   }

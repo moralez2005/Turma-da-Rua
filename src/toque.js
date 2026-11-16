@@ -33,12 +33,15 @@
   // botões de cada brincadeira: [texto, tecla, segurar?]
   const BOTOES_POR_CENA = {
     Rua: [['Jogar', 'Enter']],
+    Clube: [['Usar', 'KeyE'], ['Sair', 'Escape']],
+    Historia: [['Avançar', 'Space'], ['Usar', 'KeyE'], ['Sair', 'Escape']],
+    Videogame: [['Chutar', 'Space'], ['Sair', 'Escape']],
     Futebol: [['Passe', 'Space'], ['Chute', 'ShiftLeft', true], ['Por cima', 'KeyC'], ['Drible', 'KeyZ'], ['Caneta', 'KeyX'], ['Chapéu', 'KeyV'], ['Habilidade', 'KeyE'], ['Trocar', 'KeyQ']],
     Queimada: [['Arremessa / Agarra', 'Space', true], ['Alvo', 'KeyQ'], ['Habilidade', 'KeyE']],
     Alerta: [['Ação', 'Space'], ['Alvo', 'KeyQ'], ['Arrancada', 'KeyE']],
     EscondeEsconde: [['Agachar / Achei', 'Space'], ['Correr', 'ShiftLeft', true], ['Habilidade', 'KeyE'], ['Orelhão', 'KeyT']],
   };
-  const COM_DIRECIONAL = ['Rua', 'Futebol', 'Queimada', 'Alerta', 'EscondeEsconde'];
+  const COM_DIRECIONAL = ['Historia', 'Clube', 'Rua', 'Futebol', 'Queimada', 'Alerta', 'EscondeEsconde'];
 
   // ---------- montagem do HTML ----------
   const caixa = document.createElement('div');

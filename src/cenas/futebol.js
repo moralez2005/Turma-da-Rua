@@ -270,6 +270,7 @@ class Futebol extends Phaser.Scene {
     const lado = q.y > 394 ? -1 : 1;
     p.drib = { t: 0.8, tc: 0.52, vx: atk * 0.8, vy: lado * 0.55, solta: true }; p.immune = 0.8;
     TR.sfx(this, 'caneta', 0.6);
+    if (p.team === 0) TR.conquista('caneta', this);
     this.lento = this.time.now + 520;
     this.time.delayedCall(320, () => { if (this.state === 'play') { this.flash('CANETA!'); this.cameras.main.shake(120, 0.004); } });
     TR.bubble(this, q.spr, Phaser.Utils.Array.GetRandom(['Ah não...', 'Foi sem querer!', 'Para, gente...']), 1.4);
@@ -295,6 +296,7 @@ class Futebol extends Phaser.Scene {
     this.time.delayedCall(200, () => { p.drib = { t: 0.9, tc: 0.6, vx: atk * 0.8, vy: lado * 0.55, solta: true }; });
     p.immune = 0.9;
     TR.sfx(this, 'chapeu', 0.6);
+    if (p.team === 0) TR.conquista('chapeu', this);
     this.lento = this.time.now + 600;
     this.time.delayedCall(380, () => { if (this.state === 'play') this.flash('CHAPÉU!'); });
     TR.bubble(this, q.spr, Phaser.Utils.Array.GetRandom(['Cadê a bola?', 'Ué?!', 'Volta aqui!']), 1.2);
@@ -333,6 +335,7 @@ class Futebol extends Phaser.Scene {
   // ------------------------------------------------------------------ habilidades
   useAbility(p) {
     if (this.state !== 'play' || !p || p.habCd > 0) return;
+    if (p.id === 'pernalonga' && TR.comGesso()) { p.habCd = 7; if (p === this.human) TR.bubble(this, p.spr, 'Tô de gesso, mano!', 1.2); return; }
     p.habCd = 7;
     TR.sfx(this, 'habilidade', 0.5);
     const nome = TR.KIDS[p.id].hab;
@@ -591,6 +594,7 @@ class Futebol extends Phaser.Scene {
     this.score[team]++;
     this.state = 'goal';
     TR.sfx(this, team === 0 ? 'gol' : 'derrota', 0.6);
+    if (team === 0) TR.conquista('gol', this);
     this.flash(team === 0 ? 'GOOOL!' : 'Gol deles...');
     this.cameras.main.shake(250, 0.008);
     const sc = this.ball.last;
@@ -693,6 +697,7 @@ class Futebol extends Phaser.Scene {
     cam.fadeOut(300, 10, 8, 14);
     cam.once('camerafadeoutcomplete', () => {
       TR.musicaFundo.tocar(this, 'm_chuva');
+      TR.conquista('chuva', this);
       const D = this.cache.json.get('barracao_dentro');
       const cont = this.add.container(0, 0).setDepth(7400).setScrollFactor(0);
       cont.add(this.add.image(0, 0, 'barracao_dentro').setOrigin(0));
@@ -768,6 +773,7 @@ class Futebol extends Phaser.Scene {
     if (this.state === 'end') return;
     this.state = 'end';
     const won = this.score[0] > this.score[1], draw = this.score[0] === this.score[1];
+    if (won) TR.conquista('vitoria_futebol', this);
     TR.sfx(this, won ? 'vitoria' : 'derrota', 0.6);
     TR.endPanel(this, draw ? 'EMPATE!' : won ? 'VITÓRIA!' : 'PERDEU!', 'Time do ' + this.nomeTime[0] + ' ' + this.score[0] + ' x ' + this.score[1] + ' Time do ' + this.nomeTime[1],
       () => this.scene.restart());
@@ -810,7 +816,7 @@ class Futebol extends Phaser.Scene {
     this.hud.setText(this.nomeTime[0] + '  ' + this.score[0] + ' x ' + this.score[1] + '  ' + this.nomeTime[1] + '     ' + m + ':' + s);
     if (h) {
       const cd = Math.max(0, h.habCd);
-      this.habTxt.setText('E: ' + TR.KIDS[h.id].hab + (cd > 0 ? ' (' + Math.ceil(cd) + 's)' : ' PRONTA') + '   Z: drible' + (h.dribCd > 0 ? ' ..' : ' ok'));
+      this.habTxt.setText('E: ' + (h.id === 'pernalonga' && TR.comGesso() ? 'de gesso, sem habilidade' : TR.KIDS[h.id].hab) + (cd > 0 ? ' (' + Math.ceil(cd) + 's)' : ' PRONTA') + '   Z: drible' + (h.dribCd > 0 ? ' ..' : ' ok'));
       this.habBar.clear().fillStyle(0x0c0810, 0.8).fillRect(10, 508, 420, 28);
     }
   }

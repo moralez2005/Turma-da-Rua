@@ -53,6 +53,9 @@ def side(c, frame=0, fase=None, braco=None, bola=None, pose=None):
         cv.r(x0, ly0, x0 + 3, bottom - 2 - lf, col)
         cv.r(x0, bottom - 1 - lf, x0 + 6, bottom - 1 - lf, fcol if feet != "descalco" else col)
         cv.r(x0 + 1, bottom - 2 - lf, x0 + 5, bottom - 2 - lf, col)
+        if c.get("gesso") and k == 0:   # gesso na perna de trás (a esquerda, olhando pra direita)
+            cv.r(x0, bottom - 9 - lf, x0 + 6, bottom - 1 - lf, (226, 224, 216))
+            cv.r(x0, bottom - 9 - lf, x0 + 3, bottom - 9 - lf, (200, 196, 186))
     ly0 = bottom - 1 - lh
     sy1 = ly0 + 2
     sy0 = sy1 - 5

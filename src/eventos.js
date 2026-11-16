@@ -72,7 +72,7 @@ TR.fusca = (scene, o) => {
     const perto = (a) => outros.slice().sort((p, q) => Phaser.Math.Distance.Between(a.x, a.y, p.x, p.y) - Phaser.Math.Distance.Between(a.x, a.y, q.x, q.y))[0];
     if (vocePrimeiro) {
       const alvo = perto(voce);
-      TR.placar.petelecosDados++; TR.salvarPlacar();
+      TR.placar.petelecosDados++; TR.salvarPlacar(); TR.conquista('peteleco', scene);
       TR.bubble(scene, voce, 'FUSCA AZUL! Peteleco!', 1.4);
       TR.peteleco(scene, alvo);
       scene.time.delayedCall(500, () => TR.bubble(scene, alvo, Phaser.Utils.Array.GetRandom(['AI!', 'Ô, não vi!', 'Vale nada, não valeu!']), 1.3));
@@ -293,4 +293,47 @@ TR.orelhao = (scene, falante) => {
     scene._orelhaoTocando = false;
     if (jblTocando && Radio.mode === 'radio') Radio.toggle();   // a JBL volta a tocar
   });
+};
+
+/*
+ * Conquistas (troféus do clube): ficam guardadas no navegador e aparecem na prateleira e no mural do barracão.
+ * TR.conquista('caneta') desbloqueia (só avisa na primeira vez).
+ */
+TR.CONQUISTAS = [
+  ['gol', 'Primeiro gol', 'Fazer um gol no futebol'],
+  ['vitoria_futebol', 'Rei da rua', 'Ganhar uma partida de futebol'],
+  ['caneta', 'Caneteiro', 'Dar uma caneta (X)'],
+  ['chapeu', 'Chapeleiro', 'Dar um chapéu (V)'],
+  ['vitoria_queimada', 'Mão de ferro', 'Ganhar na queimada'],
+  ['alerta', 'Rei do Alerta', 'Ser o último na roda do Alerta'],
+  ['esconde', 'Ninja da rua', 'Ganhar no esconde-esconde'],
+  ['peteleco', 'Fusca azul!', 'Dar um peteleco quando passar o Fusca'],
+  ['chuva', 'Abrigo', 'Esperar a chuva passar no barracão'],
+  ['videogame', 'Craque do videogame', 'Fazer 4 gols nos pênaltis do videogame'],
+  ['fim', 'Fim de tarde', 'Ver o pôr do sol com a turma'],
+];
+TR.conquistas = {};
+try { TR.conquistas = JSON.parse(localStorage.getItem('turma_conquistas') || '{}'); } catch (e) { /* ok */ }
+TR.conquista = (id, scene) => {
+  if (TR.conquistas[id]) return;
+  TR.conquistas[id] = Date.now();
+  try { localStorage.setItem('turma_conquistas', JSON.stringify(TR.conquistas)); } catch (e) { /* ok */ }
+  const c = TR.CONQUISTAS.find((q) => q[0] === id);
+  if (!scene || !c) return;
+  // aviso no canto: "Troféu novo!"
+  const y = 70;
+  const cont = scene.add.container(960 + 10, y).setDepth(9800).setScrollFactor(0);
+  const g = scene.add.graphics();
+  g.fillStyle(0x0c0810, 0.92).fillRect(-4, -4, 268, 52); g.fillStyle(0x2a1d33, 1).fillRect(0, 0, 260, 44); g.fillStyle(0xf2b13c, 1).fillRect(0, 0, 4, 44);
+  TR.desenhaTrofeu(g, 22, 34, 1.2);
+  cont.add([g, TR.txt(scene, 44, 6, 'Troféu novo!', 1, 0xffd36a), TR.txt(scene, 44, 24, c[1], 1, 0xfff1d6)]);
+  scene.tweens.add({ targets: cont, x: 960 - 272, duration: 300, ease: 'Back.Out', yoyo: true, hold: 2600, onComplete: () => cont.destroy() });
+  TR.sfx(scene, 'salvou', 0.5);
+};
+// tacinha dourada em pixel (base em x, y)
+TR.desenhaTrofeu = (g, x, y, s = 1, apagado = false) => {
+  const o = apagado ? 0x3a3040 : 0xe8b030, cl = apagado ? 0x4a4050 : 0xffe080, es = apagado ? 0x2a2230 : 0xa87418;
+  const r = (a, b, w, h, c) => g.fillStyle(c, 1).fillRect(Math.round(x + a * s), Math.round(y + b * s), Math.ceil(w * s), Math.ceil(h * s));
+  r(-6, -3, 12, 3, es); r(-2, -8, 4, 5, o); r(-7, -20, 14, 12, o); r(-5, -18, 3, 8, cl);
+  r(-10, -18, 3, 6, o); r(7, -18, 3, 6, o); r(-7, -9, 14, 2, es);
 };

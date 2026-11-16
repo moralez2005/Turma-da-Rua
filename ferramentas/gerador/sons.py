@@ -268,4 +268,27 @@ save("abertura", melodia([N["C5"], N["E5"], N["G5"], N["B5"], N["A5"], N["E5"], 
 save("vitoria", mixa(melodia([N["C5"], N["E5"], N["G5"], N["C6"], 0, N["A5"], N["C6"], N["E6"], N["E6"]], 0.12, "chip", 0.3),
                      atrasa(comemora(1.2, 5) * 0.5, 0.5)), 0.55)
 save("derrota", melodia([N["G5"], N["E5"], N["C5"], N["G4"], N["C4"]], 0.17, "marimba", 0.5), 0.45)
+
+# ---------------------------------------------------------------- modo história
+# louvor saindo de um celular de botão (melodia inventada, alto-falante estourado)
+_hino = [N["G4"], N["G4"], N["A4"], N["B4"], N["B4"], N["A4"], N["G4"], N["E4"], N["D4"], N["E4"], N["G4"], N["G4"], N["A4"], N["G4"]]
+_org = np.zeros(int(SR * 4.4))
+for i, f in enumerate(_hino):
+    d = 0.3; tt = t(d)
+    s_ = sum(np.sin(2 * np.pi * f * h * tt) / h for h in (1, 2, 3, 4)) * adsr(len(tt), 0.02, 0.05, 0.8, 0.05)
+    s_ += 0.4 * sum(np.sin(2 * np.pi * f * 1.26 * h * tt) / h for h in (1, 2)) * adsr(len(tt), 0.02, 0.05, 0.8, 0.05)
+    k = int(i * d * SR); _org[k:k + len(s_)] += s_
+_org = np.tanh(bp(_org, 700, 3200) * 4) * 0.6 + hp(rng.normal(0, 1, len(_org)), 3000) * 0.03
+save("louvor", _org, 0.5, ambiente=False)
+save("grito", mixa(voz(520, 0.9, "a", vib=9, glide=0.35, vol=1), voz(560, 0.8, "e", vib=11, glide=0.3, vol=0.6), hp(ruido(0.9), 1500) * 0.08), 0.7)
+_bat = np.zeros(int(SR * 1.0))
+for k in range(3):
+    s_ = mixa(bp(ruido(0.06), 600, 2600) * dec(int(0.06 * SR), 0.012), sweep(180, 120, 0.08) * dec(int(0.08 * SR), 0.02) * 0.8)
+    i = int(k * 0.22 * SR); _bat[i:i + len(s_)] += s_
+save("batida", _bat, 0.8)
+_cl = sum(sweep(f, f * 0.98, 1.0, "tri") for f in (220, 233, 311, 330)) * np.interp(t(1.0), [0, 0.05, 1.0], [0, 1, 0])
+save("susto", mixa(_cl * 0.5, bp(ruido(0.3), 200, 4000) * dec(int(0.3 * SR), 0.08), sweep(90, 40, 0.4) * dec(int(0.4 * SR), 0.15)), 0.75)
+save("tropeco", mixa(sweep(120, 50, 0.2) * dec(int(0.2 * SR), 0.06), atrasa(bp(ruido(0.35), 300, 2000) * np.interp(t(0.35), [0, 0.05, 0.35], [0, 0.6, 0]), 0.05)), 0.7)
+save("areia", bp(ruido(0.5), 1500, 7000) * np.interp(t(0.5), [0, 0.04, 0.5], [0, 1, 0]) * (0.6 + 0.4 * rng.random(int(0.5 * SR))), 0.45)
+save("pagina", mixa(bp(ruido(0.22), 1200, 6000) * np.interp(t(0.22), [0, 0.08, 0.22], [0, 1, 0]), sweep(400, 200, 0.05) * 0.1), 0.35, ambiente=False)
 print("ok", len([f for f in os.listdir(OUT) if f.endswith(".wav")]), "wavs")

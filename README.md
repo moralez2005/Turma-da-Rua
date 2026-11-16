@@ -28,6 +28,32 @@ Um jogo indie em pixel art sobre uma tarde de brincadeiras na rua com sete amigo
 
 ![Fim de tarde](assets/prints/08_fim_de_tarde.png)
 
+## Modo história
+
+As histórias de verdade da turma, contadas em gibi. As páginas e os quadrinhos são montados com a arte do próprio jogo, e entre elas tem partes jogáveis. Você entra pelo card **Modo história** no menu da rua ou pela estante de gibis do Barracão. Cada capítulo libera o seguinte.
+
+| Capítulo | História | Parte jogável | Libera |
+| --- | --- | --- | --- |
+| 1. A rua | O Kauã me chama pra rua e eu subo pela primeira vez | Conhecer a turma | Capítulo 2 |
+| 2. A beudinha | O moleque novo de bike, a beudinha e o pedaço de pau do Cezar | Fugir dela mancando (20 s) | Skin de gesso (sem habilidade) |
+| 3. Filme de terror | "É de ação, confia" | Aguentar os sustos (Espaço na hora certa) | Capítulo 4 |
+| 4. O Matheus | A areia, a correria e o riso | Correr atrás do Matheus | Matheus |
+| 5. O Guilherme | O caminhão de mudança e a treta com o Pedro | Chamar o menino novo pra jogar | Guilherme |
+
+O progresso, os personagens liberados e a skin ficam salvos no navegador. A skin troca no mural do Barracão, com a tecla G. Os roteiros ficam em `src/historia.js`, e a arte nova em `ferramentas/gerador/historia_sprites.py` e `historia_cenarios.py`.
+
+## O Barracão (o clube da turma)
+
+No menu da rua, o card **O Barracão** abre o esconderijo da turma. Lá dentro você anda com as setas e aperta **E** perto das coisas:
+
+- **Videogame:** a TV de tubo roda "Pênaltis 2019". A mira vai e volta e você aperta Espaço na hora certa. No canto alto o goleiro não pega.
+- **Puff e sofá:** você senta e fica vendo a turma conversar.
+- **JBL:** troca a música do clube (as lofi do jogo, o 8-bit ou a rádio do Lucas e do Pedro).
+- **Gibis:** vão ser os capítulos do modo história (em breve).
+- **Mural:** mostra os recordes e os 11 troféus. Cada troféu desbloqueado aparece na prateleira.
+
+Por enquanto o clube é liberado. Depois ele vai ser desbloqueado conforme o modo história avança.
+
 ## A turma
 
 Antes de cada brincadeira você escolhe com quem joga. No futebol e na queimada, dá pra montar os dois times com qualquer um da turma (ou sortear); no futebol o 1º de cada time ataca, o 2º defende e o 3º vai pro gol. Quem fica de fora assiste da calçada.

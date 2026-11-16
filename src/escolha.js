@@ -36,13 +36,15 @@ TR._cartas = (scene, tela, onClick) => {
       .setStrokeStyle(3, 0x5b4466).setInteractive({ useHandCursor: true }));
     const spr = tela.add(scene.add.sprite(x, y + 30, id, 0).setOrigin(0.5, 1).setScale(0.85).setScrollFactor(0).setDepth(7002));
     spr.play(id + '_idle');
-    const nome = tela.add(TR.txt(scene, x, y + 36, TR.teclaCarta(i) + '.' + TR.KIDS[id].nome, 1, 0xfff1d6).setOrigin(0.5, 0).setScrollFactor(0).setDepth(7002));
+    const trancado = TR.bloqueado(id);
+    const nome = tela.add(TR.txt(scene, x, y + 36, TR.teclaCarta(i) + '.' + (trancado ? '???' : TR.KIDS[id].nome), 1, 0xfff1d6).setOrigin(0.5, 0).setScrollFactor(0).setDepth(7002));
     if (nome.width > 84) nome.setScale(84 / nome.width);
     const tag = tela.add(TR.txt(scene, x, y - 118, '', 1, 0xffffff).setOrigin(0.5).setScrollFactor(0).setDepth(7002));
-    if (TR.KIDS[id].novo) tela.add(TR.txt(scene, x, y - 100, 'NOVO', 1, 0x7cf27c).setOrigin(0.5).setScrollFactor(0).setDepth(7002));
-    fundo.on('pointerdown', () => onClick(id));
+    if (trancado) { spr.stop(); spr.setFrame(0); tela.add(TR.txt(scene, x, y - 100, 'Cap. ' + trancado, 1, 0xc9b8d8).setOrigin(0.5).setScrollFactor(0).setDepth(7002)); }
+    else if (TR.KIDS[id].novo) tela.add(TR.txt(scene, x, y - 100, 'NOVO', 1, 0x7cf27c).setOrigin(0.5).setScrollFactor(0).setDepth(7002));
+    fundo.on('pointerdown', () => (trancado ? TR.sfx(scene, 'derrota', 0.3) : onClick(id)));
     fundo.on('pointerover', () => TR.sfx(scene, 'hover', 0.2));
-    cartas[id] = { fundo, spr, nome, tag };
+    cartas[id] = { fundo, spr, nome, tag, trancado };
   });
   return cartas;
 };
@@ -50,7 +52,7 @@ TR._cartas = (scene, tela, onClick) => {
 TR.escolherTimes = (scene, chave, cfg, cb) => {
   const n = cfg.porTime || 3;
   const salvo = TR.escolhas[chave] || cfg.padrao;
-  let azul = salvo.azul.slice(), vermelho = salvo.vermelho.slice();
+  let azul = salvo.azul.filter((id) => !TR.bloqueado(id)), vermelho = salvo.vermelho.filter((id) => !TR.bloqueado(id));
   const tela = TR._telaEscolha(scene, cfg.titulo || 'Monte os times', cfg.opcoes ? 50 : 0);
   const ops = cfg.opcoes || [];
   const escolhidas = Object.assign({}, ...ops.map((o) => ({ [o.chave]: o.padrao })), (salvo.opcoes || {}));
@@ -75,6 +77,7 @@ TR.escolherTimes = (scene, chave, cfg, cb) => {
   redesenhaOps();
 
   const ciclo = (id) => {
+    if (TR.bloqueado(id)) { TR.sfx(scene, 'derrota', 0.3); return; }
     TR.sfx(scene, 'clique', 0.3);
     if (azul.includes(id)) { azul = azul.filter((x) => x !== id); if (vermelho.length < n) vermelho.push(id); }
     else if (vermelho.includes(id)) vermelho = vermelho.filter((x) => x !== id);
@@ -88,6 +91,7 @@ TR.escolherTimes = (scene, chave, cfg, cb) => {
   const desenha = () => {
     TR.ORDEM.forEach((id) => {
       const c = cartas[id];
+      if (c.trancado) { c.spr.setTint(0x000000); c.tag.setText('trancado').setTint(0x8a7a96); return; }
       const ia = azul.indexOf(id), iv = vermelho.indexOf(id);
       if (ia >= 0) { c.fundo.setStrokeStyle(4, 0x5ab0ff); c.tag.setText(ia === 0 ? 'VOCÊ' : 'AZUL').setTint(0x9ccfff); c.spr.clearTint(); }
       else if (iv >= 0) { c.fundo.setStrokeStyle(4, 0xff6a5a); c.tag.setText('VERMELHO').setTint(0xffaa9c); c.spr.clearTint(); }
@@ -97,7 +101,7 @@ TR.escolherTimes = (scene, chave, cfg, cb) => {
     aviso.setText(azul.length === n && vermelho.length === n ? '' : 'Cada time precisa de ' + n + ' jogadores.');
   };
   const sortear = () => {
-    const todos = Phaser.Utils.Array.Shuffle(TR.ORDEM.slice());
+    const todos = Phaser.Utils.Array.Shuffle(TR.liberados(TR.ORDEM));
     azul = todos.slice(0, n); vermelho = todos.slice(n, n * 2);
     TR.sfx(scene, 'selecionar', 0.4); desenha();
   };
@@ -108,7 +112,7 @@ TR.escolherTimes = (scene, chave, cfg, cb) => {
     tela.fechar();
     botoesOp.forEach((b) => b.destroy());
     // espera um instante: o mesmo Enter não pode pular a tela de instruções que vem depois
-    scene.time.delayedCall(60, () => cb({ azul, vermelho, fora: TR.ORDEM.filter((id) => !azul.includes(id) && !vermelho.includes(id)), opcoes: escolhidas }));
+    scene.time.delayedCall(60, () => cb({ azul, vermelho, fora: TR.liberados(TR.ORDEM).filter((id) => !azul.includes(id) && !vermelho.includes(id)), opcoes: escolhidas }));
   };
   const teclas = (ev) => {
     const id = TR.cartaDaTecla(ev.key);
@@ -126,15 +130,17 @@ TR.escolherTimes = (scene, chave, cfg, cb) => {
 
 TR.escolherVoce = (scene, chave, cfg, cb) => {
   let voce = TR.escolhas[chave] || cfg.padrao;
+  if (TR.bloqueado(voce)) voce = cfg.padrao;
   const tela = TR._telaEscolha(scene, cfg.titulo || 'Com quem você vai jogar?');
   tela.add(TR.txt(scene, 480, 108, cfg.dica || 'Clique em alguém da turma (ou 1 a 0) e aperte Enter.', 1, 0xc9b8d8)
     .setOrigin(0.5).setScrollFactor(0).setDepth(7001));
   const info = tela.add(TR.txt(scene, 480, 350, '', 1, 0xfff1d6).setOrigin(0.5, 0).setScrollFactor(0).setDepth(7001));
-  const marca = (id) => { voce = id; TR.sfx(scene, 'clique', 0.3); desenha(); };
+  const marca = (id) => { if (TR.bloqueado(id)) { TR.sfx(scene, 'derrota', 0.3); return; } voce = id; TR.sfx(scene, 'clique', 0.3); desenha(); };
   const cartas = TR._cartas(scene, tela, marca);
   const desenha = () => {
     TR.ORDEM.forEach((id) => {
       const c = cartas[id], on = id === voce;
+      if (c.trancado) { c.spr.setTint(0x000000); return; }
       c.fundo.setStrokeStyle(on ? 4 : 3, on ? 0xffd36a : 0x5b4466);
       c.tag.setText(on ? 'VOCÊ' : '').setTint(0xffd36a);
       if (on) c.spr.clearTint(); else c.spr.setTint(0x999999);

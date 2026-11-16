@@ -123,12 +123,15 @@ const TR = {
       scene.anims.create({ key: 'matheus_pedala_costas', frames: scene.anims.generateFrameNumbers('matheus_bike', { start: 6, end: 11 }), frameRate: 14, repeat: -1 });
       scene.anims.create({ key: 'matheus_pedala_frente', frames: scene.anims.generateFrameNumbers('matheus_bike', { start: 12, end: 17 }), frameRate: 14, repeat: -1 });
       scene.anims.create({ key: 'cezar_pedala', frames: scene.anims.generateFrameNumbers('cezar_bike', { start: 0, end: 5 }), frameRate: 14, repeat: -1 });
-      ['tita', 'marido', 'vera', 'filha', 'beudinha', 'geraldo'].forEach((v) => {
+      ['tita', 'marido', 'vera', 'filha', 'beudinha', 'geraldo', 'professor'].forEach((v) => {
         ['down', 'left', 'right', 'up'].forEach((d, row) => scene.anims.create({ key: 'viz_' + v + '_run_' + d, frames: scene.anims.generateFrameNumbers('viz_' + v, { start: row * TR.COLS, end: row * TR.COLS + 7 }), frameRate: 16, repeat: -1 }));
         scene.anims.create({ key: 'viz_' + v + '_idle', frames: [{ key: 'viz_' + v, frame: 0, duration: 2200 }, { key: 'viz_' + v, frame: TR.Q.pisca, duration: 140 }], repeat: -1 });
         scene.anims.create({ key: 'viz_' + v + '_fala', frames: [{ key: 'viz_' + v, frame: TR.Q.fala, duration: 140 }, { key: 'viz_' + v, frame: 0, duration: 140 }], repeat: 5 });
       });
     }
+    ['pernalonga', 'kaua'].forEach((id) => {   // bikes da história (a do Pernalonga é refeita quando troca a skin)
+      if (!scene.anims.exists(id + '_pedala') && scene.textures.exists(id + '_bike')) scene.anims.create({ key: id + '_pedala', frames: scene.anims.generateFrameNumbers(id + '_bike', { start: 0, end: 5 }), frameRate: 14, repeat: -1 });
+    });
     if (!scene.anims.exists('caramelo_anda')) {
       scene.anims.create({ key: 'caramelo_anda', frames: scene.anims.generateFrameNumbers('caramelo', { start: 0, end: 3 }), frameRate: 8, repeat: -1 });
       scene.anims.create({ key: 'jbl_lucas_pulsa', frames: scene.anims.generateFrameNumbers('jbl_lucas', { start: 0, end: 1 }), frameRate: 6, repeat: -1 });

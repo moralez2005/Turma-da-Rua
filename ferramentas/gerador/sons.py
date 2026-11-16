@@ -291,4 +291,21 @@ save("susto", mixa(_cl * 0.5, bp(ruido(0.3), 200, 4000) * dec(int(0.3 * SR), 0.0
 save("tropeco", mixa(sweep(120, 50, 0.2) * dec(int(0.2 * SR), 0.06), atrasa(bp(ruido(0.35), 300, 2000) * np.interp(t(0.35), [0, 0.05, 0.35], [0, 0.6, 0]), 0.05)), 0.7)
 save("areia", bp(ruido(0.5), 1500, 7000) * np.interp(t(0.5), [0, 0.04, 0.5], [0, 1, 0]) * (0.6 + 0.4 * rng.random(int(0.5 * SR))), 0.45)
 save("pagina", mixa(bp(ruido(0.22), 1200, 6000) * np.interp(t(0.22), [0, 0.08, 0.22], [0, 1, 0]), sweep(400, 200, 0.05) * 0.1), 0.35, ambiente=False)
+
+# capítulos 6, 7 e 8
+save("soco", mixa(sweep(160, 45, 0.25) * dec(int(0.25 * SR), 0.07), bp(ruido(0.08), 400, 3000) * dec(int(0.08 * SR), 0.015) * 1.2), 0.85)
+_dr = np.zeros(int(SR * 2.2))
+for k, f in enumerate((70, 70, 55)):   # TUM... TUM... TUM (zoom de novela)
+    s_ = mixa(sweep(f * 1.8, f, 0.6) * dec(int(0.6 * SR), 0.25), bp(ruido(0.1), 100, 900) * dec(int(0.1 * SR), 0.03))
+    i = int(k * 0.62 * SR); _dr[i:i + len(s_)] += s_ * (1 + k * 0.2)
+_dr += np.concatenate([np.zeros(int(1.5 * SR)), sweep(300, 1200, 0.7, "tri") * np.interp(t(0.7), [0, 0.6, 0.7], [0, 0.3, 0])])[:len(_dr)]
+save("drama", _dr, 0.8)
+save("crec", mixa(bp(ruido(0.12), 1500, 6000) * dec(int(0.12 * SR), 0.03), sweep(900, 300, 0.15, "sq") * dec(int(0.15 * SR), 0.04) * 0.3), 0.6)
+_cam = lp(np.sign(np.sin(2 * np.pi * 38 * t(2.0))) * 0.4 + ruido(2.0) * 0.3, 300) * np.interp(t(2.0), [0, 0.3, 1.6, 2.0], [0, 1, 1, 0])
+save("caminhao", mixa(_cam * 2, atrasa(sum(lp(2 * ((f * t(0.5)) % 1) - 1, 1500) for f in (220, 277)) * adsr(int(0.5 * SR), 0.01, 0.05, 0.9, 0.05) * 0.4, 0.9)), 0.6)
+save("campainha", mixa(tom(N["A6"], 0.5, "sino", 0.8), atrasa(tom(N["A6"], 0.5, "sino", 0.6), 0.12)), 0.4, ambiente=False)
+_ch = np.zeros(int(SR * 1.6))
+for k in range(4):
+    s_ = voz(560 - k * 25, 0.3, "e", vib=12, glide=-0.25, vol=0.8); i = int(k * 0.38 * SR); _ch[i:i + len(s_)] += s_
+save("choro", _ch, 0.55)
 print("ok", len([f for f in os.listdir(OUT) if f.endswith(".wav")]), "wavs")

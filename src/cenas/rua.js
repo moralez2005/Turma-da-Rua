@@ -10,13 +10,14 @@ class Rua extends Phaser.Scene {
     TR.cicloDoDia(this, () => 0.36);   // o menu fica sempre na hora dourada
 
     this.items = [
-      { key: 'futebol', cena: 'Futebol', nome: 'Futebol de rua', x: 90, y: 420, desc: 'Traves de chinelo, 3 contra 3. Você escolhe os times e o tempo.' },
-      { key: 'esconde', cena: 'EscondeEsconde', nome: 'Esconde-esconde', x: 220, y: 352, desc: 'O quarteirão inteiro. Esconda-se ou procure a turma.' },
-      { key: 'queimada', cena: 'Queimada', nome: 'Queimada', x: 350, y: 430, desc: 'Queime o time do Lucas antes que ele queime o seu.' },
-      { key: 'alerta', cena: 'Alerta', nome: 'Alerta', x: 480, y: 352, desc: 'Gritou seu nome? Pega a bola e grita ALERTA!' },
-      { key: 'fim', cena: 'Final', nome: 'Fim de tarde', x: 610, y: 420, desc: 'A turma no meio-fio vendo o pôr do sol.' },
-      { key: 'historia', cena: 'Historia', data: { de: 'Rua' }, nome: 'Modo história', x: 740, y: 352, desc: 'As histórias da turma em gibi, com partes jogáveis.' },
-      { key: 'clube', cena: 'Clube', nome: 'O Barracão', x: 870, y: 420, desc: 'O clube da turma: videogame, gibis, puff, mural e troféus.' },
+      { key: 'futebol', cena: 'Futebol', nome: 'Futebol de rua', x: 70, y: 420, desc: 'Traves de chinelo, 3 contra 3. Você escolhe os times e o tempo.' },
+      { key: 'esconde', cena: 'EscondeEsconde', nome: 'Esconde-esconde', x: 188, y: 352, desc: 'O quarteirão inteiro. Esconda-se ou procure a turma.' },
+      { key: 'queimada', cena: 'Queimada', nome: 'Queimada', x: 306, y: 430, desc: 'Queime o time do Lucas antes que ele queime o seu.' },
+      { key: 'alerta', cena: 'Alerta', nome: 'Alerta', x: 424, y: 352, desc: 'Gritou seu nome? Pega a bola e grita ALERTA!' },
+      { key: 'fim', cena: 'Final', nome: 'Fim de tarde', x: 542, y: 420, desc: 'A turma no meio-fio vendo o pôr do sol.' },
+      { key: 'historia', cena: 'Historia', data: { de: 'Rua' }, nome: 'Modo história', x: 660, y: 352, desc: 'As histórias da turma em gibi, com partes jogáveis.' },
+      { key: 'clube', cena: 'Clube', nome: 'O Barracão', x: 778, y: 420, desc: 'O clube da turma: videogame, gibis, puff, mural e troféus.' },
+      { key: 'bike', cena: 'Bike', nome: 'Passeio de bike', x: 896, y: 352, trava: 7, desc: 'Pedale pela cidade desviando dos buracos (e do Caramelo).' },
     ];
     this.items.forEach((it, i) => this.makeStation(it, i));
 
@@ -81,6 +82,7 @@ class Rua extends Phaser.Scene {
     const tok = this.add.image(it.x, it.y - 56, 'token_' + it.key).setDepth(it.y + 200);
     this.tweens.add({ targets: tok, y: it.y - 66, yoyo: true, repeat: -1, duration: 900 + i * 70, ease: 'Sine.InOut' });
     const lbl = TR.txt(this, it.x, it.y + 26, it.nome, 1, 0xfff1d6).setOrigin(0.5, 0).setDepth(it.y + 200);
+    if (it.trava && !TR.capFeito(it.trava)) { tok.setTint(0x333333); const c = this.add.graphics().setDepth(it.y + 201); c.fillStyle(0x241a2c, 1).fillRect(it.x - 9, it.y - 60, 18, 14); c.lineStyle(3, 0x241a2c, 1).strokeCircle(it.x, it.y - 62, 6); }
     const hit = this.add.zone(it.x, it.y - 40, 130, 130).setInteractive({ useHandCursor: true });
     hit.on('pointerover', () => this.select(i));
     hit.on('pointerdown', () => this.start(i));
@@ -102,6 +104,8 @@ class Rua extends Phaser.Scene {
   }
 
   start(i) {
+    const it0 = this.items[i];
+    if (it0.trava && !TR.capFeito(it0.trava)) { TR.sfx(this, 'derrota', 0.3); this.infoDesc.setText('Trancado: termine o capítulo ' + it0.trava + ' do modo história.'); return; }
     TR.lastHub = i;
     TR.sfx(this, 'selecionar', 0.5);
     const it = this.items[i];

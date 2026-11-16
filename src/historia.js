@@ -90,6 +90,14 @@ TR.gibi = (scene, paginas, fim) => {
     (p.fx || []).forEach((f) => {
       const g = scene.add.graphics(); mundo.add(g);
       if (f.tipo === 'areia') for (let i = 0; i < 40; i++) g.fillStyle([0xe8d090, 0xd8b870, 0xc8a050][i % 3], 1).fillRect(f.x + Phaser.Math.Between(-40, 40), f.y + Phaser.Math.Between(-30, 30), 3, 3);
+      if (f.tipo === 'impacto') {   // estrela de "POW"
+        const estrela = (r1, r2) => Array.from({ length: 16 }, (_, k) => { const r = k % 2 ? r1 : r2, a = k / 16 * Math.PI * 2; return { x: f.x + Math.cos(a) * r, y: f.y + Math.sin(a) * r * 0.8 }; });
+        g.fillStyle(0x111111, 1).fillPoints(estrela(24, 58), true);
+        g.fillStyle(0xfff07a, 1).fillPoints(estrela(17, 48), true);
+      }
+      if (f.tipo === 'raios') { g.lineStyle(3, 0x111111, 0.5); for (let k = 0; k < 24; k++) { const a = k / 24 * Math.PI * 2; g.lineBetween(f.x + Math.cos(a) * 120, f.y + Math.sin(a) * 90, f.x + Math.cos(a) * 400, f.y + Math.sin(a) * 300); } }
+      if (f.tipo === 'lagrimas') { g.fillStyle(0x60b0ff, 1); [[-10, 0], [10, 4], [-12, 14], [12, 18]].forEach(([dx, dy]) => g.fillRect(f.x + dx, f.y + dy, 3, 6)); }
+      if (f.tipo === 'areiaChao') { for (let i = 0; i < 160; i++) g.fillStyle([0xe0c890, 0xd0b478, 0xc8a868][i % 3], 1).fillRect(f.x + Phaser.Math.Between(-60, 60), f.y + Phaser.Math.Between(-14, 14), 4, 3); }
       if (f.tipo === 'sofa') { g.fillStyle(0x6a5292, 1).fillRect(256, 356, 448, 18); g.fillStyle(0x4a3a6a, 1).fillRect(256, 374, 448, 30); g.fillStyle(0x7e64ac, 1).fillRect(256, 354, 448, 3); }
       if (f.tipo === 'linhas') { g.lineStyle(3, 0x111111, 0.6); for (let i = 0; i < 6; i++) g.lineBetween(f.x - 30, f.y - 20 + i * 8, f.x - 70, f.y - 20 + i * 8); }
       if (f.tipo === 'tremor') { g.lineStyle(3, 0x111111, 0.7); [[-24, -10], [24, -10], [-28, 10], [28, 10]].forEach(([dx, dy]) => g.lineBetween(f.x + dx, f.y + dy, f.x + dx * 1.4, f.y + dy * 1.4)); }
@@ -489,7 +497,7 @@ TR.HJ = {
 
   TR.CAPITULOS = [
     {
-      n: 1, titulo: 'A rua', cor: 0xd84a40, resumo: 'O dia em que eu subi a rua pela primeira vez.',
+      n: 1, herois: ['kaua', 'pernalonga'], titulo: 'A rua', cor: 0xd84a40, resumo: 'O dia em que eu subi a rua pela primeira vez.',
       passos: [
         { musica: 'm_rua', gibi: [
           P('topo2', [
@@ -518,7 +526,7 @@ TR.HJ = {
       ],
     },
     {
-      n: 2, titulo: 'A beudinha', cor: 0x3a7ad0, resumo: 'O dia em que conhecemos o Cezar (e a beudinha).',
+      n: 2, herois: ['cezar', 'beudinha'], titulo: 'A beudinha', cor: 0x3a7ad0, resumo: 'O dia em que conhecemos o Cezar (e a beudinha).',
       passos: [
         { musica: 'm_rua', gibi: [
           P('tres', [
@@ -562,7 +570,7 @@ TR.HJ = {
       premio: 'Skin nova: você de gesso no pé esquerdo (sem habilidade, só estilo). Troque no mural do Barracão.',
     },
     {
-      n: 3, titulo: 'Filme de terror', cor: 0x4a3a6a, resumo: 'Era pra ser um filme de ação.',
+      n: 3, herois: ['pedro', 'kaua'], titulo: 'Filme de terror', cor: 0x4a3a6a, resumo: 'Era pra ser um filme de ação.',
       passos: [
         { musica: 'm_esconde', gibi: [
           P('topo2', [
@@ -584,7 +592,7 @@ TR.HJ = {
       ],
     },
     {
-      n: 4, titulo: 'O Matheus', cor: 0xe8b030, resumo: 'O moleque da areia.',
+      n: 4, herois: ['matheus'], titulo: 'O Matheus', cor: 0xe8b030, resumo: 'O moleque da areia.',
       passos: [
         { musica: 'm_rua', gibi: [
           P('tres', [
@@ -612,7 +620,7 @@ TR.HJ = {
       premio: 'Desbloqueado: Matheus! Ele já pode jogar todas as brincadeiras.',
     },
     {
-      n: 5, titulo: 'O Guilherme', cor: 0x48a860, resumo: 'O vizinho novo (e a treta com o Pedro).',
+      n: 5, herois: ['guilherme', 'pedro'], titulo: 'O Guilherme', cor: 0x48a860, resumo: 'O vizinho novo (e a treta com o Pedro).',
       passos: [
         { musica: 'm_rua', gibi: [
           P('dois', [
@@ -655,7 +663,7 @@ class Historia extends Phaser.Scene {
     if (P.musica) TR.musicaFundo.tocar(this, P.musica);
     if (this.passo === 0 && !data.semCapa) return this.capa(C, () => this.scene.restart({ cap: this.cap, passo: 0, semCapa: true }));
     if (P.gibi) TR.gibi(this, P.gibi, () => this.proximo());
-    else TR.HJ[P.jogo](this, () => this.proximo(), () => this.falhou());
+    else TR.HJ[P.jogo](this, () => this.proximo(), () => this.falhou(), P);
     if (P.jogo) TR.button(this, 890, 17, '‹ Sair (Esc)', () => this.menuSair(), { fixed: true, depth: 9600 });
   }
 
@@ -686,7 +694,7 @@ class Historia extends Phaser.Scene {
     TR.txt(this, 480, 112, 'Capítulo ' + C.n, 1, 0x241a2c).setOrigin(0.5, 0);
     TR.txt(this, 480, 170, C.titulo, 3, 0xfff1d6).setOrigin(0.5, 0);
     TR.txt(this, 480, 420, C.resumo, 1, 0xfff1d6).setOrigin(0.5, 0).setMaxWidth(260);
-    const herois = { 1: ['kaua', 'pernalonga'], 2: ['cezar', 'beudinha'], 3: ['pedro', 'kaua'], 4: ['matheus'], 5: ['guilherme', 'pedro'] }[C.n];
+    const herois = C.herois || ['kaua'];
     herois.forEach((id, i) => this.add.sprite(480 + (i - (herois.length - 1) / 2) * 90, 400, TR.KIDS[id] ? id : 'viz_' + id, TR.F.frente).setOrigin(0.5, 1).setScale(1.3));
     TR.sfx(this, 'pagina', 0.5);
     this.time.delayedCall(1900, depois);
@@ -722,28 +730,29 @@ class Historia extends Phaser.Scene {
     this.sel = Math.max(0, TR.CAPITULOS.findIndex((c) => !TR.capFeito(c.n)));
     if (this.sel < 0) this.sel = 0;
     this.capas = TR.CAPITULOS.map((C, i) => {
-      const x = 160 + i * 160, y = 270;
+      const x = 105 + i * 107, y = 270;
       const lib = TR.capLiberado(C.n), feito = TR.capFeito(C.n);
       const g = this.add.graphics().setDepth(102);
-      g.fillStyle(0x0c0810, 1).fillRect(x - 64, y - 96, 128, 192);
-      g.fillStyle(lib ? C.cor : 0x3a3040, 1).fillRect(x - 60, y - 92, 120, 184);
-      g.fillStyle(0xfff1d6, 1).fillRect(x - 52, y - 84, 104, 22);
+      g.fillStyle(0x0c0810, 1).fillRect(x - 48, y - 96, 96, 192);
+      g.fillStyle(lib ? C.cor : 0x3a3040, 1).fillRect(x - 44, y - 92, 88, 184);
+      g.fillStyle(0xfff1d6, 1).fillRect(x - 40, y - 84, 80, 22);
       if (!lib) { g.fillStyle(0x241a2c, 1).fillRect(x - 14, y - 4, 28, 22); g.lineStyle(4, 0x241a2c, 1).strokeCircle(x, y - 6, 9); }
-      else this.add.sprite(x, y + 64, TR.KIDS[['kaua', 'cezar', 'pedro', 'matheus', 'guilherme'][i]] ? ['kaua', 'cezar', 'pedro', 'matheus', 'guilherme'][i] : 'kaua', 0).setOrigin(0.5, 1).setScale(0.75).setDepth(103);
+      else this.add.sprite(x, y + 64, (C.herois || ['kaua'])[0], 0).setOrigin(0.5, 1).setScale(0.7).setDepth(103);
       TR.txt(this, x, y - 80, 'Cap. ' + C.n, 1, 0x241a2c).setOrigin(0.5, 0).setDepth(103);
-      const nome = TR.txt(this, x, y - 52, lib ? C.titulo : '???', 1, 0xfff1d6).setOrigin(0.5, 0).setDepth(103).setMaxWidth(110).setCenterAlign();
+      const nome = TR.txt(this, x, y - 52, lib ? C.titulo : '???', 1, 0xfff1d6).setOrigin(0.5, 0).setDepth(103).setMaxWidth(84).setCenterAlign();
       if (feito) TR.txt(this, x, y + 104, '✓ lido', 1, 0x7cf27c).setOrigin(0.5, 0).setDepth(103);
-      else if (!lib) TR.txt(this, x, y + 104, 'termine o cap. ' + (C.n - 1), 1, 0x8a7a96).setOrigin(0.5, 0).setDepth(103);
-      const brilho = this.add.rectangle(x, y, 140, 204).setStrokeStyle(4, 0xffd36a).setDepth(101).setVisible(false);
-      const zona = this.add.zone(x, y, 128, 192).setInteractive({ useHandCursor: true }).setDepth(104);
+      else if (!lib) TR.txt(this, x, y + 104, 'trancado', 1, 0x8a7a96).setOrigin(0.5, 0).setDepth(103);
+      const brilho = this.add.rectangle(x, y, 108, 204).setStrokeStyle(4, 0xffd36a).setDepth(101).setVisible(false);
+      const zona = this.add.zone(x, y, 96, 192).setInteractive({ useHandCursor: true }).setDepth(104);
       zona.on('pointerover', () => this.escolhe(i));
       zona.on('pointerdown', () => { this.escolhe(i); this.abre(); });
       return { brilho, C, lib, nome };
     });
     this.resumo = TR.txt(this, 480, 420, '', 1, 0xf4e9d8).setOrigin(0.5, 0).setDepth(103);
     this.escolhe(this.sel);
-    this.input.keyboard.on('keydown-LEFT', () => this.escolhe((this.sel + 4) % 5));
-    this.input.keyboard.on('keydown-RIGHT', () => this.escolhe((this.sel + 1) % 5));
+    const n = this.capas.length;
+    this.input.keyboard.on('keydown-LEFT', () => this.escolhe((this.sel + n - 1) % n));
+    this.input.keyboard.on('keydown-RIGHT', () => this.escolhe((this.sel + 1) % n));
     this.input.keyboard.on('keydown-ENTER', () => this.abre());
     this.input.keyboard.on('keydown-SPACE', () => this.abre());
     this.input.keyboard.on('keydown-ESC', () => TR.go(this, TR.historiaDe || 'Rua'));

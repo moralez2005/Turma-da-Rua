@@ -39,8 +39,25 @@ As histórias de verdade da turma, contadas em gibi. As páginas e os quadrinhos
 | 3. Filme de terror | "É de ação, confia" | Aguentar os sustos (Espaço na hora certa) | Capítulo 4 |
 | 4. O Matheus | A areia, a correria e o riso | Correr atrás do Matheus | Matheus |
 | 5. O Guilherme | O caminhão de mudança e a treta com o Pedro | Chamar o menino novo pra jogar | Guilherme |
+| 6. A bola do Real | O quintal cheio de bola, o portão na cara do Pedro e o soco (close de novela) | Pegar as bolas do quintal · Empurrar o Pedro | — |
+| 7. A bicicleta | O passeio pela cidade, o professor e o banco torto do Kauã | Pedalar pela cidade e fugir | Passeio de bike |
+| 8. Esconde à noite | O Kauã, a areia da obra e o caminhão de lixo (que tava lá longe) | Correr pra se esconder | — |
 
 O progresso, os personagens liberados e a skin ficam salvos no navegador. A skin troca no mural do Barracão, com a tecla G. Os roteiros ficam em `src/historia.js`, e a arte nova em `ferramentas/gerador/historia_sprites.py` e `historia_cenarios.py`.
+
+## Passeio de bike
+
+Liberado no capítulo 7. Você escolhe quem pedala (você, o Kauã, o Cezar ou o Matheus) e anda por uma cidade de quatro telas: casas, padaria, praça, escola, mercado, oficina e a casa do Kauã. As setas controlam a bike, e Espaço toca a campainha. É preciso desviar de buracos, poças, cones e do Caramelo. O recorde de distância fica salvo.
+
+## Jogada especial do Kauã
+
+No futebol, quando o Kauã é o goleiro do seu time e está com a bola, aperte **B**: ele solta a bola da mão e chuta de bico. Não serve pra nada... a não ser que a bola caia na máquina de lavar sem tampa do Geraldo, na calçada. Aí sai o troféu.
+
+## Próximas ideias (anotadas)
+
+- A história do meu aniversário, a que originou a foto da homenagem, e a magia dessas festas.
+- A brincadeira chipoca e outras brincadeiras de rua.
+- Lojinha de skins.
 
 ## O Barracão (o clube da turma)
 

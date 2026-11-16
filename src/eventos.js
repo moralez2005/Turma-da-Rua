@@ -311,6 +311,7 @@ TR.CONQUISTAS = [
   ['chuva', 'Abrigo', 'Esperar a chuva passar no barracão'],
   ['videogame', 'Craque do videogame', 'Fazer 4 gols nos pênaltis do videogame'],
   ['fim', 'Fim de tarde', 'Ver o pôr do sol com a turma'],
+  ['maquina', 'Chutão na máquina', 'Kauã no gol: aperte B e acerte a máquina do Geraldo'],
 ];
 TR.conquistas = {};
 try { TR.conquistas = JSON.parse(localStorage.getItem('turma_conquistas') || '{}'); } catch (e) { /* ok */ }

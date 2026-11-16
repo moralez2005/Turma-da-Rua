@@ -17,5 +17,5 @@ window.jogo = new Phaser.Game({
   roundPixels: true,
   scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH },
   audio: { disableWebAudio: false },
-  scene: [Boot, Abertura, Rua, Futebol, Queimada, Alerta, EscondeEsconde, Final, Clube, Videogame, Historia],
+  scene: [Boot, Abertura, Rua, Futebol, Queimada, Alerta, EscondeEsconde, Final, Clube, Videogame, Historia, Bike],
 });

@@ -16,7 +16,7 @@
   const TECLAS = {
     ArrowLeft: [37, 'ArrowLeft'], ArrowUp: [38, 'ArrowUp'], ArrowRight: [39, 'ArrowRight'], ArrowDown: [40, 'ArrowDown'],
     Space: [32, ' '], ShiftLeft: [16, 'Shift'], Enter: [13, 'Enter'], Escape: [27, 'Escape'],
-    KeyC: [67, 'c'], KeyZ: [90, 'z'], KeyE: [69, 'e'], KeyQ: [81, 'q'], KeyF: [70, 'f'], KeyT: [84, 't'], KeyX: [88, 'x'], KeyV: [86, 'v'],
+    KeyC: [67, 'c'], KeyZ: [90, 'z'], KeyE: [69, 'e'], KeyQ: [81, 'q'], KeyF: [70, 'f'], KeyT: [84, 't'], KeyX: [88, 'x'], KeyV: [86, 'v'], KeyB: [66, 'b'],
   };
   const apertadas = new Set();
   const manda = (tipo, code) => {
@@ -34,14 +34,15 @@
   const BOTOES_POR_CENA = {
     Rua: [['Jogar', 'Enter']],
     Clube: [['Usar', 'KeyE'], ['Sair', 'Escape']],
+    Bike: [['Campainha', 'Space'], ['Sair', 'Escape']],
     Historia: [['Avançar', 'Space'], ['Usar', 'KeyE'], ['Sair', 'Escape']],
     Videogame: [['Chutar', 'Space'], ['Sair', 'Escape']],
-    Futebol: [['Passe', 'Space'], ['Chute', 'ShiftLeft', true], ['Por cima', 'KeyC'], ['Drible', 'KeyZ'], ['Caneta', 'KeyX'], ['Chapéu', 'KeyV'], ['Habilidade', 'KeyE'], ['Trocar', 'KeyQ']],
+    Futebol: [['Passe', 'Space'], ['Chute', 'ShiftLeft', true], ['Por cima', 'KeyC'], ['Drible', 'KeyZ'], ['Caneta', 'KeyX'], ['Chapéu', 'KeyV'], ['Habilidade', 'KeyE'], ['Trocar', 'KeyQ'], ['Chutão', 'KeyB']],
     Queimada: [['Arremessa / Agarra', 'Space', true], ['Alvo', 'KeyQ'], ['Habilidade', 'KeyE']],
     Alerta: [['Ação', 'Space'], ['Alvo', 'KeyQ'], ['Arrancada', 'KeyE']],
     EscondeEsconde: [['Agachar / Achei', 'Space'], ['Correr', 'ShiftLeft', true], ['Habilidade', 'KeyE'], ['Orelhão', 'KeyT']],
   };
-  const COM_DIRECIONAL = ['Historia', 'Clube', 'Rua', 'Futebol', 'Queimada', 'Alerta', 'EscondeEsconde'];
+  const COM_DIRECIONAL = ['Bike', 'Historia', 'Clube', 'Rua', 'Futebol', 'Queimada', 'Alerta', 'EscondeEsconde'];
 
   // ---------- montagem do HTML ----------
   const caixa = document.createElement('div');

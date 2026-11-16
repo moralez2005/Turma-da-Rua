@@ -63,6 +63,10 @@ class Futebol extends Phaser.Scene {
       return s;
     });
     this.daniel = this.torcida[0] || this.players[0].spr;
+    // a máquina de lavar sem tampa do Geraldo, na calçada (alvo da jogada especial do Kauã)
+    this.MAQ = { x: 200, y: 262 };
+    this.add.image(this.MAQ.x, this.MAQ.y, 'maquina_lavar').setOrigin(0.5, 1).setDepth(this.MAQ.y);
+    this.geraldo = this.add.sprite(250, 262, 'viz_geraldo', 0).setOrigin(0.5, 0.97).setDepth(262).play('viz_geraldo_idle');
 
     this.ball = { x: 480, y: 394, z: 0, vx: 0, vy: 0, vz: 0, owner: null, last: null, noPick: 0 };
     this.ballShadow = this.add.ellipse(0, 0, 18, 6, 0x000000, 0.35);
@@ -80,7 +84,7 @@ class Futebol extends Phaser.Scene {
     this.big = TR.txt(this, 480, 200, '', 4, 0xffd36a).setOrigin(0.5).setDepth(6500).setVisible(false);
     TR.jblHud(this, { lucas: [548, 280], pedro: [800, 280] });
 
-    this.keys = this.input.keyboard.addKeys('UP,DOWN,LEFT,RIGHT,W,A,S,D,SPACE,SHIFT,E,Q,Z,C,X,V');
+    this.keys = this.input.keyboard.addKeys('UP,DOWN,LEFT,RIGHT,W,A,S,D,SPACE,SHIFT,E,Q,Z,C,X,V,B');
     this.input.keyboard.on('keydown-SPACE', () => this.humanPass());
     this.input.keyboard.on('keydown-Q', () => this.swapToNearest());
     this.input.keyboard.on('keydown-C', () => this.humanPass(true));
@@ -88,6 +92,7 @@ class Futebol extends Phaser.Scene {
     this.input.keyboard.on('keydown-X', () => this.caneta(this.human));
     this.input.keyboard.on('keydown-V', () => this.chapeu(this.human));
     this.input.keyboard.on('keydown-E', () => this.useAbility(this.human));
+    this.input.keyboard.on('keydown-B', () => this.chutaoDoKaua());
     this.input.keyboard.on('keyup-SHIFT', () => this.humanShoot());
 
     this.kickoff(0);
@@ -102,6 +107,7 @@ class Futebol extends Phaser.Scene {
       '   + ↑ ou ↓ ........ escolhe o canto do gol',
       'E .................. habilidade do jogador',
       'Q .................. trocar de jogador',
+      'B .................. chutão do Kauã (se ele for o goleiro do seu time e estiver com a bola)',
       'Encoste em quem está com a bola pra roubar. ' + (this.golsPraVencer ? this.golsPraVencer + ' gols ganha!' : 'Ganha quem tiver mais gols no fim!'),
     ], () => { this.state = 'play'; TR.sfx(this, 'apito', 0.5); TR.bubble(this, this.daniel, 'Vai, ' + TR.KIDS[this.human.id].nome + '!', 2); });
     const byId = {}; this.players.forEach((p) => { byId[p.id] = p.spr; }); times.fora.forEach((id, i) => { byId[id] = this.torcida[i]; });
@@ -301,6 +307,39 @@ class Futebol extends Phaser.Scene {
     this.time.delayedCall(380, () => { if (this.state === 'play') this.flash('CHAPÉU!'); });
     TR.bubble(this, q.spr, Phaser.Utils.Array.GetRandom(['Cadê a bola?', 'Ué?!', 'Volta aqui!']), 1.2);
     this.zoeira(p, q, ['UUUUH!', 'CHAPÉU!', 'Kakaka', 'Olha o chapéu!', 'Que isso!']);
+  }
+
+  // Jogada especial do Kauã: goleiro com a bola na mão, solta e chuta de bico (B). Não serve pra nada... a não ser acertar a máquina do Geraldo.
+  chutaoDoKaua() {
+    if (this.state !== 'play') return;
+    const k = this.players.find((p) => p.id === 'kaua' && p.role === 'gk' && p.team === 0);
+    if (!k) { if (this.human) TR.bubble(this, this.human.spr, 'Só o Kauã no gol faz isso!', 1); return; }
+    if (this.ball.owner !== k) { TR.bubble(this, k.spr, 'Me passa a bola!', 0.9); return; }
+    const t0 = this.time.now;
+    k.preso = 0.6; k.hold = -5;
+    k.quadro = { f: TR.Q.seguraDir, ate: t0 + 260, depois: { f: TR.Q.levantaDir, ate: t0 + 650 } };
+    this.time.delayedCall(260, () => {
+      if (this.ball.owner !== k || this.state !== 'play') return;
+      const b = this.ball, tx = this.MAQ.x + Phaser.Math.Between(-110, 110), ty = this.MAQ.y;
+      const T = 1.2, d = Math.hypot(tx - b.x, ty - b.y);
+      this.kickTo(k, tx, ty, d / (T * 0.95), 980 * T / 2);
+      b.chutao = true; b.noPick = 1.4;
+      TR.sfx(this, 'chute', 0.8); TR.bubble(this, k.spr, 'CHUTÃÃÃO!', 1);
+    });
+  }
+
+  naMaquina() {
+    const b = this.ball, k = this.players.find((p) => p.id === 'kaua');
+    Object.assign(b, { x: this.MAQ.x, y: this.MAQ.y - 2, z: 30, vx: 0, vy: 0, vz: 0, owner: null });
+    this.state = 'goal';
+    TR.sfx(this, 'batida', 0.6); TR.sfx(this, 'zoeira', 0.5);
+    this.flash('NA MÁQUINA!'); this.cameras.main.shake(220, 0.01);
+    this.time.delayedCall(150, () => this.ballSpr.setVisible(false));
+    TR.bubble(this, this.geraldo, 'Ô MOLEQUE! MINHA MÁQUINA!', 1.8);
+    const novo = !TR.conquistas.maquina;
+    TR.conquista('maquina', this);
+    if (novo && k) this.time.delayedCall(900, () => TR.bubble(this, k.spr, 'Jogada especial desbloqueada! (não serve pra nada kkk)', 2.2));
+    this.time.delayedCall(2600, () => { this.ballSpr.setVisible(true); this.kickoff(1); this.state = 'play'; });
   }
 
   humanShoot() {
@@ -512,6 +551,13 @@ class Futebol extends Phaser.Scene {
       b.z = 0;
       if (b.vz < -90) { b.vz = -b.vz * 0.48; b.quique = this.time.now; TR.sfx(this, 'quique', Math.min(0.5, -b.vz / 600)); }
       else b.vz = 0;
+    }
+    if (b.chutao) {   // chutão do Kauã: passa por cima de tudo e só vale onde cair
+      if (b.z <= 0 || b.y < 236) {
+        b.chutao = false;
+        if (Math.abs(b.x - this.MAQ.x) < 34 && b.y < F.y0 + 14) return this.naMaquina();
+        if (b.y < F.y0) { b.y = F.y0 + 4; b.vy = Math.abs(b.vy) * 0.3; b.vx *= 0.4; b.vz = 0; b.z = 0; TR.bubble(this, [b.x, F.y0 - 40], 'Passou longe!', 0.9); }
+      } else { b.vx *= Math.pow(0.9, dt); b.vy *= Math.pow(0.9, dt); return; }
     }
     const fr = Math.pow(b.z > 0 ? 0.85 : 0.32, dt);
     b.vx *= fr; b.vy *= fr;
